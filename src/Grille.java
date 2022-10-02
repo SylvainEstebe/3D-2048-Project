@@ -14,7 +14,9 @@ public class Grille implements Parametres {
     private int type; //indique si c'est une grille du haut, du milieu ou du bas
     private boolean deplacement=false;
     
-    
+    /**
+     * Constructeur qui initialise une grille vide
+     */
     public Grille(){
         grille=new ArrayList<ArrayList<Case>>();
         for (int i=0;i<TAILLE;i++){
@@ -26,6 +28,10 @@ public class Grille implements Parametres {
     }
     
     @Override
+    /**
+     * Méthode qui affiche la grille dans le terminal.
+     * @return La grille sous forme de String
+     */
     public String toString() {
         String result = "";
         for (int i=0;i<TAILLE;i++){
@@ -43,22 +49,43 @@ public class Grille implements Parametres {
         return result;
     }
     
+    /**
+     * Méthode qui retourne la grille sous forme de tableau
+     * @return la grille sous forme de tableau à deux dimensions
+     */
     public ArrayList<ArrayList<Case>> getGrille(){
         return grille;
     }
     
+    /**
+     * Méthode qui retourne le score obtenu lors du jeu pour une grille
+     * @return le score sous forme d'entier
+     */
     public int getScoreG(){
         return scoreg;
     }
     
+    /**
+     * Méthode qui retourne le type de la grille (haut/milieu/bas)
+     * @return le type sous forme d'entier
+     */
     public int getType(){
         return type;
     }
     
+    /**
+     * Méthode qui permet de modifier le type de la grille
+     * @param type sous forme d'entier
+     */
     public void setType(int type){
         this.type=type;
     }
     
+    /**
+     * Méthode qui vérifie si une partie est finie (éléments impossibles 
+     * à bouger).
+     * @return un booléen qui indique si la partie est finie ou non
+     */
     public boolean partieFinieG(){
         for (int i=0;i<TAILLE;i++){
             for (int j=0;j<TAILLE;j++){
@@ -90,6 +117,10 @@ public class Grille implements Parametres {
         return true;
     }
     
+    /**
+     * Fonction qui fusionne deux cases d'une grille
+     * @param c la case qu'on fusionne
+     */
     private void fusion(Case c) {
         c.setValeur(c.getValeur() * 2);
         if (this.scoreg < c.getValeur()) {
@@ -97,6 +128,11 @@ public class Grille implements Parametres {
         }  
     }
     
+    /**
+     * Méthode qui permet de déplacer les cases dans une direction
+     * @param direction un entier (gauche, droite, haut, bas)
+     * @return un booléen qui indique si on a bougé des cases
+     */
     public boolean deplacerCases(int direction){
         deplacement=false;
         if(direction ==HAUT||direction==BAS){
@@ -199,7 +235,12 @@ public class Grille implements Parametres {
         return deplacement;
     }
     
-    
+    /**
+     * Méthode qui permet de déplacer une case de la grille
+     * @param direc2 la direction vers laquelle on déplace la grille
+     * @param tabHB la ligne/colonne où est située la case
+     * @param k la colonne/ligne où est située la case
+     */
     private void deplacementUneCase(int direc2,ArrayList<Case> tabHB, int k){
         int voisin;
         if (direc2==GAUCHE){
@@ -228,6 +269,11 @@ public class Grille implements Parametres {
         }
     }
     
+    /**
+     * Méthode qui place une nouvelle case dans la grille s'il reste 
+     * des cases vides
+     * @return Un booléen qui indique si on a bougé la case ou non
+     */
     public boolean nouvelleCase(){
         //On détermine si on prend 2 ou 4 pour la case
         int nombre_case=0;
@@ -246,9 +292,13 @@ public class Grille implements Parametres {
             cases_vides.get(index).setValeur(nombre_case);
             return true;
         }  
-        return false;
+        return false;  
     }
     
+    /**
+     * Méthode qui permet de dire s'il y a une case libre dans la grille
+     * @return Un tableau de cases libres
+     */
     public ArrayList<Case> caseLibreG(){
         ArrayList<Case> cases_vides=new ArrayList<Case>();
         for (int i=0;i<TAILLE;i++){
@@ -264,11 +314,17 @@ public class Grille implements Parametres {
         return null;
     }
  
+    /**
+     * Méthode qui affiche la victoire et le score de la case
+     */
     public void victory(){
         System.out.println("Vous avez gagné! Votre score est de :"+scoreg);
         System.exit(0);
     }
     
+    /**
+     * méthode qui affiche la défaite 
+     */
     public void gameOver(){
         System.out.println("Vous avez perdu, retentez votre chance!");
         System.exit(1);
