@@ -12,7 +12,6 @@ public class Grille implements Parametres {
     private ArrayList<ArrayList<Case>> grille;
     private int scoreg;
     private int type; //indique si c'est une grille du haut, du milieu ou du bas
-    private boolean deplacement=false;
     
     /**
      * Constructeur qui initialise une grille vide
@@ -118,14 +117,12 @@ public class Grille implements Parametres {
     }
     
     /**
-     * Fonction qui fusionne deux cases d'une grille
+     * Fonction qui fusionne deux cases d'une grille et augmente le score de la grille
      * @param c la case qu'on fusionne
      */
-    private void fusion(Case c) {
+    public void fusion(Case c) {
         c.setValeur(c.getValeur() * 2);
-        if (this.scoreg < c.getValeur()) {
-            this.scoreg = c.getValeur();
-        }  
+        this.scoreg = scoreg + c.getValeur();
     }
     
     /**
@@ -134,7 +131,8 @@ public class Grille implements Parametres {
      * @return un booléen qui indique si on a bougé des cases
      */
     public boolean deplacerCases(int direction){
-        deplacement=false;
+        boolean deplacement = false;
+        
         if(direction ==HAUT||direction==BAS){
             ArrayList<ArrayList<Case>> tabHB=new ArrayList<ArrayList<Case>>();
             tabHB.add(new ArrayList<Case>());
@@ -166,12 +164,14 @@ public class Grille implements Parametres {
                         && tabHB.get(i).get(2).getValeur()==0)){
                         //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
                         for (int k=TAILLE-1;k>=0;k--){
-                            deplacementUneCase(GAUCHE,tabHB.get(i),k);
+                            boolean d = deplacementUneCase(GAUCHE,tabHB.get(i),k);
+                            if (d) deplacement = d;
                         }
                     }
                     else{
                         for (int k=0;k<TAILLE;k++){
-                            deplacementUneCase(GAUCHE,tabHB.get(i),k);
+                            boolean d = deplacementUneCase(GAUCHE,tabHB.get(i),k);
+                            if (d) deplacement = d;
                         }
                     }
                     
@@ -184,12 +184,14 @@ public class Grille implements Parametres {
                         && tabHB.get(i).get(2).getValeur()==0)){
                         //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
                         for (int k=0;k<TAILLE;k++){
-                            deplacementUneCase(DROITE,tabHB.get(i),k);
+                            boolean d = deplacementUneCase(DROITE,tabHB.get(i),k);
+                            if (d) deplacement = d;
                         }
                     }
                     else{
                         for (int k=TAILLE-1;k>=0;k--){
-                            deplacementUneCase(DROITE,tabHB.get(i),k);
+                            boolean d = deplacementUneCase(DROITE,tabHB.get(i),k);
+                            if (d) deplacement = d;
                         }
                     }
                 }
@@ -203,12 +205,14 @@ public class Grille implements Parametres {
                         && grille.get(i).get(2).getValeur()==0)){
                         //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
                         for (int k=0;k<TAILLE;k++){
-                            deplacementUneCase(DROITE,grille.get(i),k);
+                            boolean d = deplacementUneCase(DROITE,grille.get(i),k);
+                            if (d) deplacement = d;
                         }
                     }
                     else{
                         for (int k=TAILLE-1;k>=0;k--){
-                            deplacementUneCase(DROITE,grille.get(i),k);
+                            boolean d = deplacementUneCase(DROITE,grille.get(i),k);
+                            if (d) deplacement = d;
                         }
                     }
                     
@@ -221,12 +225,14 @@ public class Grille implements Parametres {
                         && grille.get(i).get(2).getValeur()==0)){
                         //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
                         for (int k=TAILLE-1;k>=0;k--){
-                            deplacementUneCase(GAUCHE,grille.get(i),k);
+                            boolean d = deplacementUneCase(GAUCHE,grille.get(i),k);
+                            if (d) deplacement = d;
                         }
                     }
                     else{
                         for (int k=0;k<TAILLE;k++){
-                            deplacementUneCase(GAUCHE,grille.get(i),k);
+                            boolean d = deplacementUneCase(GAUCHE,grille.get(i),k);
+                            if (d) deplacement = d;
                         }
                     }
                 } 
@@ -241,7 +247,8 @@ public class Grille implements Parametres {
      * @param tabHB la ligne/colonne où est située la case
      * @param k la colonne/ligne où est située la case
      */
-    private void deplacementUneCase(int direc2,ArrayList<Case> tabHB, int k){
+    private boolean deplacementUneCase(int direc2,ArrayList<Case> tabHB, int k){
+        boolean deplacement = false;
         int voisin;
         if (direc2==GAUCHE){
             voisin=k-1;
@@ -267,6 +274,8 @@ public class Grille implements Parametres {
                 deplacement=true;
             }
         }
+        
+        return deplacement;
     }
     
     /**

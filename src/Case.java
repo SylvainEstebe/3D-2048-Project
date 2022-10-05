@@ -34,6 +34,10 @@ public class Case implements Parametres{
     public void setGrille(Grille g) {
         this.grille = g;
     }
+    
+    public Grille getGrille() {
+        return this.grille;
+    }
 
     /**
      * Méthode qui permet d'obtenir l'abscisse de la case
