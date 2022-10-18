@@ -1,4 +1,7 @@
+package jeuConsole;
 
+
+import jeuConsole.Jeu;
 import java.util.Scanner;
 
 
@@ -8,16 +11,11 @@ import java.util.Scanner;
  */
 public class Main implements Parametres{
     public static void main(String[] args) {
-        Grille g=new Grille();
-        Grille g2 = new Grille();
-        Grille g3 = new Grille();
+        
         Scanner sc = new Scanner(System.in);
         Jeu j = new Jeu();
         
-        j.setTopGrid(g);
-        j.setMiddleGrid(g2);
-        j.setBottomGrid(g3);
-        j.getGrilleh().nouvelleCase();
+       
 
         System.out.println("Debut du jeu");
         System.out.println(j.toString());

@@ -1,4 +1,7 @@
+package jeuConsole;
 
+
+import jeuConsole.Case;
 import java.util.ArrayList;
 import java.util.Random;
 

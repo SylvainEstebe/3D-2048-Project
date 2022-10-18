@@ -1,4 +1,8 @@
+package jeuConsole;
 
+
+import jeuConsole.Grille;
+import jeuConsole.Case;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,40 +16,21 @@ import java.util.Random;
  * @author Manon
  */
 public class Jeu implements Parametres {
-
-    private Grille topGrid; //grille du haut
-    private Grille middleGrid;  //grille du milieu
-    private Grille bottomGrid;  //grille du bas
+    private ArrayList<Grille> grids = new ArrayList<Grille>();
     private int scoreFinal = 0;
-    private int scoreDeplacement; //score gagné pour 1 déplacement
 
-    //getters et setters
-    public Grille getGrilleh() {
-        return this.topGrid;
-    }
-
-    public Grille getGrillem() {
-        return this.middleGrid;
-    }
-
-    public Grille getGrilleb() {
-        return this.bottomGrid;
-    }
-
-    public void setTopGrid(Grille g) {
-        this.topGrid = g;
-    }
-
-    public void setMiddleGrid(Grille g) {
-        this.middleGrid = g;
-    }
-
-    public void setBottomGrid(Grille g) {
-        this.bottomGrid = g;
-    }
-
-    public int getScoreDeplacement() {
-        return this.scoreDeplacement;
+    /**
+     * Constructeur qui initialise le tableau grids
+     */
+    public Jeu(){
+        Grille g,g1,g2;
+        g=new Grille();
+        g1=new Grille();
+        g2=new Grille();
+        grids.add(g);
+        grids.add(g1);
+        grids.add(g2);
+        //Initialise les 3 grilles dans le tableau grids
     }
 
     public int getScoreFinal() {
@@ -56,56 +41,77 @@ public class Jeu implements Parametres {
         this.scoreFinal = score;
     }
 
-    public void setScoreDeplacement(int sc) {
-        this.scoreDeplacement = sc;
+    public ArrayList<Grille> getGrids(){
+        return grids;
+    }
+    
+    public void setGrids(ArrayList<Grille> newgrids){
+        grids=newgrids;
     }
 
     @Override
+    /**
+     * Methode qui permet d'afficher les grilles dans l'axe horizontal.
+     * @return String
+     */
     public String toString() {
+        //Affichage à l'horizontal des trois grilles
         String result = "";
-        result = topGrid.toString() + "\n" + middleGrid.toString() + "\n" + bottomGrid.toString();
+        String result_interm="";
+        //On boucle sur le nombre de lignes à afficher
+        for (int i=0;i<TAILLE;i++){
+            //On boucle sur le nombre de grilles à afficher
+            for (int j=0;j<grids.size();j++){
+                result_interm="";
+                result_interm += "[";
+                //Pour afficher une ligne
+                for (int k = 0; k < TAILLE; k++) {
+                    if (k != TAILLE - 1) {
+                        result_interm +=  grids.get(j).getGrille().get(i).get(k).getValeur() + ", ";
+                    } else {
+                        result_interm += grids.get(j).getGrille().get(i).get(k).getValeur() + "]";
+                    }
+                }
+                result+=result_interm+"\t";
+            }
+            result+="\n";
+        }
         return result;
     }
 
     // Incrémente les points gagnés au scoreFinal à chaque déplacement
-    public void updtadeScore() {
-        scoreFinal = topGrid.getScoreG() + middleGrid.getScoreG() + bottomGrid.getScoreG();
+    public void updateScore() {
+        scoreFinal = grids.get(0).getScoreG() + grids.get(1).getScoreG() + grids.get(2).getScoreG();
     }
 
     // Affiche une partie perdue et ferme le programme
     public void gameOver() {
         System.out.println("Vous avez perdu, retentez votre chance!");
-        topGrid.toString();
-        middleGrid.toString();
-        bottomGrid.toString();
+        this.toString();
         System.exit(1);
     }
 
     // Affiche une partie gagnée et ferme le programme
     public void victory() {
         System.out.println("Vous avez gagné! Votre score est de :" + scoreFinal);
-        topGrid.toString();
-        middleGrid.toString();
-        bottomGrid.toString();
+        this.toString();
         System.exit(0);
     }
 
+    //TEMPLATE :
     /**
-     * Méthode qui permet de déplacer la case entre les différentes grilles en
-     * fonction du choix de l'utilisateur
-     *
-     * @param direction direction sélectionner par l'utilisateur entre grille
-     * inférieur(Q) et supérieur(E)
-     * @return deplacement
+     * Bouge les cases selon la direction.
+     * Si direction est locale (c'est à dire gauche, droite, haut, bas), on 
+     * déplace localement les cases dans chaque grille.
+     * Si direction est globale (déplacement q ou e), on déplace les cases en
+     * conséquent selon les différents cas vus dans le jeu du prof.
+     * @param direction
+     * @return 
      */
-    public boolean deplacerG(int direction) {
+    public boolean moveCases(int direction) {
         boolean deplacement = false;
 
-        ArrayList<Grille> grilles = new ArrayList<>();
-        // Ajout des différentes grille à la liste
-        grilles.add(this.topGrid);
-        grilles.add(this.middleGrid);
-        grilles.add(this.bottomGrid);
+        
 
         //Ajout de liste dans une liste
         ArrayList<ArrayList<Case>> MoveUpAndDown = new ArrayList<>();
@@ -123,18 +129,18 @@ public class Jeu implements Parametres {
         for (int i = 0; i < TAILLE; i++) {
             for (int j = 0; j < TAILLE; j++) {
                 for (int k = 0; k < TAILLE; k++) {
-                    ArrayList<ArrayList<Case>> grille = grilles.get(k).getGrille();
+                    ArrayList<ArrayList<Case>> grille = grids.get(k).getGrille();
                     int index = grille.get(i).get(j).getY() * 3 + grille.get(i).get(j).getX();
                     MoveUpAndDown.get(index).add(grille.get(i).get(j));
                 }
             }
         }
-        // Différentes conditions
+        
 
         // Direction
         if (direction == DROITE || direction == GAUCHE || direction == BAS || direction == HAUT) {
             for (int i = 0; i < TAILLE; i++) {
-                grilles.get(i).deplacerCases(direction);
+                grids.get(i).deplacerCases(direction);
 
             }
         }
@@ -215,56 +221,7 @@ public class Jeu implements Parametres {
         }
         return deplacement;
     }
-
-    /**
-     * Méthode qui renvoie vrai si une nouvelle case est ajouté, faux dans le
-     * cas contraire
-     *
-     * @return true si une nouvelle case est ajoutée, faux dans le cas
-     * contraire.
-     */
-    public boolean nouvCase() {
-        //Array List des cases libres pour chaque grille
-        ArrayList<Case> casesLibrestopGrid = topGrid.caseLibreG();
-        ArrayList<Case> casesLibresmiddleGrid = middleGrid.caseLibreG();
-        ArrayList<Case> casesLibresbottomGrid = bottomGrid.caseLibreG();
-
-        boolean places[] = new boolean[3]; //[0] = true s'il reste de la place dans gh
-        places[0] = casesLibrestopGrid != null;
-        places[1] = casesLibresmiddleGrid != null;
-        places[2] = casesLibresbottomGrid != null;
-
-        if (places[0] || places[1] || places[2]) { //si au moins 1 grille n'est pas pleine
-            Random ra = new Random();
-            int index = ra.nextInt(places.length);
-
-            while (!places[index]) {
-                index = ra.nextInt(places.length); // on récupère aléatoirement une grille non pleine
-            }
-
-            Grille grilleChoisie = null;
-            switch (index) {
-                case 0 ->
-                    grilleChoisie = topGrid;
-                case 1 ->
-                    grilleChoisie = middleGrid;
-                case 2 ->
-                    grilleChoisie = bottomGrid;
-            }
-            return grilleChoisie.nouvelleCase();
-        } // else méthode où on a perdu car toutes les grilles sont pleines
-        else {
-            return false;
-        }
-    }
-
-    public boolean partieFinie() {
-
-        return false;
-
-    }
-
-    public void ajoutCase() {
+/**public void ajoutCase() {
         int nombreAleatoireCase = (int) (Math.random() * ((1 - 0) + 1));
 
         if (nombreAleatoireCase == 1) {
@@ -319,6 +276,89 @@ public class Jeu implements Parametres {
                     break;
             }
         }
+    }**/
+    //TEMPLATE : 
+    /**
+     * On peut choisir si on ajoute une ou deux cases (au hasard)
+     * Si on ajoute une case, on choisir une grille au hasard où la mettre.
+     * Si on ajotue deux cases, on choisit deux grilles au hasard où les placer.
+     * Les deux grilles choisies peuvent être identiques.
+     * On ajoute les nouvelles cases.
+     * ATTENTION, REGARDER LA FONCTION QUI AJOUTE UNE CASE DANS UNE GRILLE,
+     * ELLE CHERCHE DEJA LES CASES LIBRES DONC INUTILE DE CHERCHER ICI. 
+     * METHODE A REFAIRE (s'inspirer de celle du dessus sans la copier parce qu'
+     * elle est trop longue et probablement avec des bugs).
+     * @return 
+     */
+    public boolean addCases() {
+        //Array List des cases libres pour chaque grille
+        ArrayList<Case> casesLibrestopGrid = grids.get(0).caseLibreG();
+        ArrayList<Case> casesLibresmiddleGrid = grids.get(1).caseLibreG();
+        ArrayList<Case> casesLibresbottomGrid = grids.get(2).caseLibreG();
+
+        boolean places[] = new boolean[3]; //[0] = true s'il reste de la place dans gh
+        places[0] = casesLibrestopGrid != null;
+        places[1] = casesLibresmiddleGrid != null;
+        places[2] = casesLibresbottomGrid != null;
+
+        if (places[0] || places[1] || places[2]) { //si au moins 1 grille n'est pas pleine
+            Random ra = new Random();
+            int index = ra.nextInt(places.length);
+
+            while (!places[index]) {
+                index = ra.nextInt(places.length); // on récupère aléatoirement une grille non pleine
+            }
+
+            Grille grilleChoisie = null;
+            switch (index) {
+                case 0 ->
+                    grilleChoisie = grids.get(0);
+                case 1 ->
+                    grilleChoisie = grids.get(1);
+                case 2 ->
+                    grilleChoisie = grids.get(2);
+            }
+            return grilleChoisie.nouvelleCase();
+        } // else méthode où on a perdu car toutes les grilles sont pleines
+        else {
+            return false;
+        }
+    }
+
+    //TEMPLATE :
+    /**
+     * Vérifie si le jeu est fini (plus aucun déplacement possible).
+     * On vérifie que pour chaque grille, on ne peut aller ni en haut, ni
+     * en bas, ni à gauche, ni à droite.
+     * On vérifie que l'on ne peut pas faire le déplacement q et e (voir le jeu
+     * du prof).
+     * Si c'est possible, on return true, sinon false.
+     * @return 
+     */
+    public boolean FinishGame() {
+
+        return false;
+
+    }
+
+    
+    
+    //TEMPLATE :
+    /**
+     * Lance le jeu et le fait marcher tant que le joueur n'a ni gagné ni perdu.
+     * On crée le jeu (avec constructeur).
+     * On le lance avec des cases déjà remplies (une ou deux).
+     * On laisse l'utilisateur choisir son déplacement
+     * On déplace les éléments en conséquent.
+     * On update le score
+     * On ajoute de nouvelles cases si c'est possible.
+     * On vérifie que le jeu n'est pas fini.
+     * Si le jeu est fini, on regarde si le joueur a gagné (score=2048) ou perdu.
+     * Si le joueur a perdu, message de gameOver, sinon message de Victory, et 
+     * on termine programme.
+     */
+    public void launchGame(){
+        
     }
 
 }

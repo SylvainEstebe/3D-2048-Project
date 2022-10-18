@@ -1,3 +1,5 @@
+package jeuConsole;
+
 
 import java.util.ArrayList;
 
