@@ -16,13 +16,23 @@ public class Main implements Parametres{
         Jeu j = new Jeu();
         
        
-
+        /**
         System.out.println("Debut du jeu");
+        j.addCases();
         System.out.println(j.toString());
        
-        /**
+        j.randomMove();
+        j.addCases();
+        System.out.println(j.toString());
+        
+ 
+        j.randomMove();
+        System.out.println(j.toString());
+        
+        * 
+        * 
         // Début de la partie
-        System.out.println("Debut du jeu");
+        System.out.println("Début du jeu");
         System.out.println(g);
         while (!g.partieFinieG()) {
             System.out.println("Déplacer vers la Droite (d), Gauche (g), Haut (h), ou Bas (b), niveau supérieur(e) niveau inférieur (q) ?");

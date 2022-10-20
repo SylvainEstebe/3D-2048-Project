@@ -3,6 +3,7 @@ package jeuConsole;
 
 import jeuConsole.Grille;
 import jeuConsole.Case;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -292,14 +293,14 @@ public class Jeu implements Parametres {
      */
     public boolean addCases() {
         //Array List des cases libres pour chaque grille
-        ArrayList<Case> casesLibrestopGrid = grids.get(0).caseLibreG();
-        ArrayList<Case> casesLibresmiddleGrid = grids.get(1).caseLibreG();
-        ArrayList<Case> casesLibresbottomGrid = grids.get(2).caseLibreG();
+        ArrayList<Case> casesLibresTopGrid = grids.get(0).caseLibreG();
+        ArrayList<Case> casesLibresMiddleGrid = grids.get(1).caseLibreG();
+        ArrayList<Case> casesLibresBottomGrid = grids.get(2).caseLibreG();
 
         boolean places[] = new boolean[3]; //[0] = true s'il reste de la place dans gh
-        places[0] = casesLibrestopGrid != null;
-        places[1] = casesLibresmiddleGrid != null;
-        places[2] = casesLibresbottomGrid != null;
+        places[0] = casesLibresTopGrid != null;
+        places[1] = casesLibresMiddleGrid != null;
+        places[2] = casesLibresBottomGrid != null;
 
         if (places[0] || places[1] || places[2]) { //si au moins 1 grille n'est pas pleine
             Random ra = new Random();
@@ -324,6 +325,30 @@ public class Jeu implements Parametres {
             return false;
         }
     }
+    
+
+    //l'ordinateur effectue un déplacement aléatoire pour le prochain coup
+    public boolean randomMove (){
+        boolean moveDone = false; //faux si le déplacement n'a pas été effectué
+        Random ra = new Random(); 
+        
+        //on met les valeurs correspondant aux déplacements dans une liste
+        ArrayList<Integer> values = new ArrayList<>();
+        values.add(BAS);
+        values.add(DROITE);
+        values.add(GAUCHE);
+        values.add(HAUT);
+        values.add(MONTERG);
+        values.add(DESCG);
+        
+        int index = ra.nextInt(values.size()); 
+        
+        int chosenMove = values.get(index);
+        moveDone = moveCases(chosenMove);
+        
+        return moveDone; 
+    }
+
 
     //TEMPLATE :
     /**
