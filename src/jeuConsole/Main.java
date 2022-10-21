@@ -15,22 +15,26 @@ public class Main implements Parametres{
         Scanner sc = new Scanner(System.in);
         Jeu j = new Jeu();
         
-       
-        /**
-        System.out.println("Debut du jeu");
-        j.addCases();
+        System.out.println("Début du jeu");
+        j.addTiles();
         System.out.println(j.toString());
        
         j.randomMove();
-        j.addCases();
+        j.addTiles();
+        j.addTiles();
+        j.addTiles();
+        j.addTiles();
+        
+        
+        
         System.out.println(j.toString());
         
  
         j.randomMove();
         System.out.println(j.toString());
         
-        * 
-        * 
+         
+        /**
         // Début de la partie
         System.out.println("Début du jeu");
         System.out.println(g);
@@ -70,6 +74,8 @@ public class Main implements Parametres{
         // Fin de la partie
         g.gameOver();
          **/
+        
+        
     }
       
 }

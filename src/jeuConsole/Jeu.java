@@ -3,7 +3,6 @@ package jeuConsole;
 
 import jeuConsole.Grille;
 import jeuConsole.Case;
-import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -112,8 +111,6 @@ public class Jeu implements Parametres {
     public boolean moveCases(int direction) {
         boolean deplacement = false;
 
-        
-
         //Ajout de liste dans une liste
         ArrayList<ArrayList<Case>> MoveUpAndDown = new ArrayList<>();
         MoveUpAndDown.add(new ArrayList<>()); //x = 0, y = 0
@@ -166,7 +163,7 @@ public class Jeu implements Parametres {
             }
         }
 
-        // Direction = Inférieur
+        // Direction = Inférieure
         if (direction == DESCG) {
             for (int i = 0; i < TAILLE; i++) {
                 //Si le voisin a une valeur de 0 OU le voisin du voisin est nul
@@ -280,50 +277,29 @@ public class Jeu implements Parametres {
     }**/
     //TEMPLATE : 
     /**
-     * On peut choisir si on ajoute une ou deux cases (au hasard)
+     * On peut choisir si on ajoute une ou deux cases (au hasard) : plutôt dans la boucle de jeu que dans la méthode
      * Si on ajoute une case, on choisir une grille au hasard où la mettre.
      * Si on ajotue deux cases, on choisit deux grilles au hasard où les placer.
      * Les deux grilles choisies peuvent être identiques.
      * On ajoute les nouvelles cases.
-     * ATTENTION, REGARDER LA FONCTION QUI AJOUTE UNE CASE DANS UNE GRILLE,
-     * ELLE CHERCHE DEJA LES CASES LIBRES DONC INUTILE DE CHERCHER ICI. 
-     * METHODE A REFAIRE (s'inspirer de celle du dessus sans la copier parce qu'
-     * elle est trop longue et probablement avec des bugs).
      * @return 
      */
-    public boolean addCases() {
-        //Array List des cases libres pour chaque grille
-        ArrayList<Case> casesLibresTopGrid = grids.get(0).caseLibreG();
-        ArrayList<Case> casesLibresMiddleGrid = grids.get(1).caseLibreG();
-        ArrayList<Case> casesLibresBottomGrid = grids.get(2).caseLibreG();
+    public boolean addTiles() {
+        boolean places[] = new boolean[3]; 
+        places[0] = true; //on suppose qu'il y a de la place dans les grilles
+        places[1] = true;
+        places[2] = true;
+        
+        Random ra = new Random();
+        int index = ra.nextInt(grids.size()); //on choisit un index
 
-        boolean places[] = new boolean[3]; //[0] = true s'il reste de la place dans gh
-        places[0] = casesLibresTopGrid != null;
-        places[1] = casesLibresMiddleGrid != null;
-        places[2] = casesLibresBottomGrid != null;
-
-        if (places[0] || places[1] || places[2]) { //si au moins 1 grille n'est pas pleine
-            Random ra = new Random();
-            int index = ra.nextInt(places.length);
-
-            while (!places[index]) {
-                index = ra.nextInt(places.length); // on récupère aléatoirement une grille non pleine
-            }
-
-            Grille grilleChoisie = null;
-            switch (index) {
-                case 0 ->
-                    grilleChoisie = grids.get(0);
-                case 1 ->
-                    grilleChoisie = grids.get(1);
-                case 2 ->
-                    grilleChoisie = grids.get(2);
-            }
-            return grilleChoisie.nouvelleCase();
-        } // else méthode où on a perdu car toutes les grilles sont pleines
-        else {
-            return false;
+        while (!grids.get(index).nouvelleCase()) { //si une grille est pleine, on en choisit une autre, sinon on ajoute une case
+            places[index] = false; // On enregistre que la grille testée est pleine
+            if (!(places[0] || places[1] || places[2])) return false; // Retourne faux si toutes les grilles sont pleines
+            index = ra.nextInt(grids.size()); // on récupère aléatoirement une grille
         }
+        
+        return true; //une nouvelle case a été ajoutée
     }
     
 
@@ -360,10 +336,9 @@ public class Jeu implements Parametres {
      * Si c'est possible, on return true, sinon false.
      * @return 
      */
-    public boolean FinishGame() {
+    public boolean finishGame() {
 
         return false;
-
     }
 
     
@@ -372,11 +347,11 @@ public class Jeu implements Parametres {
     /**
      * Lance le jeu et le fait marcher tant que le joueur n'a ni gagné ni perdu.
      * On crée le jeu (avec constructeur).
-     * On le lance avec des cases déjà remplies (une ou deux).
+     * On le lance avec 2 cases déjà remplies 
      * On laisse l'utilisateur choisir son déplacement
      * On déplace les éléments en conséquent.
      * On update le score
-     * On ajoute de nouvelles cases si c'est possible.
+     * On ajoute de nouvelles cases si c'est possible :  une ou deux cases (au hasard)
      * On vérifie que le jeu n'est pas fini.
      * Si le jeu est fini, on regarde si le joueur a gagné (score=2048) ou perdu.
      * Si le joueur a perdu, message de gameOver, sinon message de Victory, et 
