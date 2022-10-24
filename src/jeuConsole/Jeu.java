@@ -1,10 +1,10 @@
 package jeuConsole;
 
 
-import jeuConsole.Grille;
-import jeuConsole.Case;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
+import java.util.Scanner;
 
 /*
      * To change this license header, choose License Headers in Project Properties.
@@ -24,9 +24,9 @@ public class Jeu implements Parametres {
      */
     public Jeu(){
         Grille g,g1,g2;
-        g=new Grille();
-        g1=new Grille();
-        g2=new Grille();
+        g=new Grille(this, GRILLEH);
+        g1=new Grille(this, GRILLEM);
+        g2=new Grille(this, GRILLEB);
         grids.add(g);
         grids.add(g1);
         grids.add(g2);
@@ -97,6 +97,21 @@ public class Jeu implements Parametres {
         this.toString();
         System.exit(0);
     }
+    
+    /**
+     * 
+     * @return la valeur maximale du jeu
+     */
+    public int getValeurMaxJeu (){
+        int max = 0;
+
+        for (int i = 0; i < TAILLE; i++) {
+            if (grids.get(i).getValeurMax() > max) {
+               max = grids.get(i).getValeurMax();
+            }
+        }
+        return max;
+    }
 
     //TEMPLATE :
     /**
@@ -108,80 +123,62 @@ public class Jeu implements Parametres {
      * @param direction
      * @return 
      */
-    public boolean moveCases(int direction) {
+    public boolean moveTiles(int direction) {
         boolean deplacement = false;
+        
+        // Direction
+        if (direction == DROITE || direction == GAUCHE || direction == BAS || direction == HAUT) {
+            for (int i = 0; i < TAILLE; i++) {
+                boolean d = grids.get(i).deplacerCases(direction);
+                if (d) deplacement = d;
+            }
+        }
+        
+        if (direction == MONTERG || direction == DESCG) {
+            //Ajout de liste dans une liste
+            ArrayList<ArrayList<Case>> moveUpAndDown = new ArrayList<>();
+            moveUpAndDown.add(new ArrayList<>()); //x = 0, y = 0
+            moveUpAndDown.add(new ArrayList<>()); //x = 1, y = 0
+            moveUpAndDown.add(new ArrayList<>()); //x = 2, y = 0
+            moveUpAndDown.add(new ArrayList<>()); // x = 0, y = 1...
+            moveUpAndDown.add(new ArrayList<>());
+            moveUpAndDown.add(new ArrayList<>());
+            moveUpAndDown.add(new ArrayList<>());// x = 0, y = 2...
+            moveUpAndDown.add(new ArrayList<>());
+            moveUpAndDown.add(new ArrayList<>());
 
-        //Ajout de liste dans une liste
-        ArrayList<ArrayList<Case>> MoveUpAndDown = new ArrayList<>();
-        MoveUpAndDown.add(new ArrayList<>()); //x = 0, y = 0
-        MoveUpAndDown.add(new ArrayList<>()); //x = 1, y = 0
-        MoveUpAndDown.add(new ArrayList<>()); //x = 2, y = 0
-        MoveUpAndDown.add(new ArrayList<>()); // x = 0, y = 1...
-        MoveUpAndDown.add(new ArrayList<>());
-        MoveUpAndDown.add(new ArrayList<>());
-        MoveUpAndDown.add(new ArrayList<>());// x = 0, y = 2...
-        MoveUpAndDown.add(new ArrayList<>());
-        MoveUpAndDown.add(new ArrayList<>());
+            // On crée des tableaux de haut en bas pour mieux manipuler les valeurs
+            for (int i = 0; i < TAILLE; i++) {
+                for (int j = 0; j < TAILLE; j++) {
+                    for (int k = 0; k < TAILLE; k++) {
+                        ArrayList<ArrayList<Case>> grille = grids.get(k).getGrille();
+                        int index = grille.get(i).get(j).getY() * 3 + grille.get(i).get(j).getX();
+                        moveUpAndDown.get(index).add(grille.get(i).get(j));
+                    }
+                }
+            }
 
-        // On crée des tableaux de haut en bas pour mieux manipuler les valeurs
-        for (int i = 0; i < TAILLE; i++) {
-            for (int j = 0; j < TAILLE; j++) {
-                for (int k = 0; k < TAILLE; k++) {
-                    ArrayList<ArrayList<Case>> grille = grids.get(k).getGrille();
-                    int index = grille.get(i).get(j).getY() * 3 + grille.get(i).get(j).getX();
-                    MoveUpAndDown.get(index).add(grille.get(i).get(j));
+            // Direction = Supérieure
+            if (direction == MONTERG) {
+                for (int i = 0; i < TAILLE*TAILLE; i++) {
+                    for (int k = 0; k < TAILLE; k++) {
+                        boolean d = deplacementUneCaseUD(MONTERG, moveUpAndDown.get(i), k);
+                        if (d) deplacement = d;
+                    }
+                }
+            }
+
+            // Direction = Inférieure
+            if (direction == DESCG) {
+                for (int i = 0; i < TAILLE*TAILLE; i++) {
+                    for (int k = TAILLE- 1; k >= 0; k--) {
+                        boolean d = deplacementUneCaseUD(DESCG, moveUpAndDown.get(i), k);
+                        if (d) deplacement = d;
+                    }
                 }
             }
         }
         
-
-        // Direction
-        if (direction == DROITE || direction == GAUCHE || direction == BAS || direction == HAUT) {
-            for (int i = 0; i < TAILLE; i++) {
-                grids.get(i).deplacerCases(direction);
-
-            }
-        }
-
-        // Direction = Supérieure
-        if (direction == MONTERG) {
-            for (int i = 0; i < TAILLE; i++) {
-                //Si le voisin a une valeur de 0 OU le voisin du voisin est nul
-                if (MoveUpAndDown.get(i).get(1).getValeur() == 0
-                        || (MoveUpAndDown.get(i).get(1).getValeur() != 0
-                        && MoveUpAndDown.get(i).get(2).getValeur() == 0)) {
-                    //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
-                    for (int k = TAILLE - 1; k >= 0; k--) {
-                        deplacementUneCaseUD(GAUCHE, MoveUpAndDown.get(i), k);
-                    }
-                } else {
-                    for (int k = 0; k < TAILLE; k++) {
-                        deplacementUneCaseUD(GAUCHE, MoveUpAndDown.get(i), k);
-                    }
-                }
-
-            }
-        }
-
-        // Direction = Inférieure
-        if (direction == DESCG) {
-            for (int i = 0; i < TAILLE; i++) {
-                //Si le voisin a une valeur de 0 OU le voisin du voisin est nul
-                if (MoveUpAndDown.get(i).get(1).getValeur() == 0
-                        || (MoveUpAndDown.get(i).get(1).getValeur() != 0
-                        && MoveUpAndDown.get(i).get(2).getValeur() == 0)) {
-                    //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
-                    for (int k = TAILLE - 1; k >= 0; k--) {
-                        deplacementUneCaseUD(GAUCHE, MoveUpAndDown.get(i), k);
-                    }
-                } else {
-                    for (int k = 0; k < TAILLE; k++) {
-                        deplacementUneCaseUD(GAUCHE, MoveUpAndDown.get(i), k);
-                    }
-                }
-
-            }
-        }
         return deplacement;
     }
 
@@ -192,97 +189,52 @@ public class Jeu implements Parametres {
      * @param tabHB la ligne/colonne où est située la case
      * @param tilesLocation la colonne/ligne où est située la case
      */
-    private boolean deplacementUneCaseUD(int direction2, ArrayList<Case> MoveUpAndDown, int tilesLocation) {
+    private boolean deplacementUneCaseUD(int direction2, ArrayList<Case> moveUpAndDown, int tilesLocation) {
         boolean deplacement = false;
         int neighboringTile;
 
-        if (direction2 == GAUCHE) {
+        if (direction2 == MONTERG) {
             neighboringTile = tilesLocation - 1;
         } else {
             neighboringTile = tilesLocation + 1;
         }
+        
+        // Tant que mon voisin = 0, je me déplace avant de chercher à fusionner
+        while (neighboringTile >= 0 && neighboringTile < TAILLE && moveUpAndDown.get(neighboringTile).getValeur() == 0) {
+            moveUpAndDown.get(neighboringTile).setValeur(moveUpAndDown.get(tilesLocation).getValeur());
+            moveUpAndDown.get(tilesLocation).setValeur(0);
+            deplacement = true;
+            
+            // Je mets à jour mon index et celui de mon voisin
+            if (direction2 == MONTERG) {
+                neighboringTile--;
+                tilesLocation--;
+            } else {
+                neighboringTile++;
+                tilesLocation++;
+            }
+        }
+        
         if (neighboringTile >= 0 && neighboringTile < TAILLE) {
             //Si mon voisin a la même valeur que moi, je fusionne
-            if (MoveUpAndDown.get(neighboringTile).getValeur()
-                    == MoveUpAndDown.get(tilesLocation).getValeur()) {
-                MoveUpAndDown.get(neighboringTile).getGrille().fusion(MoveUpAndDown.get(neighboringTile)); //on effectue la fusion sur la bonne grille
-                MoveUpAndDown.get(tilesLocation).setValeur(0);
-                deplacement = true;
-            }
-            //Si mon voisin =0, je me déplace
-            if (MoveUpAndDown.get(neighboringTile).getValeur() == 0) {
-                MoveUpAndDown.get(neighboringTile).setValeur(
-                        MoveUpAndDown.get(tilesLocation).getValeur());
-                MoveUpAndDown.get(tilesLocation).setValeur(0);
+            if (moveUpAndDown.get(neighboringTile).getValeur()
+                    == moveUpAndDown.get(tilesLocation).getValeur()) {
+                moveUpAndDown.get(neighboringTile).getGrille().fusion(moveUpAndDown.get(neighboringTile)); //on effectue la fusion sur la bonne grille
+                moveUpAndDown.get(tilesLocation).setValeur(0);
                 deplacement = true;
             }
         }
+        
         return deplacement;
     }
-/**public void ajoutCase() {
-        int nombreAleatoireCase = (int) (Math.random() * ((1 - 0) + 1));
 
-        if (nombreAleatoireCase == 1) {
-            int nombreAleatoireGrille = (int) (Math.random() * ((2 - 0) + 1));
-            int nombreAleatoireGrille2 = (int) (Math.random() * ((2 - 0) + 1));
-
-            switch (nombreAleatoireGrille) {
-                case (0):
-                    this.topGrid.nouvelleCase();
-
-                    break;
-                case (1):
-
-                    this.middleGrid.nouvelleCase();
-                    break;
-
-                case (2):
-                    this.bottomGrid.nouvelleCase();
-                    break;
-            }
-
-            switch (nombreAleatoireGrille2) {
-                case (0):
-                    this.topGrid.nouvelleCase();
-
-                    break;
-                case (1):
-
-                    this.middleGrid.nouvelleCase();
-                    break;
-
-                case (2):
-                    this.bottomGrid.nouvelleCase();
-                    break;
-            }
-
-        } else {
-            int nombreAleatoireGrille = (int) (Math.random() * ((2 - 0) + 1));
-
-            switch (nombreAleatoireGrille) {
-                case (0):
-                    this.topGrid.nouvelleCase();
-
-                    break;
-                case (1):
-
-                    this.middleGrid.nouvelleCase();
-                    break;
-
-                case (2):
-                    this.bottomGrid.nouvelleCase();
-                    break;
-            }
-        }
-    }**/
-    //TEMPLATE : 
     /**
      * On peut choisir si on ajoute une ou deux cases (au hasard) : plutôt dans la boucle de jeu que dans la méthode
      * Si on ajoute une case, on choisir une grille au hasard où la mettre.
      * Si on ajotue deux cases, on choisit deux grilles au hasard où les placer.
      * Les deux grilles choisies peuvent être identiques.
      * On ajoute les nouvelles cases.
-     * @return 
+     * @return true si une case a été ajoutée
      */
     public boolean addTiles() {
         boolean places[] = new boolean[3]; 
@@ -302,10 +254,13 @@ public class Jeu implements Parametres {
         return true; //une nouvelle case a été ajoutée
     }
     
-
-    //l'ordinateur effectue un déplacement aléatoire pour le prochain coup
-    public boolean randomMove (){
-        boolean moveDone = false; //faux si le déplacement n'a pas été effectué
+     /**
+     * l'ordinateur effectue un déplacement aléatoire pour le prochain coup
+     *
+     * @return true si le mouvement aléatoire a été effectué
+     */
+    
+    public boolean randomMove () {
         Random ra = new Random(); 
         
         //on met les valeurs correspondant aux déplacements dans une liste
@@ -317,27 +272,39 @@ public class Jeu implements Parametres {
         values.add(MONTERG);
         values.add(DESCG);
         
+        boolean[] moves = new boolean[6];
+        moves[0] = true;
+        moves[1] = true;
+        moves[2] = true;
+        moves[3] = true;
+        moves[4] = true;
+        moves[5] = true;
+        
         int index = ra.nextInt(values.size()); 
         
         int chosenMove = values.get(index);
-        moveDone = moveCases(chosenMove);
-        
-        return moveDone; 
+        while (!moveTiles(chosenMove)) {
+            moves[index] = false; // On enregistre que le mouvement choisi est possible
+            if (!(moves[0] || moves[1] || moves[2] || moves[3] || moves[4] || moves[5])) return false; // Retourne faux si toutes mouvements sont impossibles
+            index = ra.nextInt(values.size());
+        }
+
+        return true; 
     }
 
 
-    //TEMPLATE :
     /**
-     * Vérifie si le jeu est fini (plus aucun déplacement possible).
-     * On vérifie que pour chaque grille, on ne peut aller ni en haut, ni
-     * en bas, ni à gauche, ni à droite.
-     * On vérifie que l'on ne peut pas faire le déplacement q et e (voir le jeu
-     * du prof).
-     * Si c'est possible, on return true, sinon false.
-     * @return 
+     * Vérifie que la partie est terminée
+     *
+     * @return true si aucune possibilité de déplacement restante : la partie est terminée
      */
     public boolean finishGame() {
-
+        for (int i = 0; i < TAILLE; i++) {
+            boolean fini = grids.get(i).partieFinieG();
+            if (fini) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -358,7 +325,67 @@ public class Jeu implements Parametres {
      * on termine programme.
      */
     public void launchGame(){
+        Scanner sc = new Scanner(System.in);
+        Random ra = new Random(); 
         
+        //le jeu commence avec 2 cases
+        this.addTiles();
+        this.addTiles();
+        
+        // Début de la partie
+        System.out.println("Début du jeu");
+        System.out.println(this);
+        
+        while (!this.finishGame()) {
+            System.out.println("Déplacer vers la Droite (d), Gauche (g), Haut (h), ou Bas (b), niveau supérieur (e) niveau inférieur (q) ?");
+            String s = sc.nextLine();
+            s = s.toLowerCase();
+            if (!(s.equals("d") || s.equals("droite")
+                    || s.equals("g") || s.equals("gauche")
+                    || s.equals("h") || s.equals("haut")
+                    || s.equals("b") || s.equals("bas")
+                    || s.equals("e") || s.equals("niveau supérieur")
+                    || s.equals("q") || s.equals("niveau inférieur")
+                    )) {
+                System.out.println("Vous devez écrire d pour Droite, g pour Gauche, h pour Haut ou b pour Bas, e pour supérieur, q pour inférieur");
+            } else {
+                int direction;
+                direction = switch (s) {
+                    case "q", "niveau inférieur" -> DESCG;
+                    case "e", "niveau supérieur" -> MONTERG;
+                    case "d", "droite" -> DROITE;
+                    case "g", "gauche" -> GAUCHE;
+                    case "h", "haut" -> HAUT;
+                    default -> BAS;
+                };
+                
+                System.out.println("Avant de bouger");
+                System.out.println(this);
+                boolean b2 = this.moveTiles(direction);
+                
+                if (b2) {
+                    //aléatoire : on ajoute 1 ou 2 cases : QUELLE PROBA D'AVOIR UN 2 ??? A VOIR
+                    int random = ra.nextInt(2) +1;
+                    for (int i = 0; i < random; i++) {
+                        this.addTiles();
+                    }
+                }
+                
+                this.updateScore();
+                System.out.println("Valeur max du jeu : " + this.getValeurMaxJeu());
+                System.out.println("Score : " + scoreFinal);
+                System.out.println("après avoir bougé");
+                System.out.println(this);
+                
+            }
+        } 
+        
+        if (this.getValeurMaxJeu() >= OBJECTIF) {
+            this.victory();
+        }
+        else {
+            this.gameOver();
+        }
     }
 
 }

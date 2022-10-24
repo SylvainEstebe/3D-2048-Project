@@ -12,21 +12,33 @@ import java.util.Scanner;
 public class Main implements Parametres{
     public static void main(String[] args) {
         
+        
         Scanner sc = new Scanner(System.in);
         Jeu j = new Jeu();
         
+        j.launchGame();
+        /**
         System.out.println("Début du jeu");
+        j.addTiles();
         j.addTiles();
         System.out.println(j.toString());
        
-        j.randomMove();
-        j.addTiles();
-        j.addTiles();
-        j.addTiles();
-        j.addTiles();
+        boolean termine = false;
+        while (!termine) {
+            j.randomMove();
+            boolean result = j.addTiles();
+            System.out.println("Ajout :" + result);
+            if (!result) {
+                termine = j.finishGame();
+            }
+            
+            System.out.println("Terminée : " + termine);
+            System.out.println(j.toString());
+        }
         
         
         
+        /**
         System.out.println(j.toString());
         
  

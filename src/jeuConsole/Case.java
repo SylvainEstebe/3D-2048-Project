@@ -105,7 +105,7 @@ public class Case implements Parametres{
     /**
      * Méthode qui permet d'obtenir le voisin direct de la case dans
      * une certaine direction
-     * @param direction (gauche,droite,haut,bas)
+     * @param direction (gauche,droite,haut,bas monterg, descg)
      * @return la case voisine
      */
     public Case getVoisinDirect(int direction) {
@@ -134,12 +134,30 @@ public class Case implements Parametres{
                 }
                 return null;
             }
+            case MONTERG -> {
+                ArrayList<Grille> grids = grille.getJeu().getGrids();
+                int index = grids.indexOf(this.grille); //index de la grille à laquelle appartient la case
+                if (grille.getType() != GRILLEH) { 
+                    return grids.get(index -1).getGrille().get(x).get(y);
+                }
+                return null;
+            }   
+            case DESCG -> {
+                ArrayList<Grille> grids = grille.getJeu().getGrids();
+                int index = grids.indexOf(this.grille); //index de la grille à laquelle appartient la case
+                if (grille.getType() != GRILLEB) { 
+                    return grids.get(index +1).getGrille().get(x).get(y);
+                }
+                return null;
+            } 
+            
             default -> {
             }
         }
         return null;
     }
 
+    
    
     /**
      * Méthode qui permet d'afficher la case

@@ -15,11 +15,12 @@ public class Grille implements Parametres {
     private ArrayList<ArrayList<Case>> grille;
     private int scoreg;
     private int type; //indique si c'est une grille du haut, du milieu ou du bas
-
+    private Jeu jeu; //jeu auquel appartient la grille
+    
     /**
      * Constructeur qui initialise une grille vide
      */
-    public Grille() {
+    public Grille(Jeu jeu, int t) {
         grille = new ArrayList<ArrayList<Case>>();
         for (int i = 0; i < TAILLE; i++) {
             grille.add(new ArrayList<Case>());
@@ -27,6 +28,8 @@ public class Grille implements Parametres {
                 grille.get(i).add(new Case(i, j, 0, this));
             }
         }
+        this.jeu = jeu;
+        this.type = t;
     }
 
     @Override
@@ -77,6 +80,15 @@ public class Grille implements Parametres {
     public int getType() {
         return type;
     }
+    
+    /**
+     * Méthode qui retourne le jeu auquel appartient la grille
+     *
+     * @return le Jeu de la grille
+     */
+    public Jeu getJeu(){
+        return this.jeu;
+    }
 
     /**
      * Méthode qui permet de modifier le type de la grille
@@ -86,6 +98,7 @@ public class Grille implements Parametres {
     public void setType(int type) {
         this.type = type;
     }
+    
 
     /**
      * Méthode qui vérifie si une partie est finie (éléments impossibles à
@@ -119,6 +132,19 @@ public class Grille implements Parametres {
                         return false;
                     }
                 }
+                //on fait le test dans la classe Grille pour MONTERG et DESCG car il se peut qu'une seule grille soit terminée 
+                //mais que des fusions en montant et descendant soient toujours possibles
+                if (grille.get(i).get(j).getVoisinDirect(MONTERG) != null) { 
+                    if (grille.get(i).get(j).valeurEgale(grille.get(i).get(j).getVoisinDirect(MONTERG))) {
+                        return false;
+                    }
+                }
+                if (grille.get(i).get(j).getVoisinDirect(DESCG) != null) {
+                    if (grille.get(i).get(j).valeurEgale(grille.get(i).get(j).getVoisinDirect(DESCG))) {
+                        return false;
+                    }
+                }
+                
             }
         }
         return true;
@@ -167,47 +193,17 @@ public class Grille implements Parametres {
             //Si la direction est haut
             if (direction == HAUT) {
                 for (int i = 0; i < TAILLE; i++) {
-                    //Si le voisin a une valeur de 0 OU le voisin du voisin est nul
-                    if (tabHB.get(i).get(1).getValeur() == 0
-                            || (tabHB.get(i).get(1).getValeur() != 0
-                            && tabHB.get(i).get(2).getValeur() == 0)) {
-                        //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
-                        for (int k = TAILLE - 1; k >= 0; k--) {
-                            boolean d = deplacementUneCase(GAUCHE, tabHB.get(i), k);
-                            if (d) {
-                                deplacement = d;
-                            }
-                        }
-                    } else {
-                        for (int k = 0; k < TAILLE; k++) {
-                            boolean d = deplacementUneCase(GAUCHE, tabHB.get(i), k);
-                            if (d) {
-                                deplacement = d;
-                            }
-                        }
+                    for (int k = 0; k < TAILLE; k++) {
+                        boolean d = deplacementUneCase(HAUT, tabHB.get(i), k);
+                        if (d) deplacement = d;
                     }
-
                 }
             }
             if (direction == BAS) {
                 for (int i = 0; i < TAILLE; i++) {
-                    if (tabHB.get(i).get(1).getValeur() == 0
-                            || (tabHB.get(i).get(1).getValeur() != 0
-                            && tabHB.get(i).get(2).getValeur() == 0)) {
-                        //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
-                        for (int k = 0; k < TAILLE; k++) {
-                            boolean d = deplacementUneCase(DROITE, tabHB.get(i), k);
-                            if (d) {
-                                deplacement = d;
-                            }
-                        }
-                    } else {
-                        for (int k = TAILLE - 1; k >= 0; k--) {
-                            boolean d = deplacementUneCase(DROITE, tabHB.get(i), k);
-                            if (d) {
-                                deplacement = d;
-                            }
-                        }
+                    for (int k = TAILLE - 1; k >= 0; k--) {
+                        boolean d = deplacementUneCase(BAS, tabHB.get(i), k);
+                        if (d) deplacement = d;
                     }
                 }
             }
@@ -215,46 +211,17 @@ public class Grille implements Parametres {
         if (direction == DROITE || direction == GAUCHE) {
             if (direction == DROITE) {
                 for (int i = 0; i < TAILLE; i++) {
-                    if (grille.get(i).get(1).getValeur() == 0
-                            || (grille.get(i).get(1).getValeur() != 0
-                            && grille.get(i).get(2).getValeur() == 0)) {
-                        //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
-                        for (int k = 0; k < TAILLE; k++) {
-                            boolean d = deplacementUneCase(DROITE, grille.get(i), k);
-                            if (d) {
-                                deplacement = d;
-                            }
-                        }
-                    } else {
-                        for (int k = TAILLE - 1; k >= 0; k--) {
-                            boolean d = deplacementUneCase(DROITE, grille.get(i), k);
-                            if (d) {
-                                deplacement = d;
-                            }
-                        }
+                    for (int k = TAILLE - 1; k >= 0; k--) {
+                        boolean d = deplacementUneCase(DROITE, grille.get(i), k);
+                        if (d) deplacement = d;
                     }
-
                 }
             }
             if (direction == GAUCHE) {
                 for (int i = 0; i < TAILLE; i++) {
-                    if (grille.get(i).get(1).getValeur() == 0
-                            || (grille.get(i).get(1).getValeur() != 0
-                            && grille.get(i).get(2).getValeur() == 0)) {
-                        //Je vais de droite à gauche pour déplacer les éléments dans le bon sens
-                        for (int k = TAILLE - 1; k >= 0; k--) {
-                            boolean d = deplacementUneCase(GAUCHE, grille.get(i), k);
-                            if (d) {
-                                deplacement = d;
-                            }
-                        }
-                    } else {
-                        for (int k = 0; k < TAILLE; k++) {
-                            boolean d = deplacementUneCase(GAUCHE, grille.get(i), k);
-                            if (d) {
-                                deplacement = d;
-                            }
-                        }
+                    for (int k = 0; k < TAILLE; k++) {
+                        boolean d = deplacementUneCase(GAUCHE, grille.get(i), k);
+                        if (d) deplacement = d;
                     }
                 }
             }
@@ -272,25 +239,33 @@ public class Grille implements Parametres {
     private boolean deplacementUneCase(int direc2, ArrayList<Case> tabHB, int k) {
         boolean deplacement = false;
         int voisin;
-        if (direc2 == GAUCHE) {
+        if (direc2 == GAUCHE || direc2 == HAUT) {
             voisin = k - 1;
         } else {
             voisin = k + 1;
         }
+        
+        // Tant que mon voisin = 0, je me déplace avant de chercher à fusionner
+        while (voisin >= 0 && voisin < TAILLE && tabHB.get(voisin).getValeur() == 0) {
+            tabHB.get(voisin).setValeur(tabHB.get(k).getValeur());
+            tabHB.get(k).setValeur(0);
+            deplacement = true;
+            
+            // Je mets à jour mon index et celui de mon voisin
+            if (direc2 == GAUCHE || direc2 == HAUT) {
+                voisin--;
+                k--;
+            } else {
+                voisin++;
+                k++;
+            }
+        }
+        
         if (voisin >= 0 && voisin < TAILLE) {
-
             //Si mon voisin a la même valeur que moi, je fusionne
             if (tabHB.get(voisin).getValeur()
                     == tabHB.get(k).getValeur()) {
                 fusion(tabHB.get(voisin));
-                tabHB.get(k).setValeur(0);
-                deplacement = true;
-            }
-
-            //Si mon voisin =0, je me déplace
-            if (tabHB.get(voisin).getValeur() == 0) {
-                tabHB.get(voisin).setValeur(
-                        tabHB.get(k).getValeur());
                 tabHB.get(k).setValeur(0);
                 deplacement = true;
             }
@@ -343,6 +318,23 @@ public class Grille implements Parametres {
             return cases_vides;
         }
         return null;
+    }
+    
+    /**
+     * 
+     * @return la valeur maximale de la grille
+     */
+    public int getValeurMax (){
+        int max = 0;
+
+        for (int i = 0; i < TAILLE; i++) {
+            for (int j = 0; j < TAILLE; j++) {
+                if (grille.get(i).get(j).getValeur() > max) {
+                   max = grille.get(i).get(j).getValeur();
+                }
+            }
+        }
+        return max;
     }
 
     /**
