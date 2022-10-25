@@ -299,13 +299,11 @@ public class Jeu implements Parametres {
      * @return true si aucune possibilité de déplacement restante : la partie est terminée
      */
     public boolean finishGame() {
-        for (int i = 0; i < TAILLE; i++) {
-            boolean fini = grids.get(i).partieFinieG();
-            if (fini) {
-                return true;
-            }
+        if (grids.get(0).partieFinieG() && grids.get(1).partieFinieG() && grids.get(2).partieFinieG()) {
+            return true;
+        } else  {
+          return false;
         }
-        return false;
     }
 
     
@@ -364,7 +362,7 @@ public class Jeu implements Parametres {
                 boolean b2 = this.moveTiles(direction);
                 
                 if (b2) {
-                    //aléatoire : on ajoute 1 ou 2 cases : QUELLE PROBA D'AVOIR UN 2 ??? A VOIR
+                    //aléatoire : on ajoute 1 ou 2 cases : QUELLE PROBA D'AVOIR 2 cases ??? A VOIR
                     int random = ra.nextInt(2) +1;
                     for (int i = 0; i < random; i++) {
                         this.addTiles();

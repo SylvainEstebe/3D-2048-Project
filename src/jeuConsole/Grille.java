@@ -171,10 +171,10 @@ public class Grille implements Parametres {
         boolean deplacement = false;
 
         if (direction == HAUT || direction == BAS) {
-            ArrayList<ArrayList<Case>> tabHB = new ArrayList<ArrayList<Case>>();
-            tabHB.add(new ArrayList<Case>());
-            tabHB.add(new ArrayList<Case>());
-            tabHB.add(new ArrayList<Case>());
+            ArrayList<ArrayList<Case>> tabHB = new ArrayList<>();
+            tabHB.add(new ArrayList<>());
+            tabHB.add(new ArrayList<>());
+            tabHB.add(new ArrayList<>());
             //On crée des tableaux de haut en bas pour mieux manipuler les valeurs
             for (int i = 0; i < TAILLE; i++) {
                 for (int j = 0; j < TAILLE; j++) {
