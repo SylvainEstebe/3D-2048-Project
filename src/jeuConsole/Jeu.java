@@ -292,14 +292,42 @@ public class Jeu implements Parametres {
         return true; 
     }
 
+ /**
+     * Méthode qui vérifie si les déplacements MONTERG et DESCG  sont possible ou pas dans une partie 
+     * @return un booléen qui indique si la partie est finie ou non
+     */
+    public boolean partieFinie3G() {
+      
+        for (int j = 0; j < TAILLE; j++) {
+            for (int k = 0; k < TAILLE; k++) {
+                 for(int i=0;i< grids.size(); i++){
+                if( grids.get(i).getGrille().get(j).get(k).getValeur()==0){
+                      return false;
+                }
+                 if (grids.get(i).getGrille().get(j).get(k).getVoisinDirect(MONTERG) != null) { 
+                    if (grids.get(i).getGrille().get(j).get(k).valeurEgale(grids.get(i).getGrille().get(j).get(k).getVoisinDirect(MONTERG))) {
+                        return false;
+                    }
+                }
+                if (grids.get(i).getGrille().get(j).get(k).getVoisinDirect(DESCG) != null) {
+                    if (grids.get(i).getGrille().get(j).get(k).valeurEgale(grids.get(i).getGrille().get(j).get(k).getVoisinDirect(DESCG))) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
 
+    return true;
+    }
+ 
     /**
      * Vérifie que la partie est terminée
      *
      * @return true si aucune possibilité de déplacement restante : la partie est terminée
      */
     public boolean finishGame() {
-        if (grids.get(0).partieFinieG() && grids.get(1).partieFinieG() && grids.get(2).partieFinieG()) {
+        if (grids.get(0).partieFinieG() && grids.get(1).partieFinieG() && grids.get(2).partieFinieG() && this.partieFinie3G()) {
             return true;
         } else  {
           return false;
