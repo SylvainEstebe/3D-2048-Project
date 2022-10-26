@@ -19,6 +19,8 @@ public class Grille implements Parametres {
     
     /**
      * Constructeur qui initialise une grille vide
+     * @param jeu jeu auquel appartient la grille
+     * @param t  type de grille(haut/milieu/bas)
      */
     public Grille(Jeu jeu, int t) {
         grille = new ArrayList<ArrayList<Case>>();
@@ -32,10 +34,10 @@ public class Grille implements Parametres {
         this.type = t;
     }
 
-    @Override
+    
     /**
      * Méthode qui affiche la grille dans le terminal.
-     *
+     *@Override
      * @return La grille sous forme de String
      */
     public String toString() {
@@ -44,7 +46,7 @@ public class Grille implements Parametres {
             result += "[";
             for (int j = 0; j < TAILLE; j++) {
                 if (j != TAILLE - 1) {
-                    result += grille.get(i).get(j).getValeur() + ", ";
+                    result += grille.get(i).get(j).getValeur() + "| ";
                 } else {
                     result += grille.get(i).get(j).getValeur() + "]";
                 }
@@ -55,8 +57,7 @@ public class Grille implements Parametres {
     }
 
     /**
-     * Méthode qui retourne la grille sous forme de tableau
-     *
+     * Méthode qui affiche la grille sous forme de tableau
      * @return la grille sous forme de tableau à deux dimensions
      */
     public ArrayList<ArrayList<Case>> getGrille() {
@@ -65,7 +66,6 @@ public class Grille implements Parametres {
 
     /**
      * Méthode qui retourne le score obtenu lors du jeu pour une grille
-     *
      * @return le score sous forme d'entier
      */
     public int getScoreG() {
@@ -74,7 +74,6 @@ public class Grille implements Parametres {
 
     /**
      * Méthode qui retourne le type de la grille (haut/milieu/bas)
-     *
      * @return le type sous forme d'entier
      */
     public int getType() {
@@ -83,7 +82,6 @@ public class Grille implements Parametres {
     
     /**
      * Méthode qui retourne le jeu auquel appartient la grille
-     *
      * @return le Jeu de la grille
      */
     public Jeu getJeu(){
@@ -92,7 +90,6 @@ public class Grille implements Parametres {
 
     /**
      * Méthode qui permet de modifier le type de la grille
-     *
      * @param type sous forme d'entier
      */
     public void setType(int type) {
@@ -101,12 +98,12 @@ public class Grille implements Parametres {
     
 
     /**
-     * Méthode qui vérifie si une partie est finie (éléments impossibles à
-     * bouger).
-     *
-     * @return un booléen qui indique si la partie est finie ou non
+     * Méthode qui vérifie s'il y a des déplacements (Gauche/Droite/Bas/Haut) 
+     * possibles sur une grille 
+     * @return un booléen qui indique s'il y a encore des déplacements possibles
+     * ou non
      */
-    public boolean partieFinieG() {
+    public boolean DeplacementFiniG() {
         for (int i = 0; i < TAILLE; i++) {
             for (int j = 0; j < TAILLE; j++) {
                 if (grille.get(i).get(j).getValeur() == 0) {
@@ -131,20 +128,7 @@ public class Grille implements Parametres {
                     if (grille.get(i).get(j).valeurEgale(grille.get(i).get(j).getVoisinDirect(GAUCHE))) {
                         return false;
                     }
-                }
-                //on fait le test dans la classe Grille pour MONTERG et DESCG car il se peut qu'une seule grille soit terminée 
-                //mais que des fusions en montant et descendant soient toujours possibles
-                if (grille.get(i).get(j).getVoisinDirect(MONTERG) != null) { 
-                    if (grille.get(i).get(j).valeurEgale(grille.get(i).get(j).getVoisinDirect(MONTERG))) {
-                        return false;
-                    }
-                }
-                if (grille.get(i).get(j).getVoisinDirect(DESCG) != null) {
-                    if (grille.get(i).get(j).valeurEgale(grille.get(i).get(j).getVoisinDirect(DESCG))) {
-                        return false;
-                    }
-                }
-                
+                }                
             }
         }
         return true;
@@ -153,7 +137,6 @@ public class Grille implements Parametres {
     /**
      * Fonction qui fusionne deux cases d'une grille et augmente le score de la
      * grille
-     *
      * @param c la case qu'on fusionne
      */
     public void fusion(Case c) {
@@ -162,10 +145,10 @@ public class Grille implements Parametres {
     }
 
     /**
-     * Méthode qui permet de déplacer les cases dans une direction
-     *
+     * Méthode qui permet de déplacer toutes les cases dans une direction
+     * (sur la même grille)
      * @param direction un entier (gauche, droite, haut, bas)
-     * @return un booléen qui indique si on a bougé des cases
+     * @return un booléen qui indique si on a déplacé les cases ou non 
      */
     public boolean deplacerCases(int direction) {
         boolean deplacement = false;
@@ -179,7 +162,6 @@ public class Grille implements Parametres {
             for (int i = 0; i < TAILLE; i++) {
                 for (int j = 0; j < TAILLE; j++) {
                     if (grille.get(i).get(j).getY() == 0) {
-
                         tabHB.get(0).add(grille.get(i).get(j));
                     } else if (grille.get(i).get(j).getY() == 1) {
 
@@ -235,6 +217,7 @@ public class Grille implements Parametres {
      * @param direc2 la direction vers laquelle on déplace la grille
      * @param tabHB la ligne/colonne où est située la case
      * @param k la colonne/ligne où est située la case
+     * @return qui indique si on a déplacé une case ou non 
      */
     private boolean deplacementUneCase(int direc2, ArrayList<Case> tabHB, int k) {
         boolean deplacement = false;
@@ -275,10 +258,10 @@ public class Grille implements Parametres {
     }
 
     /**
-     * Méthode qui place une nouvelle case dans la grille s'il reste des cases
+     * Méthode qui génère une nouvelle case dans la grille s'il reste des cases
      * vides
      *
-     * @return Un booléen qui indique si on a bougé la case ou non
+     * @return Un booléen qui indique si on a placé une nouvelle case ou pas
      */
     public boolean nouvelleCase() {
         //On détermine si on prend 2 ou 4 pour la case
@@ -303,7 +286,7 @@ public class Grille implements Parametres {
     /**
      * Méthode qui permet de dire s'il y a une case libre dans la grille
      *
-     * @return Un tableau de cases libres
+     * @return une liste de cases libres
      */
     public ArrayList<Case> caseLibreG() {
         ArrayList<Case> cases_vides = new ArrayList<Case>();
@@ -321,12 +304,11 @@ public class Grille implements Parametres {
     }
     
     /**
-     * 
+     * Méthode qui retourne la valeur maximale dans la grille
      * @return la valeur maximale de la grille
      */
     public int getValeurMax (){
         int max = 0;
-
         for (int i = 0; i < TAILLE; i++) {
             for (int j = 0; j < TAILLE; j++) {
                 if (grille.get(i).get(j).getValeur() > max) {
@@ -337,19 +319,5 @@ public class Grille implements Parametres {
         return max;
     }
 
-    /**
-     * Méthode qui affiche la victoire et le score de la case
-     */
-    public void victory() {
-        System.out.println("Vous avez gagné! Votre score est de :" + scoreg);
-        System.exit(0);
-    }
 
-    /**
-     * méthode qui affiche la défaite
-     */
-    public void gameOver() {
-        System.out.println("Vous avez perdu, retentez votre chance!");
-        System.exit(1);
-    }
 }

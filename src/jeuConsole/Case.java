@@ -20,7 +20,7 @@ public class Case implements Parametres{
      * @param abs l'abscisse de la case
      * @param ord l'ordonnée de la case
      * @param v la valeur de la case
-     * @param g la grille dans laquelle est la case
+     * @param g la grille dans laquelle se trouve la case
      */
     public Case(int abs, int ord, int v, Grille g) {
         this.x = abs;
@@ -37,6 +37,10 @@ public class Case implements Parametres{
         this.grille = g;
     }
     
+    /**
+    * Méthode qui permet d'obtenir la grille dans laquelle se trouve la case 
+    * @return la grille 
+    */
     public Grille getGrille() {
         return this.grille;
     }
@@ -135,18 +139,18 @@ public class Case implements Parametres{
                 return null;
             }
             case MONTERG -> {
-                ArrayList<Grille> grids = grille.getJeu().getGrids();
-                int index = grids.indexOf(this.grille); //index de la grille à laquelle appartient la case
+                ArrayList<Grille> grilles = grille.getJeu().getgrilles();
+                int index = grilles.indexOf(this.grille); //index de la grille à laquelle appartient la case
                 if (grille.getType() != GRILLEH) { 
-                    return grids.get(index -1).getGrille().get(x).get(y);
+                    return grilles.get(index -1).getGrille().get(x).get(y);
                 }
                 return null;
             }   
             case DESCG -> {
-                ArrayList<Grille> grids = grille.getJeu().getGrids();
-                int index = grids.indexOf(this.grille); //index de la grille à laquelle appartient la case
+                ArrayList<Grille> grilles = grille.getJeu().getgrilles();
+                int index = grilles.indexOf(this.grille); //index de la grille à laquelle appartient la case
                 if (grille.getType() != GRILLEB) { 
-                    return grids.get(index +1).getGrille().get(x).get(y);
+                    return grilles.get(index +1).getGrille().get(x).get(y);
                 }
                 return null;
             } 
