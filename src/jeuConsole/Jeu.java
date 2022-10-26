@@ -104,7 +104,7 @@ public class Jeu implements Parametres {
     /* 
     *Méthode qui incrémente les points gagnés au scoreFinal à chaque déplacement
      */
-    public void updateScore() {
+    public void majScore() {
         scoreFinal = grilles.get(0).getScoreG() + grilles.get(1).getScoreG() + grilles.get(2).getScoreG();
     }
 
@@ -113,7 +113,7 @@ public class Jeu implements Parametres {
      * est perdue
      *
      */
-    public void gameOver() {
+    public void  jeuPerdu(){
         System.out.println("Vous avez perdu, retentez votre chance!");
         this.toString();
         System.exit(1);
@@ -286,9 +286,8 @@ public class Jeu implements Parametres {
      *
      * @return true si le mouvement aléatoire a été effectué
      */
-    public boolean randomMove() {
+    public boolean MouvementAlea() {
         Random ra = new Random();
-
         //on met les valeurs correspondant aux déplacements dans une liste
         ArrayList<Integer> valeurs = new ArrayList<>();
         valeurs.add(BAS);
@@ -306,7 +305,6 @@ public class Jeu implements Parametres {
         deplacements[5] = true;
 
         int index = ra.nextInt(valeurs.size());
-
         int chosenMove = valeurs.get(index);
         while (!this.deplacerCases3G(chosenMove)) {
             deplacements[index] = false; // On enregistre que le mouvement choisi est possible
@@ -322,7 +320,6 @@ public class Jeu implements Parametres {
     /**
      * Méthode qui vérifie si les déplacements MONTERG et DESCG sont possible ou
      * pas dans une partie
-     *
      * @return un booléen qui indique si les déplacements MONTERG et DESCG sont
      * possible ou non
      */
@@ -370,7 +367,8 @@ public class Jeu implements Parametres {
      * l'odinateur joue un coup à la place du joueur s'il veut Fin du jeu
      */
     public void lancementJeu() {
-        Scanner sc = new Scanner(System.in);
+        Scanner sc1 = new Scanner(System.in);
+        Scanner sc2 = new Scanner(System.in);
         Random ra = new Random();
         //le jeu commence avec 2 cases
         this.ajoutCases();
@@ -380,9 +378,15 @@ public class Jeu implements Parametres {
         System.out.println(this);
         while (!this.finJeu()) {
             System.out.println("Déplacer vers la Droite (d), Gauche (g), Haut (h), ou Bas (b), niveau supérieur (e) niveau inférieur (q) ?");
-            String s = sc.nextLine();
+            System.out.println("Si vous voulez nous laisser choisir pour vous, tapez '?' ");
+            String s = sc1.next();
             s = s.toLowerCase();
-            if (!(s.equals("d") || s.equals("droite")
+            if (s.equals("?")) {
+                this.MouvementAlea();
+                                this.majScore();
+            System.out.println(this);
+                   
+            } else if (!(s.equals("d") || s.equals("droite")
                     || s.equals("g") || s.equals("gauche")
                     || s.equals("h") || s.equals("haut")
                     || s.equals("b") || s.equals("bas")
@@ -413,18 +417,20 @@ public class Jeu implements Parametres {
                         this.ajoutCases();
                     }
                 }
-
-                this.updateScore();
-                System.out.println(this);
+                this.majScore();
+            System.out.println(this);
+                   
 
             }
-        }
+            
 
+        }
         if (this.getValeurMaxJeu() >= OBJECTIF) {
             this.victoire();
         } else {
-            this.gameOver();
+            this.finJeu();
         }
-    }
 
+    }
+  
 }
