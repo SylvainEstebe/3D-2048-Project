@@ -389,8 +389,6 @@ public class Jeu implements Parametres {
                     default -> BAS;
                 };
                 
-                System.out.println("Avant de bouger");
-                System.out.println(this);
                 boolean b2 = this.moveTiles(direction);
                 
                 if (b2) {
@@ -402,9 +400,6 @@ public class Jeu implements Parametres {
                 }
                 
                 this.updateScore();
-                System.out.println("Valeur max du jeu : " + this.getValeurMaxJeu());
-                System.out.println("Score : " + scoreFinal);
-                System.out.println("après avoir bougé");
                 System.out.println(this);
                 
             }
