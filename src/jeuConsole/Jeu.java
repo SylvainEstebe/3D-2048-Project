@@ -1,5 +1,13 @@
 package jeuConsole;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -9,10 +17,11 @@ import java.util.Scanner;
  *
  * @author Manon
  */
-public class Jeu implements Parametres {
+public class Jeu implements Parametres, Serializable {
 
     private ArrayList<Grille> grilles = new ArrayList<Grille>();
     private int scoreFinal = 0;
+    private boolean existePartiePrecedente;
 
     /**
      * Constructeur qui initialise la liste des grilles
@@ -27,6 +36,7 @@ public class Jeu implements Parametres {
         grilles.add(g);
         grilles.add(g1);
         grilles.add(g2);
+        existePartiePrecedente = false;
 
     }
 
@@ -113,7 +123,7 @@ public class Jeu implements Parametres {
      * est perdue
      *
      */
-    public void  jeuPerdu(){
+    public void jeuPerdu() {
         System.out.println("Vous avez perdu, retentez votre chance!");
         this.toString();
         System.exit(1);
@@ -121,7 +131,6 @@ public class Jeu implements Parametres {
 
     /**
      * Méthode qui ferme le programme et affiche un message de victoire
-     *
      */
     public void victoire() {
         System.out.println("Vous avez gagné! Votre score est de :" + scoreFinal);
@@ -130,9 +139,17 @@ public class Jeu implements Parametres {
     }
 
     /**
+     * Méthode qui serialise la dernière partie et ferme le programme quand le
+     * joueur le décide
+     */
+    public void quitter() {
+        this.existePartiePrecedente = true;
+        this.serialiser();
+        System.exit(0);
+    }
+
+    /**
      * Méthode qui donne la valeur maximale atteinte du jeu
-     *
-     * @return la valeur maximale du jeu
      */
     public int getValeurMaxJeu() {
         int max = 0;
@@ -147,7 +164,8 @@ public class Jeu implements Parametres {
     /**
      * Méthode qui déplace les cases dans les 3 grilles selon la direction
      *
-     * @param direction gauche,droite,haut,bas monterg, descg)
+     * @param direction gauche,droite,haut,bas monterg, descg)b
+     *
      * @return un booleen qui indique si on a déplacé toutes les cases ou non
      */
     public boolean deplacerCases3G(int direction) {
@@ -320,6 +338,7 @@ public class Jeu implements Parametres {
     /**
      * Méthode qui vérifie si les déplacements MONTERG et DESCG sont possible ou
      * pas dans une partie
+     *
      * @return un booléen qui indique si les déplacements MONTERG et DESCG sont
      * possible ou non
      */
@@ -368,24 +387,30 @@ public class Jeu implements Parametres {
      */
     public void lancementJeu() {
         Scanner sc1 = new Scanner(System.in);
-        Scanner sc2 = new Scanner(System.in);
         Random ra = new Random();
-        //le jeu commence avec 2 cases
-        this.ajoutCases();
-        this.ajoutCases();
-        // Début de la partie
-        System.out.println("Début du jeu");
-        System.out.println(this);
+        if (this.existePartiePrecedente) {// si le joueur choisit de terminer une partie précédente
+            System.out.println(this);
+        } else { // si le joueur commence une nouvelle partie
+            //le jeu commence avec 2 cases
+            this.ajoutCases();
+            this.ajoutCases();
+            System.out.println("Début du jeu");
+            System.out.println(this);
+        }
         while (!this.finJeu()) {
             System.out.println("Déplacer vers la Droite (d), Gauche (g), Haut (h), ou Bas (b), niveau supérieur (e) niveau inférieur (q) ?");
             System.out.println("Si vous voulez nous laisser choisir pour vous, tapez '?' ");
+            System.out.println("Pour quitter le jeu taper 'x'");
             String s = sc1.next();
             s = s.toLowerCase();
+            if (s.equals("x")) {
+                this.quitter();
+            }
             if (s.equals("?")) {
                 this.MouvementAlea();
-                                this.majScore();
-            System.out.println(this);
-                   
+                this.majScore();
+                System.out.println(this);
+
             } else if (!(s.equals("d") || s.equals("droite")
                     || s.equals("g") || s.equals("gauche")
                     || s.equals("h") || s.equals("haut")
@@ -418,11 +443,9 @@ public class Jeu implements Parametres {
                     }
                 }
                 this.majScore();
-            System.out.println(this);
-                   
+                System.out.println(this);
 
             }
-            
 
         }
         if (this.getValeurMaxJeu() >= OBJECTIF) {
@@ -432,5 +455,85 @@ public class Jeu implements Parametres {
         }
 
     }
-  
+
+    
+    /**
+     *Methode qui demande au joueur s'il veut terminer une partie précédente ou 
+     * commencer une nouvelle
+     * @return booléen ture: pour terminer une partie précedente et false: pour une nouvelle
+     */
+    public boolean rechargerPartie() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Voulez-vous reprendre la partie précepente ?(oui/non)");
+        String s = sc.next();
+        s.toLowerCase();
+        while (!s.equals("oui") || !s.equals("non")) {
+            if (s.equals("oui")) {
+                this.deserialiser();
+                return true;
+            } else if (s.equals("non")) {
+                return false;
+            } else {
+                System.out.println("vous devez saisir oui pour reprendre la partie précédente, sinon non");
+                s = sc.next();
+                s.toLowerCase();
+            }
+        }
+        return false;
+    }
+
+    
+    /**
+     *Méthode pour sérialiser une partie non finie que le joueur l'a abandonnée
+     * en tapant 'x'
+     */
+    public void serialiser() {
+        ObjectOutputStream oos = null;
+        try {
+            final FileOutputStream fichier = new FileOutputStream("jeu.ser");
+            oos = new ObjectOutputStream(fichier);
+            oos.writeObject(this);
+            oos.flush();
+        } catch (final java.io.IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (oos != null) {
+                    oos.flush();
+                    oos.close();
+                }
+            } catch (final IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    
+    /**
+     *Methode qui déserialise une partie précédente (dernier état du jeu avant de quiter)
+     * @return Jeu l'état des 3 grilles dans la partie précédente
+     **/
+    public Jeu deserialiser() {
+        ObjectInputStream ois = null;
+        try {
+            final FileInputStream fichierIn = new FileInputStream("jeu.ser");
+            ois = new ObjectInputStream(fichierIn);
+            Jeu jeu = (Jeu) ois.readObject();
+            return jeu;
+        } catch (final java.io.IOException e) {
+            e.printStackTrace();
+        } catch (final ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ois != null) {
+                    ois.close();
+                }
+            } catch (final IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 }

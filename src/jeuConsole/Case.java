@@ -1,6 +1,7 @@
 package jeuConsole;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  * 
  */
 
-public class Case implements Parametres{
+public class Case implements Parametres, Serializable {
 
     private int x, y, valeur; 
     private Grille grille;

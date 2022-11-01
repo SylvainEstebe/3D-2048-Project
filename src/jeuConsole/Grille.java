@@ -1,6 +1,7 @@
 package jeuConsole;
 
 
+import java.io.Serializable;
 import jeuConsole.Case;
 import java.util.ArrayList;
 import java.util.Random;
@@ -10,12 +11,12 @@ import java.util.Random;
  *
  * @author Alexanne
  */
-public class Grille implements Parametres {
+public class Grille implements Parametres , Serializable{
 
-    private ArrayList<ArrayList<Case>> grille;
+    private  ArrayList<ArrayList<Case>> grille;
     private int scoreg;
     private int type; //indique si c'est une grille du haut, du milieu ou du bas
-    private Jeu jeu; //jeu auquel appartient la grille
+    private  Jeu jeu; //jeu auquel appartient la grille
     
     /**
      * Constructeur qui initialise une grille vide
