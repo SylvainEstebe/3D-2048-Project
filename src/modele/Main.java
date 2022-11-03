@@ -1,10 +1,11 @@
-package jeuConsole;
+package modele;
 
+import variables.Parametres;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import jeuConsole.Jeu;
+import modele.Jeu;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,24 +23,27 @@ public class Main implements Parametres {
         try {
             //verifier s'il existe un fichier: une partie précédente
             FileInputStream fichierIn = new FileInputStream("jeu.ser");
+            
             existe = (fichierIn != null);
 
         } catch (FileNotFoundException ex) {
         }
-
-        if (existe == false) { //il n'y a pas une partie enregistrer -->  on lance une nouvelle 
+        
+        if (existe == false) { //il n'y a pas une partie enregistrée -->  on lance une nouvelle 
             Jeu j = new Jeu();
-            j.lancementJeu();
+            
+            j.lancementJeuConsole();
         } else {//il y a une partie précédente 
             try {
+                
                 final FileInputStream fichierIn = new FileInputStream("jeu.ser");
                 ois = new ObjectInputStream(fichierIn);
                 Jeu jeu = (Jeu) ois.readObject();
                 if (jeu.rechargerPartie()) {// si le joueur veut continuer la partie précédente
-                    jeu.lancementJeu();
+                    jeu.lancementJeuConsole();
                 } else {//si le joueur abandonne la partie précédente et commence  à nouveau 
                     Jeu j = new Jeu();
-                    j.lancementJeu();
+                    j.lancementJeuConsole();
                 }
 
             } catch (final java.io.IOException e) {

@@ -1,4 +1,4 @@
-package jeuConsole;
+package application;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -24,14 +24,18 @@ public class NewFXMain extends Application {
     
     @Override
     public void start(Stage stage) throws IOException {
-Parent root = FXMLLoader.load(getClass().getResource("FXML.fxml"));
-
-Scene scene = new Scene(root);
-boolean add = scene.getStylesheets().add("css/styles.css");
-
-stage.setScene(scene);
-stage.show();
-}
+        
+        
+        
+        Parent root = FXMLLoader.load(getClass().getResource("/application/FXML.fxml"));
+        
+        Scene scene = new Scene(root);
+        stage.setTitle("Jeu 2048 3D");
+        boolean add = scene.getStylesheets().add("css/style.css");
+        
+        stage.setScene(scene);
+        stage.show();
+    }
     /**
      * @param args the command line arguments
      */

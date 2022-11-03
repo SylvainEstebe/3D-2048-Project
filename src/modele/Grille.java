@@ -1,8 +1,9 @@
-package jeuConsole;
+package modele;
 
 
+import variables.Parametres;
 import java.io.Serializable;
-import jeuConsole.Case;
+import modele.Case;
 import java.util.ArrayList;
 import java.util.Random;
 

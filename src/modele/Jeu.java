@@ -1,6 +1,8 @@
-package jeuConsole;
+package modele;
 
+import variables.Parametres;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -64,7 +66,7 @@ public class Jeu implements Parametres, Serializable {
      *
      * @return les 3 grilles
      */
-    public ArrayList<Grille> getgrilles() {
+    public ArrayList<Grille> getGrilles() {
         return grilles;
     }
 
@@ -380,12 +382,32 @@ public class Jeu implements Parametres, Serializable {
         }
     }
 
+    public void lancementJeuAppli(){
+        //le jeu commence avec 2 cases
+        this.ajoutCases();
+        this.ajoutCases();
+        
+    }
+    
+    public void choixNbCasesAjout(Boolean b2){
+        Random ra = new Random();
+        if (b2) {
+            int random = ra.nextInt(2) + 1;
+            for (int i = 0; i < random; i++) {
+                this.ajoutCases();
+            }
+        }
+        this.majScore();
+        
+    }
+    
+    
     /**
      * Méthode lancement et déroulement du jeu Affectuer des déplacements selon
      * une direction saisie par le joueur + synchronisation du score + aide:
      * l'odinateur joue un coup à la place du joueur s'il veut Fin du jeu
      */
-    public void lancementJeu() {
+    public void lancementJeuConsole() {
         Scanner sc1 = new Scanner(System.in);
         Random ra = new Random();
         if (this.existePartiePrecedente) {// si le joueur choisit de terminer une partie précédente
@@ -436,13 +458,7 @@ public class Jeu implements Parametres, Serializable {
                 };
 
                 boolean b2 = this.deplacerCases3G(direction);
-                if (b2) {
-                    int random = ra.nextInt(2) + 1;
-                    for (int i = 0; i < random; i++) {
-                        this.ajoutCases();
-                    }
-                }
-                this.majScore();
+                choixNbCasesAjout(b2);
                 System.out.println(this);
 
             }

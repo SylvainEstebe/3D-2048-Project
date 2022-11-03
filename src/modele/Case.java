@@ -1,6 +1,7 @@
-package jeuConsole;
+package modele;
 
 
+import variables.Parametres;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -140,7 +141,7 @@ public class Case implements Parametres, Serializable {
                 return null;
             }
             case MONTERG -> {
-                ArrayList<Grille> grilles = grille.getJeu().getgrilles();
+                ArrayList<Grille> grilles = grille.getJeu().getGrilles();
                 int index = grilles.indexOf(this.grille); //index de la grille à laquelle appartient la case
                 if (grille.getType() != GRILLEH) { 
                     return grilles.get(index -1).getGrille().get(x).get(y);
@@ -148,7 +149,7 @@ public class Case implements Parametres, Serializable {
                 return null;
             }   
             case DESCG -> {
-                ArrayList<Grille> grilles = grille.getJeu().getgrilles();
+                ArrayList<Grille> grilles = grille.getJeu().getGrilles();
                 int index = grilles.indexOf(this.grille); //index de la grille à laquelle appartient la case
                 if (grille.getType() != GRILLEB) { 
                     return grilles.get(index +1).getGrille().get(x).get(y);

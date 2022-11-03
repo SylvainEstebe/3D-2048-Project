@@ -1,4 +1,4 @@
-package jeuConsole;
+package variables;
 
 
 
