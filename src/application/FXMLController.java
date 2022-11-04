@@ -4,6 +4,9 @@
  */
 package application;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -25,6 +28,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import java.sql.*;
+import javafx.geometry.Pos;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.ConnexionBDD;
 import modele.Jeu;
@@ -71,11 +76,12 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     private MenuItem newPartie;
-
+    @FXML
+    private MenuItem quitter;
     private ArrayList<ArrayList<Label>> eltsGrilles;
-    
-    private Jeu jeuAppli=null;
-    
+
+    private Jeu jeuAppli = null;
+
     private ArrayList<GridPane> tabGrillesApp;
 
     @FXML
@@ -90,8 +96,31 @@ public class FXMLController implements Initializable, Parametres {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // verification de l'existance d'une partie précedente 
+        boolean existe = false;
+        ObjectInputStream ois = null;
+        try {
+            FileInputStream fichierIn = new FileInputStream("jeu.ser");
+            existe = (fichierIn != null);
+        } catch (FileNotFoundException ex) {
+        }
+        if (existe == false) { //il n'y a pas une partie enregistrée -->  on lance une nouvelle 
+            chargePartie.setDisable(true);
+            sauvegardePartie.setDisable(true);
+        } else {
+            try {
+                chargePartie.setDisable(false);
+                final FileInputStream fichierIn = new FileInputStream("jeu.ser");
+                ois = new ObjectInputStream(fichierIn);
+                Jeu jeu = (Jeu) ois.readObject();
+                jeuAppli = jeu;
+            } catch (final java.io.IOException e) {
+                e.printStackTrace();
+            } catch (final ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
 
-        // TODO
     }
 
     @FXML
@@ -102,16 +131,20 @@ public class FXMLController implements Initializable, Parametres {
         tabGrillesApp.add(grilleB);
         jeuAppli = new Jeu();
         jeuAppli.lancementJeuAppli();
+        sauvegardePartie.setDisable(false);
         this.majGrillesApp();
 
     }
 
+    /**
+     * Méthode pour afficher les 3 grilles du jeu
+     *
+     */
     private void majGrillesApp() {
         //Boucle pour chaque grille
         for (int k = 0; k < TAILLE; k++) {
             for (int i = 0; i < TAILLE; i++) {
                 for (int j = 0; j < TAILLE; j++) {
-
                     Label caseJeu = new Label("" + jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur());
                     caseJeu.getStyleClass().add("caseJeu");
                     Pane caseJeuCouleur = new Pane();
@@ -244,16 +277,60 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     private void chargerPartie(ActionEvent event) {
+        chargePartie.setDisable(true);
+        jeuAppli.deserialiser();
+        tabGrillesApp = new ArrayList<GridPane>();
+        tabGrillesApp.add(grilleH);
+        tabGrillesApp.add(grilleM);
+        tabGrillesApp.add(grilleB);
+        this.majGrillesApp();
+        this.sauvegardePartie.setDisable(false);
     }
 
     @FXML
     private void sauvegarderPartie(ActionEvent event) {
         //Lorsqu'on sauvegarde, le bouton de chargement devient actif
-        chargePartie.setDisable(false);
+        jeuAppli.serialiser();
+        chargePartie.setDisable(true);
     }
 
     @FXML
     private void undo(MouseEvent event) {
+    }
+
+    @FXML
+    private void quitter(ActionEvent event) {
+
+        Stage abandonner = new Stage();
+        abandonner.setTitle("Voulez-vous vraiment quitter le jeu ? ");
+        BorderPane root = new BorderPane();
+        root.getStyleClass().add("pane");
+
+        //Titre
+        Label message = new Label("\t\t\t\t   la partie n'est pas finie!"
+                + "\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?" );
+        message.setFont(new Font("Serif", 18));
+        root.setTop(message);
+        Pane decision = new Pane();
+        decision.setPrefWidth(200);
+        Button oui = new Button();
+        Button non = new Button();
+        oui.setText("Quitter");
+        non.setText("Retour");
+        oui.setLayoutX(120);
+        oui.setLayoutY(20);
+        non.setLayoutX(220);
+        non.setLayoutY(20);
+        decision.getChildren().addAll(oui, non);
+        root.setCenter(decision);
+        root.setMargin(decision, new Insets(10, 10, 10, 10));
+        final Scene scene = new Scene(root, 420, 120);
+        boolean add = scene.getStylesheets().add("css/style.css");
+        abandonner.setScene(scene);
+        abandonner.show();
+        non.setOnAction(actionEvent -> abandonner.close());
+        oui.setOnAction(actionEvent -> System.exit(0));
+
     }
 
     public void majScoreApp() {
@@ -331,7 +408,6 @@ public class FXMLController implements Initializable, Parametres {
         fenetre_aide.show();
     }
 
-
     // Enregistrement lors du clic sur le bouton BDD
     @FXML
     private void enregistrementBDD(MouseEvent event) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -342,9 +418,8 @@ public class FXMLController implements Initializable, Parametres {
 
         // Stockage du score du joueur
         int scoreJoueurFin = Integer.valueOf(score.getText());
-        
+
         // Récupérer les données de score, temps (existe pas encors) et déplacement (existe pas encore)
-        
         // BDD infos
         String host = "localhost";
         String port = "8889";
@@ -354,7 +429,7 @@ public class FXMLController implements Initializable, Parametres {
         // BDD Connexion
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         // BDD requête ajout Joueur(int,string,int,int,int) Joueur(id,pseudo,score,temps,deplacement)
-        String query = "INSERT INTO Joueur VALUES ('"+ 0 +"','"+ pseudo + "','" + scoreJoueurFin + "','" + 0 + "','" + 0 + "')";
+        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + 0 + "','" + 0 + "')";
         c.insertTuples(query);
 
     }
@@ -373,27 +448,25 @@ public class FXMLController implements Initializable, Parametres {
         String queryTemps = "SELECT  pseudo, temps FROM Joueur ORDER BY temps ASC";
         String queryDéplacement = "SELECT  pseudo, nombreDéplacement FROM Joueur ORDER BY nombreDéplacement ASC ";
         c.getTuples(queryScore);
-        
+
     }
 
     @FXML
     private void mouvOrdiApp(MouseEvent event) {
-        if (jeuAppli!=null){
-            boolean b2=jeuAppli.MouvementAlea();
+        if (jeuAppli != null) {
+            boolean b2 = jeuAppli.MouvementAlea();
             jeuAppli.choixNbCasesAjout(b2);
             this.majScoreApp();
             this.majGrillesApp();
-            if(jeuAppli.finJeu()){
+            if (jeuAppli.finJeu()) {
                 if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
                     this.victoireAppli();
-                } 
-                else {
+                } else {
                     this.jeuPerduAppli();
                 }
             }
         }
-        
+
     }
-    
 
 }
