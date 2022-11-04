@@ -73,9 +73,9 @@ public class FXMLController implements Initializable, Parametres {
     private MenuItem newPartie;
 
     private ArrayList<ArrayList<Label>> eltsGrilles;
-
-    private Jeu jeuAppli;
-
+    
+    private Jeu jeuAppli=null;
+    
     private ArrayList<GridPane> tabGrillesApp;
 
     @FXML
@@ -331,6 +331,7 @@ public class FXMLController implements Initializable, Parametres {
         fenetre_aide.show();
     }
 
+
     // Enregistrement lors du clic sur le bouton BDD
     @FXML
     private void enregistrementBDD(MouseEvent event) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -374,5 +375,25 @@ public class FXMLController implements Initializable, Parametres {
         c.getTuples(queryScore);
         
     }
+
+    @FXML
+    private void mouvOrdiApp(MouseEvent event) {
+        if (jeuAppli!=null){
+            boolean b2=jeuAppli.MouvementAlea();
+            jeuAppli.choixNbCasesAjout(b2);
+            this.majScoreApp();
+            this.majGrillesApp();
+            if(jeuAppli.finJeu()){
+                if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
+                    this.victoireAppli();
+                } 
+                else {
+                    this.jeuPerduAppli();
+                }
+            }
+        }
+        
+    }
+    
 
 }

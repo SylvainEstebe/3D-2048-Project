@@ -185,6 +185,11 @@
                         <Font name="Arial" size="18.0" />
                      </font>
                   </Button>
+                  <Button fx:id="mouvOrdi" defaultButton="true" layoutX="371.0" layoutY="34.0" mnemonicParsing="false" onMouseClicked="#mouvOrdiApp" prefHeight="34.0" prefWidth="217.0" style="-fx-background-color: #bbada0#bb#bbada0#bbada0ada0; -fx-border-radius: 10px;" text="Mouvement ordinateur" textAlignment="CENTER" textFill="#eee4da">
+                     <font>
+                        <Font name="Arial" size="18.0" />
+                     </font>
+                  </Button>
                </children>
             </Pane>
          </bottom>
