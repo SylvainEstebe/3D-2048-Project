@@ -429,7 +429,8 @@ public class Jeu implements Parametres, Serializable {
                 this.quitter();
             }
             if (s.equals("?")) {
-                this.MouvementAlea();
+                boolean b2=this.MouvementAlea();
+                choixNbCasesAjout(b2);
                 this.majScore();
                 System.out.println(this);
 
@@ -467,7 +468,7 @@ public class Jeu implements Parametres, Serializable {
         if (this.getValeurMaxJeu() >= OBJECTIF) {
             this.victoire();
         } else {
-            this.finJeu();
+            this.jeuPerdu();
         }
 
     }

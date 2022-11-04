@@ -80,12 +80,14 @@ public class FXMLController implements Initializable, Parametres {
     
     private ArrayList<ArrayList<Label>> eltsGrilles;
     
-    private Jeu jeuAppli;
+    private Jeu jeuAppli=null;
     
     private ArrayList<GridPane> tabGrillesApp;
     
     @FXML
     private Label score;
+    @FXML
+    private Button mouvOrdi;
     
 
     /**
@@ -347,6 +349,25 @@ public class FXMLController implements Initializable, Parametres {
         boolean add = scene.getStylesheets().add("css/style.css");
         fenetre_aide.setScene(scene); 
         fenetre_aide.show();
+    }
+
+    @FXML
+    private void mouvOrdiApp(MouseEvent event) {
+        if (jeuAppli!=null){
+            boolean b2=jeuAppli.MouvementAlea();
+            jeuAppli.choixNbCasesAjout(b2);
+            this.majScoreApp();
+            this.majGrillesApp();
+            if(jeuAppli.finJeu()){
+                if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
+                    this.victoireAppli();
+                } 
+                else {
+                    this.jeuPerduAppli();
+                }
+            }
+        }
+        
     }
     
   
