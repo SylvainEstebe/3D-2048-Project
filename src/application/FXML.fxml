@@ -162,6 +162,8 @@
                         <Font name="Arial" size="80.0" />
                      </font>
                   </Label>
+                  <Button fx:id="boutonBDD" layoutX="428.0" layoutY="132.0" mnemonicParsing="false" onMouseClicked="#enregistrementBDD" text="BASE DE DONNÉE" />
+                  <Button fx:id="boutonBDD2" layoutX="579.0" layoutY="133.0" mnemonicParsing="false" onMouseClicked="#consultationBDD" prefHeight="26.0" prefWidth="130.0" text="Consulter BBDD" />
                </children>
             </Pane>
          </center>
