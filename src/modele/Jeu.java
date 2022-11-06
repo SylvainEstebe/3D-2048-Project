@@ -1,3 +1,4 @@
+
 package modele;
 
 import variables.Parametres;
@@ -381,6 +382,9 @@ public class Jeu implements Parametres, Serializable {
             return false;
         }
     }
+    /*
+    *Methode pour lancer une nouvelle partie sur l'interface graphique
+    */
 
     public void lancementJeuAppli(){
         //le jeu commence avec 2 cases

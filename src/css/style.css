@@ -4,8 +4,10 @@
     Author     : Alexanne
 */
 
+
+
 .pane {
-    -fx-background-color:  #faf8ef;
+    -fx-background-color:  #faf8ef; 
 }
 
 .text_horsjeu{
@@ -40,4 +42,3 @@
     -fx-background-color : #eee4da;
     -fx-border-color :  black;
 }
-

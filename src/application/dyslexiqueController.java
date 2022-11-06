@@ -1,12 +1,13 @@
+
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,52 +18,58 @@ import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.ConnexionBDD;
 import modele.Jeu;
-import modele.Main;
 import variables.Parametres;
+import static variables.Parametres.BAS;
+import static variables.Parametres.DESCG;
+import static variables.Parametres.DROITE;
+import static variables.Parametres.GAUCHE;
+import static variables.Parametres.HAUT;
+import static variables.Parametres.MONTERG;
+import static variables.Parametres.OBJECTIF;
+import static variables.Parametres.TAILLE;
 
 /**
  * FXML Controller class
  *
- * @author sylvainestebe
+ * @author Mouna
  */
-public class FXMLController implements Initializable, Parametres {
+public class dyslexiqueController implements Initializable, Parametres {
 
-    @FXML
-    private AnchorPane rootPane;
-    @FXML
-    private Button mouvOrdi;
     @FXML
     private MenuItem chargePartie;
     @FXML
     private MenuItem sauvegardePartie;
     @FXML
-    private Button help;
+    private ImageView haut;
+    @FXML
+    private ImageView bas;
+    @FXML
+    private ImageView droite;
+    @FXML
+    private ImageView gauche;
+    @FXML
+    private ImageView monter;
+    @FXML
+    private ImageView descendre;
     @FXML
     private Button stopIA;
     @FXML
     private Button undo;
+    @FXML
+    private Button mouvOrdi;
     @FXML
     private GridPane grilleH;
     @FXML
@@ -70,16 +77,13 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private Pane tuile;
     @FXML
+    private Pane instructionJeu;
+    @FXML
     private Label valTuile;
     @FXML
     private GridPane grilleB;
     @FXML
     private Label meilleurScore;
-    @FXML
-    private MenuItem daltonien;
-    @FXML
-    private MenuItem dyslexique;
-
     @FXML
     private MenuItem ia1;
     @FXML
@@ -106,9 +110,6 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private Button boutonBDD2;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // verification de l'existance d'une partie précedente 
@@ -147,8 +148,8 @@ public class FXMLController implements Initializable, Parametres {
         jeuAppli.lancementJeuAppli();
         sauvegardePartie.setDisable(false);
         this.majGrillesApp();
+        instructionJeu.setVisible(true);
         mouvOrdi.setDisable(false);
-
     }
 
     /**
@@ -179,25 +180,25 @@ public class FXMLController implements Initializable, Parametres {
                     //Gestion des couleurs des cases
                     switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
                         case 2:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFFADF;");
+                            caseJeuCouleur.setStyle("-fx-background-color :  #00FA9A;");
                             break;
                         case 4:
-                            caseJeuCouleur.setStyle("-fx-background-color : #F3E9BE;");
+                            caseJeuCouleur.setStyle("-fx-background-color : #7FFFD4;");
                             break;
                         case 8:
-                            caseJeuCouleur.setStyle("-fx-background-color : #F3C076;");
+                            caseJeuCouleur.setStyle("-fx-background-color :  #f2b179 ;");
                             break;
                         case 16:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FD9C4C;");
+                            caseJeuCouleur.setStyle("-fx-background-color :#DDA0DD;");
                             break;
                         case 32:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FF7440;");
+                            caseJeuCouleur.setStyle("-fx-background-color :  #5F9EA0;");
                             break;
                         case 64:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FF513F;");
+                            caseJeuCouleur.setStyle("-fx-background-color : #90EE90;");
                             break;
                         case 128:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            caseJeuCouleur.setStyle("-fx-background-color : #5F9EA0;");
                             break;
                         case 256:
                             caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
@@ -206,10 +207,10 @@ public class FXMLController implements Initializable, Parametres {
                             caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
                             break;
                         case 1024:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            caseJeuCouleur.setStyle("-fx-background-color :  #90EE90;");
                             break;
                         case 2048:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            caseJeuCouleur.setStyle("-fx-background-color :  #90EE90;");
                             break;
                     }
 
@@ -223,65 +224,6 @@ public class FXMLController implements Initializable, Parametres {
             }
 
         }
-
-    }
-
-    @FXML
-    private void affichageDltonien(ActionEvent event) {
-        try {
-            AnchorPane pane = FXMLLoader.load(getClass().getResource("/application/daltonien.fxml"));
-            rootPane.getChildren().setAll(pane);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-    }
-
-    @FXML
-    private void affichageDyslexique(ActionEvent event) {
-        try {
-            AnchorPane pane = FXMLLoader.load(getClass().getResource("/application/dyslexique.fxml"));
-            rootPane.getChildren().setAll(pane);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-    }
-
-    @FXML
-    /**
-     * Méthode qui affiches des aides concernant les commandes du jeu sous forme
-     * d'alert *
-     *
-     */
-    private void aidePopUp(MouseEvent event) {
-        Stage fenetre_aide = new Stage();
-        fenetre_aide.setTitle("Comment jouer?");
-        BorderPane root = new BorderPane();
-        root.getStyleClass().add("pane");
-
-        //Titre
-        Label titre_aide = new Label("Règles du jeu");
-        titre_aide.getStyleClass().add("text_horsjeu");
-        root.setTop(titre_aide);
-
-        //Texte explicatif
-        Pane boxText_expli = new Pane();
-        boxText_expli.getStyleClass().add("boxStyle1");
-        boxText_expli.setPrefWidth(400);
-
-        Label text_expli = new Label(" Presser D pour aller à droite"
-                + "\n Presser G pour aller à gauche." + "\n Presser H pour aller en haut."
-                + "\n Presser B pour aller en bas.\n Presser E pour aller au niveau supérieur."
-                + "\n Presser Q pour aller au niveau inférieur.");
-        text_expli.getStyleClass().add("text_horsjeu2");
-        boxText_expli.getChildren().add(text_expli);
-        root.setLeft(boxText_expli);
-        root.setMargin(boxText_expli, new Insets(10, 10, 10, 10));
-        final Scene scene = new Scene(root, 500, 200);
-        boolean add = scene.getStylesheets().add("css/style.css");
-        fenetre_aide.setScene(scene);
-        fenetre_aide.show();
 
     }
 
@@ -306,15 +248,14 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private void chargerPartie(ActionEvent event) {
         chargePartie.setDisable(true);
-
         jeuAppli.deserialiser();
-
         tabGrillesApp = new ArrayList<GridPane>();
         tabGrillesApp.add(grilleH);
         tabGrillesApp.add(grilleM);
         tabGrillesApp.add(grilleB);
         this.majGrillesApp();
         this.sauvegardePartie.setDisable(false);
+        this.instructionJeu.setVisible(true);
         mouvOrdi.setDisable(false);
     }
 
@@ -335,30 +276,37 @@ public class FXMLController implements Initializable, Parametres {
         Stage abandonner = new Stage();
         abandonner.setTitle("Voulez-vous vraiment quitter le jeu ? ");
         BorderPane root = new BorderPane();
-        root.getStyleClass().add("pane");
-        Label message = new Label("\t\t\t\t la partie n'est pas finie!"
+        root.setStyle("  -fx-background-color:#F5DEB3;	");
+
+        //Titre
+        Label message = new Label(" La partie n'est pas finie!"
                 + "\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?");
-        message.setFont(new Font("Serif", 18));
         root.setTop(message);
-        Pane decision = new Pane();
-        decision.setPrefWidth(200);
+
+        message.setStyle(" -fx-font-family : ARIAL;\n"
+                + "    -fx-font-size :18;\n"
+                + "    -fx-text-fill :#4e3f3f;");
+        Pane choix = new Pane();
+        choix.setPrefWidth(450);
         Button oui = new Button();
         Button non = new Button();
         oui.setText("Quitter");
         non.setText("Retour");
-        oui.setLayoutX(120);
+        oui.setLayoutX(100);
         oui.setLayoutY(20);
         non.setLayoutX(220);
         non.setLayoutY(20);
-        decision.getChildren().addAll(oui, non);
-        root.setCenter(decision);
-        root.setMargin(decision, new Insets(10, 10, 10, 10));
-        final Scene scene = new Scene(root, 420, 120);
-        boolean add = scene.getStylesheets().add("css/style.css");
+        oui.setStyle("  -fx-background-color: #FFE4E1;  -fx-text-fill: #4e3f3f;  -fx-font-size :18;");
+        non.setStyle(" -fx-background-color:  #FFE4E1;   -fx-text-fill :#4e3f3f;  -fx-font-size :18;");
+        choix.getChildren().addAll(oui, non);
+        root.setCenter(choix);
+        root.setMargin(choix, new Insets(10, 10, 10, 10));
+        final Scene scene = new Scene(root, 500, 150);
         abandonner.setScene(scene);
         abandonner.show();
         non.setOnAction(actionEvent -> abandonner.close());
         oui.setOnAction(actionEvent -> System.exit(0));
+
     }
 
     public void majScoreApp() {

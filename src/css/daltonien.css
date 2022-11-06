@@ -1,0 +1,46 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 4 nov. 2022, 21:19:18
+    Author     : Mouna 
+*/
+.pane {
+    -fx-background-color: #fef86c; 
+}
+
+
+.text_horsjeu{
+    
+    -fx-font-family : ARIAL;
+    -fx-font-size :30;
+    -fx-text-fill :darkblue;
+    
+}
+
+.text_horsjeu2{
+    
+    -fx-font-family : ARIAL;
+    -fx-font-size :20;
+    -fx-text-fill : white;
+    
+}
+
+.boxStyle1{
+    -fx-background-color : #2F48FF ;
+    -fx-background-radius : 10px;
+    
+}
+
+.caseJeu{
+    -fx-font-size : 48px;
+    -fx-text-fill :black;
+
+}
+
+.couleurCase{
+    -fx-background-color : #fef86c;
+    -fx-border-color :  black;
+}
