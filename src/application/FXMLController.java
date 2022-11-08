@@ -29,12 +29,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Menu;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.ConnexionBDD;
@@ -106,6 +111,12 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private Button boutonBDD2;
 
+    int compteMouv;
+    @FXML
+    private Menu fichier;
+    @FXML
+    private Label txtBDD;
+
     /**
      * Initializes the controller class.
      */
@@ -139,6 +150,7 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     public void nouvellePartie(ActionEvent event) {
+        compteMouv = 0;
         tabGrillesApp = new ArrayList<GridPane>();
         tabGrillesApp.add(grilleH);
         tabGrillesApp.add(grilleM);
@@ -370,6 +382,8 @@ public class FXMLController implements Initializable, Parametres {
     private void mouvJoueur(KeyEvent event) {
         String direction = event.getText();
         boolean b = false;
+        //Compteur de mouvement
+        compteMouv = compteMouv + 1;
         //Déplacement des cases selon la touche clavier
         if (direction.equals("g")) {
             b = jeuAppli.deplacerCases3G(GAUCHE);
@@ -440,24 +454,38 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private void enregistrementBDD(MouseEvent event) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-        // ça serait chouette de demander lors d'une nouvelle partie le pseudo du joueur
-        // Le pseudo en dessous est juste pour le test
-        String pseudo = "Sylvain";
+        //Enregistrement du pseudo
+        // create a tile pane
+        TilePane r = new TilePane();
+        // create a label to show the input in text dialog
+        Label l = new Label("Rentrez votre pseudo");
+        // create a text input dialog
+        TextInputDialog td = new TextInputDialog();
+        td.setTitle("Veuillez rentrer votre pseudonyme");
+        // create a button
+        Button d = new Button("click");
+        // show the text input dialog
+        td.showAndWait();
+        // set the text of the label
+        l.setText(td.getEditor().getText());
+        String pseudo = l.getText();
 
         // Stockage du score du joueur
         int scoreJoueurFin = Integer.valueOf(score.getText());
 
+        // Création d'une condition si le pseudo existe dèja
         // Récupérer les données de score, temps (existe pas encors) et déplacement (existe pas encore)
         // BDD infos
         String host = "localhost";
-        String port = "8889";
+        String port = "3306";
         String dbname = "2048_game_Estebe";
-        String username = "java";
-        String password = "projetjava";
+        String username = "root";
+        String password = "root";
+
         // BDD Connexion
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         // BDD requête ajout Joueur(int,string,int,int,int) Joueur(id,pseudo,score,temps,deplacement)
-        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + 0 + "','" + 0 + "')";
+        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + 0 + "','" + compteMouv + "')";
         c.insertTuples(query);
 
     }
@@ -465,17 +493,22 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private void consultationBDD(MouseEvent event) {
         String host = "localhost";
-        String port = "8889";
+        String port = "3306";
         String dbname = "2048_game_Estebe";
-        String username = "java";
-        String password = "projetjava";
+        String username = "root";
+        String password = "root";
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
-
+        String infos;
         // On faira différentes méthodes en fonction des besoins et différentes conditions
-        String queryScore = "SELECT  pseudo, scores FROM Joueur ORDER BY scores DESC ";
-        String queryTemps = "SELECT  pseudo, temps FROM Joueur ORDER BY temps ASC";
+        String queryScore = "SELECT pseudo FROM Joueur ORDER BY score ASC";
+        String queryTemps = "SELECT pseudo, temps FROM Joueur ORDER BY temps ASC";
         String queryDéplacement = "SELECT  pseudo, nombreDéplacement FROM Joueur ORDER BY nombreDéplacement ASC ";
-        c.getTuples(queryScore);
+        ArrayList<String> pseudo = c.getTuples(queryScore);
+        txtBDD.setText("" + pseudo.size());
+        
+       for(String elem: pseudo){
+       	 txtBDD.setText(elem);
+       } 
 
     }
 
