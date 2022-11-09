@@ -73,6 +73,8 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private GridPane grilleM;
     @FXML
+    private Pane instructionJeu;
+    @FXML
     private Pane tuile;
     @FXML
     private Label valTuile;
@@ -84,6 +86,8 @@ public class FXMLController implements Initializable, Parametres {
     private MenuItem daltonien;
     @FXML
     private MenuItem dyslexique;
+    @FXML
+    private MenuItem classique;
 
     @FXML
     private MenuItem ia1;
@@ -117,6 +121,9 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private Label txtBDD;
 
+    /* private boolean modeClassique = true;
+    private boolean modeDaltonien = false;
+    private boolean modeDyslexique = false;*/
     /**
      * Initializes the controller class.
      */
@@ -146,15 +153,11 @@ public class FXMLController implements Initializable, Parametres {
                 e.printStackTrace();
             }
         }
+
     }
 
     @FXML
     public void nouvellePartie(ActionEvent event) {
-        compteMouv = 0;
-        tabGrillesApp = new ArrayList<GridPane>();
-        tabGrillesApp.add(grilleH);
-        tabGrillesApp.add(grilleM);
-        tabGrillesApp.add(grilleB);
         jeuAppli = new Jeu();
         jeuAppli.lancementJeuAppli();
         sauvegardePartie.setDisable(false);
@@ -163,11 +166,33 @@ public class FXMLController implements Initializable, Parametres {
 
     }
 
+    @FXML
+    private void chargerPartie(ActionEvent event) {
+        chargePartie.setDisable(true);
+        jeuAppli.deserialiser();
+        this.majGrillesApp();
+        this.sauvegardePartie.setDisable(false);
+        mouvOrdi.setDisable(false);
+       
+
+    }
+
+    @FXML
+    private void sauvegarderPartie(ActionEvent event) {
+        //Lorsqu'on sauvegarde, le bouton de chargement devient actif
+        jeuAppli.serialiser();
+        chargePartie.setDisable(false);
+    }
+
     /**
      * Méthode pour afficher les 3 grilles du jeu
      *
      */
     private void majGrillesApp() {
+        tabGrillesApp = new ArrayList<GridPane>();
+        tabGrillesApp.add(grilleH);
+        tabGrillesApp.add(grilleM);
+        tabGrillesApp.add(grilleB);
         //Boucle pour chaque grille
         for (int k = 0; k < TAILLE; k++) {
             for (int i = 0; i < TAILLE; i++) {
@@ -188,41 +213,83 @@ public class FXMLController implements Initializable, Parametres {
                         caseJeuCouleur.setStyle("-fx-border-width : 1px 1px 1px 1px ");
                     }
 
-                    //Gestion des couleurs des cases
-                    switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
-                        case 2:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFFADF;");
-                            break;
-                        case 4:
-                            caseJeuCouleur.setStyle("-fx-background-color : #F3E9BE;");
-                            break;
-                        case 8:
-                            caseJeuCouleur.setStyle("-fx-background-color : #F3C076;");
-                            break;
-                        case 16:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FD9C4C;");
-                            break;
-                        case 32:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FF7440;");
-                            break;
-                        case 64:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FF513F;");
-                            break;
-                        case 128:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            break;
-                        case 256:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            break;
-                        case 512:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            break;
-                        case 1024:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            break;
-                        case 2048:
-                            caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            break;
+                    if (classique.isDisable()) {
+                        //Gestion des couleurs des cases
+                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
+                            case 2 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFFADF;");
+                            case 4 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #F3E9BE;");
+                            case 8 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #F3C076;");
+                            case 16 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FD9C4C;");
+                            case 32 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FF7440;");
+                            case 64 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FF513F;");
+                            case 128 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            case 256 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            case 512 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            case 1024 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            case 2048 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                        }
+                    } else if (daltonien.isDisable()) {
+                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
+                            case 2 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #E0431C;");
+                            case 4 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #00926a;");
+                            case 8 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #c67bd5;");
+                            case 16 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFD53A;");
+                            case 32 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
+                            case 64 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FF513F;");
+                            case 128 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #00926a;");
+                            case 256 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #c67bd5;");
+                            case 512 ->
+                                caseJeuCouleur.setStyle("-fx-background-color :#bae1f5;");
+                            case 1024 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
+                            case 2048 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
+                        }
+
+                    } else if (dyslexique.isDisable()) {
+                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
+                            case 2 ->
+                                caseJeuCouleur.setStyle("-fx-background-color :  #00FA9A;");
+                            case 4 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #7FFFD4;");
+                            case 8 ->
+                                caseJeuCouleur.setStyle("-fx-background-color :  #f2b179 ;");
+                            case 16 ->
+                                caseJeuCouleur.setStyle("-fx-background-color :#DDA0DD;");
+                            case 32 ->
+                                caseJeuCouleur.setStyle("-fx-background-color :  #5F9EA0;");
+                            case 64 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #90EE90;");
+                            case 128 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #5F9EA0;");
+                            case 256 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            case 512 ->
+                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                            case 1024 ->
+                                caseJeuCouleur.setStyle("-fx-background-color :  #90EE90;");
+                            case 2048 ->
+                                caseJeuCouleur.setStyle("-fx-background-color :  #90EE90;");
+                        }
                     }
 
                     caseJeuCouleur.getStyleClass().add("couleurCase");
@@ -239,24 +306,41 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
-    private void affichageDltonien(ActionEvent event) {
-        try {
-            AnchorPane pane = FXMLLoader.load(getClass().getResource("/application/daltonien.fxml"));
-            rootPane.getChildren().setAll(pane);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    private void affichageDaltonien(ActionEvent event) {
+        rootPane.getStylesheets().clear();
+        rootPane.getStylesheets().add("css/daltonien.css");
+        this.dyslexique.setDisable(false);
+        this.daltonien.setDisable(true);
+        this.classique.setDisable(false);
+        help.setVisible(true);
+        help.setDisable(false);
+        instructionJeu.setVisible(false);
+    }
+
+    @FXML
+    private void affichageClassique(ActionEvent event) {
+        rootPane.getStylesheets().clear();
+        rootPane.getStylesheets().add("css/classique.css");
+        this.dyslexique.setDisable(false);
+        this.daltonien.setDisable(false);
+        this.classique.setDisable(true);
+        help.setVisible(true);
+        help.setDisable(false);
+        instructionJeu.setVisible(false);
 
     }
 
     @FXML
     private void affichageDyslexique(ActionEvent event) {
-        try {
-            AnchorPane pane = FXMLLoader.load(getClass().getResource("/application/dyslexique.fxml"));
-            rootPane.getChildren().setAll(pane);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+
+        rootPane.getStylesheets().clear();
+        rootPane.getStylesheets().add("css/dyslexique.css");
+        this.help.setDisable(true);
+        this.dyslexique.setDisable(true);
+        this.daltonien.setDisable(false);
+        this.classique.setDisable(false);
+        instructionJeu.setVisible(true);
+        help.setVisible(false);
 
     }
 
@@ -291,7 +375,12 @@ public class FXMLController implements Initializable, Parametres {
         root.setLeft(boxText_expli);
         root.setMargin(boxText_expli, new Insets(10, 10, 10, 10));
         final Scene scene = new Scene(root, 500, 200);
-        boolean add = scene.getStylesheets().add("css/style.css");
+
+        if (classique.isDisable()) {
+            scene.getStylesheets().add("css/classique.css");
+        } else if (daltonien.isDisable()) {
+            scene.getStylesheets().add("css/daltonien.css");
+        }
         fenetre_aide.setScene(scene);
         fenetre_aide.show();
 
@@ -316,28 +405,6 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
-    private void chargerPartie(ActionEvent event) {
-        chargePartie.setDisable(true);
-
-        jeuAppli.deserialiser();
-
-        tabGrillesApp = new ArrayList<GridPane>();
-        tabGrillesApp.add(grilleH);
-        tabGrillesApp.add(grilleM);
-        tabGrillesApp.add(grilleB);
-        this.majGrillesApp();
-        this.sauvegardePartie.setDisable(false);
-        mouvOrdi.setDisable(false);
-    }
-
-    @FXML
-    private void sauvegarderPartie(ActionEvent event) {
-        //Lorsqu'on sauvegarde, le bouton de chargement devient actif
-        jeuAppli.serialiser();
-        chargePartie.setDisable(false);
-    }
-
-    @FXML
     private void undo(MouseEvent event) {
     }
 
@@ -350,7 +417,7 @@ public class FXMLController implements Initializable, Parametres {
         root.getStyleClass().add("pane");
         Label message = new Label("\t\t\t\t la partie n'est pas finie!"
                 + "\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?");
-        message.setFont(new Font("Serif", 18));
+        root.getStyleClass().add("message");
         root.setTop(message);
         Pane decision = new Pane();
         decision.setPrefWidth(200);
@@ -366,7 +433,14 @@ public class FXMLController implements Initializable, Parametres {
         root.setCenter(decision);
         root.setMargin(decision, new Insets(10, 10, 10, 10));
         final Scene scene = new Scene(root, 420, 120);
-        boolean add = scene.getStylesheets().add("css/style.css");
+        if (classique.isDisable()) {
+            scene.getStylesheets().add("css/classique.css");
+        } else if (daltonien.isDisable()) {
+            scene.getStylesheets().add("css/daltonien.css");
+        } else if (dyslexique.isDisable()) {
+            scene.getStylesheets().add("css/dyslexique.css");
+        }
+
         abandonner.setScene(scene);
         abandonner.show();
         non.setOnAction(actionEvent -> abandonner.close());
@@ -380,10 +454,15 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     private void mouvJoueur(KeyEvent event) {
+        if (dyslexique.isDisable()) {
+            instructionJeu.setVisible(true);
+            help.setVisible(false);
+        } else {
+            instructionJeu.setVisible(false);
+            help.setVisible(true);
+        }
         String direction = event.getText();
         boolean b = false;
-        //Compteur de mouvement
-        compteMouv = compteMouv + 1;
         //Déplacement des cases selon la touche clavier
         if (direction.equals("g")) {
             b = jeuAppli.deplacerCases3G(GAUCHE);
@@ -418,7 +497,6 @@ public class FXMLController implements Initializable, Parametres {
         BorderPane root = new BorderPane();
         root.getStyleClass().add("pane");
 
-        //Titre
         Label victoire = new Label("Félicitations, vous avez gagné!");
         Label scoreAff = new Label("Votre score : " + jeuAppli.getScoreFinal());
         victoire.getStyleClass().add("text_horsjeu");
@@ -426,7 +504,14 @@ public class FXMLController implements Initializable, Parametres {
         root.setCenter(victoire);
         root.setTop(scoreAff);
         final Scene scene = new Scene(root, 100, 100);
-        boolean add = scene.getStylesheets().add("css/style.css");
+        if (classique.isDisable()) {
+            scene.getStylesheets().add("css/classique.css");
+        } else if (daltonien.isDisable()) {
+            scene.getStylesheets().add("css/daltonien.css");
+        } else if (dyslexique.isDisable()) {
+            scene.getStylesheets().add("css/dyslexique.css");
+        }
+
         fenetre_aide.setScene(scene);
         fenetre_aide.show();
     }
@@ -445,7 +530,14 @@ public class FXMLController implements Initializable, Parametres {
         root.setCenter(defaite);
         root.setTop(scoreAff);
         final Scene scene = new Scene(root, 100, 100);
-        boolean add = scene.getStylesheets().add("css/style.css");
+        if (classique.isDisable()) {
+            scene.getStylesheets().add("css/classique.css");
+        } else if (daltonien.isDisable()) {
+            scene.getStylesheets().add("css/daltonien.css");
+        } else if (dyslexique.isDisable()) {
+            scene.getStylesheets().add("css/dyslexique.css");
+        }
+
         fenetre_aide.setScene(scene);
         fenetre_aide.show();
     }
@@ -505,10 +597,10 @@ public class FXMLController implements Initializable, Parametres {
         String queryDéplacement = "SELECT  pseudo, nombreDéplacement FROM Joueur ORDER BY nombreDéplacement ASC ";
         ArrayList<String> pseudo = c.getTuples(queryScore);
         txtBDD.setText("" + pseudo.size());
-        
-       for(String elem: pseudo){
-       	 txtBDD.setText(elem);
-       } 
+
+        for (String elem : pseudo) {
+            txtBDD.setText(elem);
+        }
 
     }
 

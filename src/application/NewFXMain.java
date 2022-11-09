@@ -24,19 +24,15 @@ import javafx.stage.Stage;
  */
 public class NewFXMain extends Application {
 
-    @FXML
-    private MenuItem daltolien;
-    private Stage stage = new Stage();
 
     @Override
     public void start(Stage stage) throws IOException {
-        //Parent root = FXMLLoader.load(getClass().getResource("/application/daltonien.fxml"));
-        //  Parent root = FXMLLoader.load(getClass().getResource("/application/dyslexique.fxml"));
+
         Parent root = FXMLLoader.load(getClass().getResource("/application/FXML.fxml"));
         Scene scene = new Scene(root);
         stage.setResizable(false);
         stage.setTitle("Jeu 2048 3D");
-        boolean add = scene.getStylesheets().add("css/style.css");
+        boolean add = scene.getStylesheets().add("css/classique.css");
         stage.setScene(scene);
         stage.show();
 

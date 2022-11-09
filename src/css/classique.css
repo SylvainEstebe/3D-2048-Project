@@ -1,0 +1,90 @@
+
+/* 
+    Created on : 3 nov. 2022, 10:32:55
+    Author     : Alexanne
+*/
+
+
+.paneCentrale1{
+
+    -fx-background-color :  #faf8ef;
+    -fx-background-radius : 10px ;
+}
+.paneCentrale2{
+    -fx-background-color :   #bbada0;
+}
+.bestScore , .score{
+    -fx-background-color :   #bbada0;
+    -fx-background-radius : 10px;
+}
+gridPane{
+    -fx-background-color:  rgba(238, 228, 218, 0.35);
+    -fx-border-radius :  10px;
+    -fx-background-radius: 10px;
+
+}
+
+.paneBas{
+    -fx-background-color:    #bbada0;
+}
+
+.case4{
+    -fx-background-color : #F3E9BE;
+}
+.case8{
+    -fx-background-color : #F3C076;
+}
+.case2{
+    -fx-background-color : #FFFADF;
+}
+.case32{
+
+    -fx-background-color : #FF7440;
+}
+.pane {
+    -fx-background-color:  #faf8ef; 
+}
+.option{
+    -fx-text-fill: #4e3f3f; 
+    -fx-background-color : #F3E9BE; 
+}
+
+.message{
+    -fx-font-family : ARIAL;
+    -fx-font-size :18;
+    -fx-text-fill : white;
+}
+
+.text_horsjeu{
+
+    -fx-font-family : ARIAL;
+    -fx-font-size :30;
+    -fx-text-fill : #776e65;
+
+}
+
+.text_horsjeu2{
+
+    -fx-font-family : ARIAL;
+    -fx-font-size :20;
+    -fx-text-fill : white;
+
+}
+
+
+.boxStyle1{
+    -fx-background-color :  #bbada0;
+    -fx-background-radius : 10px;
+
+}
+.caseJeu{
+    -fx-font-size : 48px;
+    -fx-text-fill : #776e65;
+
+}
+
+.couleurCase{
+    -fx-background-color : #eee4da;
+    -fx-border-color :  black;
+}
+

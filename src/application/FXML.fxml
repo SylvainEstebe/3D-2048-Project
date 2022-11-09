@@ -5,6 +5,8 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -13,11 +15,11 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
+<AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="808.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
    <children>
-      <BorderPane prefHeight="800.0" prefWidth="1006.0">
-         <top>
-            <MenuBar prefHeight="28.0" prefWidth="1006.0" BorderPane.alignment="CENTER">
+      <AnchorPane layoutY="14.0" prefHeight="881.0" prefWidth="1018.0" AnchorPane.bottomAnchor="-67.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0">
+         <children>
+            <MenuBar layoutY="-15.0" prefHeight="38.0" prefWidth="1018.0">
               <menus>
                 <Menu fx:id="fichier" mnemonicParsing="false" text="Fichier">
                   <items>
@@ -29,7 +31,8 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Interface">
                   <items>
-                    <MenuItem fx:id="daltonien" mnemonicParsing="false" onAction="#affichageDltonien" text="Daltonien" />
+                        <MenuItem fx:id="classique" disable="true" mnemonicParsing="false" onAction="#affichageClassique" text="Classique" />
+                    <MenuItem fx:id="daltonien" mnemonicParsing="false" onAction="#affichageDaltonien" text="Daltonien" />
                         <MenuItem fx:id="dyslexique" mnemonicParsing="false" onAction="#affichageDyslexique" text="Dyslexique" />
                   </items>
                 </Menu>
@@ -44,157 +47,227 @@
                 </Menu>
               </menus>
             </MenuBar>
-         </top>
-         <center>
-            <Pane prefHeight="599.0" prefWidth="892.0" style="-fx-background-color: #faf8ef#faf8ef #faf8ef#faf8ef; -fx-background-radius: 10px;" styleClass="paneCentrale1" BorderPane.alignment="CENTER">
-               <children>
-                  <Pane layoutY="222.0" prefHeight="329.0" prefWidth="1006.0" style="-fx-background-color: #bbada0#bbada0#bbada0#bbada0;" styleClass="paneCentrale2">
+            <BorderPane prefHeight="823.0" prefWidth="1018.0" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+               <bottom>
+                  <Pane prefHeight="63.0" prefWidth="1018.0" styleClass="paneBas" BorderPane.alignment="CENTER">
                      <children>
-                        <GridPane fx:id="grilleH" gridLinesVisible="true" layoutX="14.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <Pane prefHeight="92.0" prefWidth="100.0" style="-fx-background-color: #f67c5f#f67c5f;" GridPane.columnIndex="2">
-                                 <children>
-                                    <Label layoutX="21.0" layoutY="20.0" prefHeight="60.0" prefWidth="59.0" text="32" textAlignment="CENTER" textFill="WHITE">
-                                       <font>
-                                          <Font size="48.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </Pane>
-                           </children>
-                        </GridPane>
-                        <GridPane fx:id="grilleM" gridLinesVisible="true" layoutX="353.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <Pane fx:id="tuile" prefHeight="92.0" prefWidth="100.0" style="-fx-background-color: #ede0c8#ede0c8;">
-                                 <children>
-                                    <Label fx:id="valTuile" layoutX="35.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="4" textAlignment="CENTER" textFill="#776e65">
-                                       <font>
-                                          <Font size="48.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </Pane>
-                           </children>
-                        </GridPane>
-                        <GridPane fx:id="grilleB" gridLinesVisible="true" layoutX="692.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Pane prefHeight="92.0" prefWidth="60.0" style="-fx-background-color: #eee4da#eee4da;" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                 <children>
-                                    <Label layoutX="36.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="2" textAlignment="CENTER" textFill="#776e65">
-                                       <font>
-                                          <Font size="48.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </Pane>
-                              <Pane prefHeight="92.0" prefWidth="100.0" style="-fx-background-color: #f2b179#f2b179;" GridPane.columnIndex="2">
-                                 <children>
-                                    <Label layoutX="36.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="8" textAlignment="CENTER" textFill="WHITE">
-                                       <font>
-                                          <Font size="48.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </Pane>
-                           </children>
-                        </GridPane>
+                        <Button fx:id="help" defaultButton="true" layoutX="798.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#aidePopUp" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Comment jouer ? " textAlignment="CENTER" textFill="#eee4da">
+                           <font>
+                              <Font name="Arial" size="18.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="mouvOrdi" defaultButton="true" disable="true" layoutX="466.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#mouvOrdiApp" prefHeight="34.0" prefWidth="217.0" styleClass="option" text="Mouvement ordinateur" textAlignment="CENTER" textFill="#eee4da">
+                           <font>
+                              <Font name="Arial" size="18.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="undo" disable="true" layoutX="44.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#undo" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Retour" textAlignment="CENTER" textFill="#eee4da">
+                           <font>
+                              <Font name="Arial" size="18.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="stopIA" disable="true" layoutX="250.0" layoutY="15.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Arrêter IA" textAlignment="CENTER" textFill="#eee4da">
+                           <font>
+                              <Font name="Arial" size="18.0" />
+                           </font>
+                        </Button>
                      </children>
                   </Pane>
-                  <Pane layoutX="870.0" layoutY="16.0" prefHeight="117.0" prefWidth="126.0" style="-fx-background-color: #bbada0#bb#bbada0#bbada0ada0; -fx-background-radius: 10px;" styleClass="bestScore">
+               </bottom>
+               <top>
+                  <Pane prefHeight="722.0" prefWidth="1018.0" styleClass="paneCentrale1" BorderPane.alignment="CENTER">
                      <children>
-                        <Label layoutX="37.0" layoutY="14.0" prefHeight="27.0" prefWidth="53.0" text="Best" textFill="#eee4da">
+                        <Pane layoutY="180.0" prefHeight="329.0" prefWidth="1018.0" styleClass="paneCentrale2">
+                           <children>
+                              <GridPane fx:id="grilleH" gridLinesVisible="true" layoutX="14.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Pane prefHeight="92.0" prefWidth="100.0" styleClass="case32" GridPane.columnIndex="2">
+                                       <children>
+                                          <Label layoutX="21.0" layoutY="20.0" prefHeight="60.0" prefWidth="59.0" text="32" textAlignment="CENTER" textFill="WHITE">
+                                             <font>
+                                                <Font size="48.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                 </children>
+                              </GridPane>
+                              <GridPane fx:id="grilleM" gridLinesVisible="true" layoutX="353.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Pane fx:id="tuile" prefHeight="92.0" prefWidth="100.0" styleClass="case4">
+                                       <children>
+                                          <Label fx:id="valTuile" layoutX="35.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="4" textAlignment="CENTER" textFill="#776e65">
+                                             <font>
+                                                <Font size="48.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                 </children>
+                              </GridPane>
+                              <GridPane fx:id="grilleB" gridLinesVisible="true" layoutX="692.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Pane prefHeight="92.0" prefWidth="60.0" styleClass="case2" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label layoutX="36.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="2" textAlignment="CENTER" textFill="#776e65">
+                                             <font>
+                                                <Font size="48.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                    <Pane prefHeight="92.0" prefWidth="100.0" styleClass="case8" GridPane.columnIndex="2">
+                                       <children>
+                                          <Label layoutX="36.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="8" textAlignment="CENTER" textFill="WHITE">
+                                             <font>
+                                                <Font size="48.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </Pane>
+                        <Pane layoutX="870.0" layoutY="16.0" prefHeight="117.0" prefWidth="126.0" styleClass="bestScore">
+                           <children>
+                              <Label layoutX="37.0" layoutY="14.0" prefHeight="27.0" prefWidth="53.0" styleClass="labelEx" text="Best" textFill="#eee4da">
+                                 <font>
+                                    <Font name="Arial" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="meilleurScore" layoutX="18.0" layoutY="59.0" prefHeight="27.0" prefWidth="95.0" styleClass="labelEx" text="     0" textAlignment="CENTER" textFill="WHITE">
+                                 <font>
+                                    <Font name="Arial" size="24.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </Pane>
+                        <Pane layoutX="736.0" layoutY="16.0" prefHeight="116.0" prefWidth="125.0" styleClass="score">
+                           <children>
+                              <Label layoutX="26.0" layoutY="14.0" prefHeight="26.0" prefWidth="73.0" styleClass="labelEx" text="Score" textFill="#eee4da">
+                                 <font>
+                                    <Font name="Arial" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="score" layoutX="10.0" layoutY="58.0" prefHeight="32.0" prefWidth="105.0" styleClass="labelEx" text="      0" textAlignment="CENTER" textFill="WHITE">
+                                 <font>
+                                    <Font name="Arial" size="24.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </Pane>
+                        <Label layoutX="14.0" layoutY="18.0" prefHeight="72.0" prefWidth="354.0" styleClass="labelEx" text="2048 - 3D" textFill="#776e65">
                            <font>
-                              <Font name="Arial" size="24.0" />
+                              <Font name="Arial" size="80.0" />
                            </font>
                         </Label>
-                        <Label fx:id="meilleurScore" layoutX="18.0" layoutY="59.0" prefHeight="27.0" prefWidth="95.0" text="     0" textAlignment="CENTER" textFill="WHITE">
-                           <font>
-                              <Font name="Arial" size="24.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="boutonBDD" layoutX="428.0" layoutY="132.0" mnemonicParsing="false" onMouseClicked="#enregistrementBDD" text="BASE DE DONNÉE" />
+                        <Button fx:id="boutonBDD2" layoutX="579.0" layoutY="133.0" mnemonicParsing="false" onMouseClicked="#consultationBDD" prefHeight="26.0" prefWidth="130.0" text="Consulter BBDD" />
+                        <Pane fx:id="instructionJeu" layoutY="521.0" prefHeight="213.0" prefWidth="1018.0" visible="false">
+                           <children>
+                              <ImageView fx:id="haut" fitHeight="59.0" fitWidth="61.0" layoutX="270.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/h.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="bas" fitHeight="60.0" fitWidth="57.0" layoutX="272.0" layoutY="137.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/b.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="gauhe" fitHeight="75.0" fitWidth="59.0" layoutX="200.0" layoutY="68.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/g.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="droite" fitHeight="65.0" fitWidth="58.0" layoutX="348.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/d.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="descendre" fitHeight="65.0" fitWidth="90.0" layoutX="413.0" layoutY="109.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/q.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="monter" fitHeight="65.0" fitWidth="90.0" layoutX="413.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/e.png" />
+                                 </image>
+                              </ImageView>
+                              <Label layoutX="21.0" layoutY="17.0" prefHeight="50.0" prefWidth="197.0" text="Pour Jouer : ">
+                                 <font>
+                                    <Font size="21.0" />
+                                 </font>
+                              </Label>
+                              <ImageView fitHeight="27.0" fitWidth="22.0" layoutX="318.0" layoutY="86.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/fd.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fitHeight="27.0" fitWidth="22.0" layoutX="259.0" layoutY="86.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/fg.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fitHeight="29.0" fitWidth="22.0" layoutX="290.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/fh.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fitHeight="27.0" fitWidth="22.0" layoutX="290.0" layoutY="113.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/fb.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fitHeight="68.0" fitWidth="30.0" layoutX="489.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/fh.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fitHeight="71.0" fitWidth="37.0" layoutX="486.0" layoutY="128.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/fb.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </Pane>
                      </children>
                   </Pane>
-                  <Pane layoutX="736.0" layoutY="16.0" prefHeight="116.0" prefWidth="125.0" style="-fx-background-color: #bbada0#bb#bbada0#bbada0ada0; -fx-background-radius: 10px;" styleClass="score">
-                     <children>
-                        <Label layoutX="26.0" layoutY="14.0" prefHeight="26.0" prefWidth="73.0" text="Score" textFill="#eee4da">
-                           <font>
-                              <Font name="Arial" size="24.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="score" layoutX="10.0" layoutY="58.0" prefHeight="32.0" prefWidth="105.0" text="      0" textAlignment="CENTER" textFill="WHITE">
-                           <font>
-                              <Font name="Arial" size="24.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </Pane>
-                  <Label layoutX="14.0" layoutY="18.0" prefHeight="72.0" prefWidth="354.0" text="2048 - 3D" textFill="#776e65">
-                     <font>
-                        <Font name="Arial" size="80.0" />
-                     </font>
-                  </Label>
-                  <Button fx:id="boutonBDD" layoutX="428.0" layoutY="132.0" mnemonicParsing="false" onMouseClicked="#enregistrementBDD" text="BASE DE DONNÉE" />
-                  <Button fx:id="boutonBDD2" layoutX="579.0" layoutY="133.0" mnemonicParsing="false" onMouseClicked="#consultationBDD" prefHeight="26.0" prefWidth="130.0" text="Consulter BBDD" />
-                  <Label fx:id="txtBDD" layoutX="41.0" layoutY="137.0" prefHeight="36.0" prefWidth="357.0" text="Label" />
-               </children>
-            </Pane>
-         </center>
-         <bottom>
-            <Pane prefHeight="78.0" prefWidth="1006.0" style="-fx-background-color: #faf8ef#faf8ef;" styleClass="paneBas" BorderPane.alignment="CENTER">
-               <children>
-                  <Button fx:id="help" defaultButton="true" layoutX="821.0" layoutY="34.0" mnemonicParsing="false" onMouseClicked="#aidePopUp" prefHeight="33.0" prefWidth="171.0" style="-fx-background-color: #bbada0#bb#bbada0#bbada0ada0; -fx-border-radius: 10px;" text="Comment jouer ? " textAlignment="CENTER" textFill="#eee4da">
-                     <font>
-                        <Font name="Arial" size="18.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="stopIA" disable="true" layoutX="194.0" layoutY="34.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="171.0" style="-fx-background-color: #bbada0#bb#bbada0#bbada0ada0 #bbada0#bb#bbada0#bbada0ada0; -fx-border-radius: 10px;" text="Arrêter IA" textAlignment="CENTER" textFill="#eee4da">
-                     <font>
-                        <Font name="Arial" size="18.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="undo" disable="true" layoutX="14.0" layoutY="34.0" mnemonicParsing="false" onMouseClicked="#undo" prefHeight="33.0" prefWidth="171.0" style="-fx-background-color: #bbada0#bb#bbada0#bbada0ada0 #bbada0#bb#bbada0#bbada0ada0; -fx-border-radius: 10px;" text="Retour" textAlignment="CENTER" textFill="#eee4da">
-                     <font>
-                        <Font name="Arial" size="18.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="mouvOrdi" defaultButton="true" disable="true" layoutX="371.0" layoutY="34.0" mnemonicParsing="false" onMouseClicked="#mouvOrdiApp" prefHeight="34.0" prefWidth="217.0" style="-fx-background-color: #bbada0#bb#bbada0#bbada0ada0; -fx-border-radius: 10px;" text="Mouvement ordinateur" textAlignment="CENTER" textFill="#eee4da">
-                     <font>
-                        <Font name="Arial" size="18.0" />
-                     </font>
-                  </Button>
-               </children>
-            </Pane>
-         </bottom>
-      </BorderPane>
+               </top>
+            </BorderPane>
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>
