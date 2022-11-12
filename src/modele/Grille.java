@@ -1,10 +1,8 @@
-package jeuConsole;
-
-
+package modele;
 import java.io.Serializable;
-import jeuConsole.Case;
 import java.util.ArrayList;
 import java.util.Random;
+import variables.Parametres;
 
 /**
  * Classe qui réalise toutes les fonctionnalités sur une grille précise du jeu

@@ -1,0 +1,99 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 4 nov. 2022, 21:19:18
+    Author     : Mouna 
+*/
+
+.paneCentrale1{
+    -fx-background-color :  #fef86c;
+    -fx-background-radius : 10px;
+}
+.paneCentrale2{
+    -fx-background-color :   #2F48FF;
+
+}
+.bestScore , .score{
+    -fx-background-color :  #2F48FF;
+    -fx-background-radius : 10px;
+}
+gridPane{
+    -fx-background-color:  rgba(238, 228, 218, 0.35) ;
+    -fx-border-radius :  10px;
+    -fx-background-radius: 10px;
+
+}
+
+.paneBas {
+    -fx-background-color:  #2F48FF;
+}
+
+.case4{
+    -fx-background-color :  #00926a;
+}
+.case8{
+    -fx-background-color : #c67bd5;
+}
+.case2{
+    -fx-background-color :#E0431C;
+}
+.case32{
+
+    -fx-background-color: #bae1f5;
+}
+
+.option{
+    -fx-background-color :   #00926a;
+    -fx-border-radius :10px;    
+}
+
+
+.pane {
+    -fx-background-color:  rgba(238, 228, 218, 0.35); 
+}
+
+.message{
+     -fx-font-family : serif;
+    -fx-font-size :18;
+    -fx-text-fill : white;
+}
+
+.text_horsjeu{
+
+    -fx-font-family : ARIAL;
+    -fx-font-size :30;
+    -fx-text-fill :darkblue;
+
+}
+
+.text_horsjeu2{
+
+    -fx-font-family : ARIAL;
+    -fx-font-size :20;
+    -fx-text-fill : white;
+
+}
+
+.boxStyle1{
+    -fx-background-color : #2F48FF ;
+    -fx-background-radius : 10px;
+
+}
+
+.caseJeu{
+    -fx-font-size : 48px;
+    -fx-text-fill :black;
+
+}
+
+.couleurCase{
+    -fx-background-color : #fef86c;
+    -fx-border-color :  black;
+}
+.labelEx{
+    -fx-text-fill:  #4e3f3f;
+}
+

@@ -1,4 +1,4 @@
-package jeuConsole;
+package modele;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
+import variables.Parametres;
+import java.io.FileNotFoundException;
 
 /**
  *
@@ -78,7 +80,7 @@ public class Jeu implements Parametres, Serializable {
      *
      * @return les 3 grilles
      */
-    public ArrayList<Grille> getgrilles() {
+    public ArrayList<Grille> getGrilles() {
         return grilles;
     }
     
@@ -421,13 +423,36 @@ public class Jeu implements Parametres, Serializable {
             return false;
         }
     }
+    /*
+    *Methode pour lancer une nouvelle partie sur l'interface graphique
+    */
+
+    public void lancementJeuAppli(){
+        //le jeu commence avec 2 cases
+        this.ajoutCases();
+        this.ajoutCases();
+        
+    }
+    
+    public void choixNbCasesAjout(Boolean b2){
+        Random ra = new Random();
+        if (b2) {
+            int random = ra.nextInt(2) + 1;
+            for (int i = 0; i < random; i++) {
+                this.ajoutCases();
+            }
+        }
+        this.majScore();
+        
+    }
+    
 
     /**
      * Méthode lancement et déroulement du jeu Affectuer des déplacements selon
      * une direction saisie par le joueur + synchronisation du score + aide:
      * l'ordinateur joue un coup à la place du joueur s'il veut Fin du jeu
      */
-    public void lancementJeu() {
+    public void lancementJeuConsole() {
         Scanner sc1 = new Scanner(System.in);
         Random ra = new Random();
         boolean retour = false; //faux car le retour n'a pas encore été utilisé
@@ -460,7 +485,8 @@ public class Jeu implements Parametres, Serializable {
                 retour = true;
             }
             if (s.equals("?")) {
-                this.MouvementAlea();
+                boolean b2=this.MouvementAlea();
+                choixNbCasesAjout(b2);
                 this.majScore();
                 System.out.println(this);
 
@@ -490,12 +516,7 @@ public class Jeu implements Parametres, Serializable {
 
                 enregistrement();
                 boolean b2 = this.deplacerCases3G(direction);
-                if (b2) {
-                    int random = ra.nextInt(2) + 1;
-                    for (int i = 0; i < random; i++) {
-                        this.ajoutCases();
-                    }
-                }
+                choixNbCasesAjout(b2);
                 if (b2) {
                     validerEnregistrement();
                 } else {
@@ -510,7 +531,7 @@ public class Jeu implements Parametres, Serializable {
         if (this.getValeurMaxJeu() >= OBJECTIF) {
             this.victoire();
         } else {
-            this.finJeu();
+            this.jeuPerdu();
         }
 
     }
@@ -666,7 +687,7 @@ public class Jeu implements Parametres, Serializable {
         System.out.println(this);*/
         
         //retour au coup d'avant
-        this.setgrilles(etatsPrecedents.get(0).getgrilles()); 
+        this.setgrilles(etatsPrecedents.get(0).getGrilles()); 
         this.setScoreFinal(etatsPrecedents.get(0).getScoreFinal()); 
         this.setExistePartiePrecedente(etatsPrecedents.get(0).getExistePartiePrecedente());  //à tester
         etatsPrecedents.remove(0);

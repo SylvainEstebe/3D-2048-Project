@@ -1,0 +1,74 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 9 nov. 2022, 10:59:36
+    Author     : Mouna 
+*/
+
+.paneCentrale1{
+    -fx-background-color :   #F5DEB3;
+    -fx-background-radius : 10px;
+}
+.paneCentrale2{
+    -fx-background-color :   #E6E6FA;
+
+}
+.bestScore , .score{
+    -fx-background-color :  #E6E6FA;
+    -fx-background-radius : 10px;
+}
+gridPane{
+    -fx-background-color:   rgba(238, 228, 218, 0.35);
+    -fx-border-radius :  10px;
+    -fx-background-radius: 10px;
+
+}
+
+.paneBas{
+    -fx-background-color:    #E6E6FA;
+}
+.option{
+    -fx-background-color: #bae1f5;
+    -fx-border-radius : 10px;    
+}
+
+.case4{
+    -fx-background-color : #7FFFD4;
+}
+.case8{
+    -fx-background-color :#f2b179 ;
+}
+.case2{
+    -fx-background-color :#00FA9A;
+}
+.case32{
+
+    -fx-background-color: #bae1f5;
+}
+.pane {
+    -fx-background-color:  #F5DEB3;
+}
+
+.message{
+    -fx-font-family : ARIAL;
+    -fx-font-size :18px;
+    -fx-text-fill :#4e3f3f;
+}
+
+
+.caseJeu{
+    -fx-font-size : 48px;
+    -fx-text-fill :black;
+
+}
+
+.couleurCase{
+    -fx-background-color : #F5DEB3;
+    -fx-border-color :  black;
+}
+.label{
+    -fx-text-fill :#4e3f3f;
+}
