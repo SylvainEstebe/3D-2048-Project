@@ -15,6 +15,7 @@ public class Case implements Parametres, Serializable {
 
     private int x, y, valeur; 
     private Grille grille;
+    private boolean fusionnee; //indique si la case a déjà été fusionnée durant un coup donné, réinitialisée à chaque coup
 
     /**
      * Constructeur de case
@@ -28,6 +29,7 @@ public class Case implements Parametres, Serializable {
         this.y = ord;
         this.valeur = v;
         grille=g;
+        this.fusionnee = false;
     }
 
     /**
@@ -92,6 +94,22 @@ public class Case implements Parametres, Serializable {
      */
     public int getValeur() {
         return this.valeur;
+    }
+    
+    /**
+     * Méthode qui permet de modifier l'ordonnée de la case
+     * @param f le nouveau booléen fusionnee
+     */
+    public void setFusionnee(boolean f) {
+        this.fusionnee = f;
+    }
+    
+     /**
+     * Méthode qui permet d'obtenir le booléen fusionnee
+     * @return fusionnee le booléen qui indique si la case a déjà été fusionnée
+     */
+    public boolean isFusionnee() {
+        return this.fusionnee;
     }
 
     /**

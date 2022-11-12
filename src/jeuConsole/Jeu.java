@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -22,7 +23,7 @@ public class Jeu implements Parametres, Serializable {
     private ArrayList<Grille> grilles = new ArrayList<Grille>();
     private int scoreFinal = 0;
     private boolean existePartiePrecedente;
-
+    private LinkedList<Jeu> etatsPrecedents = new LinkedList<>();
     /**
      * Constructeur qui initialise la liste des grilles
      */
@@ -38,6 +39,19 @@ public class Jeu implements Parametres, Serializable {
         grilles.add(g2);
         existePartiePrecedente = false;
 
+    }
+    
+    /**
+     * Crée une copie du Jeu
+     * 
+     * @param j Jeu à copier 
+     */
+    private Jeu(Jeu j) {
+        this.grilles.add(j.grilles.get(0).clone(this));
+        this.grilles.add(j.grilles.get(1).clone(this));
+        this.grilles.add(j.grilles.get(2).clone(this));
+        this.scoreFinal = j.scoreFinal;
+        this.existePartiePrecedente = j.existePartiePrecedente;
     }
 
     /**
@@ -67,7 +81,16 @@ public class Jeu implements Parametres, Serializable {
     public ArrayList<Grille> getgrilles() {
         return grilles;
     }
-
+    
+    /**
+     * Méthode qui retourne le booléen existePartiePrecedente : faux si elle n'y en a pas
+     *
+     * @return faux s'il n'y en a pas de partie précédente
+     */
+    public boolean getExistePartiePrecedente() {
+        return existePartiePrecedente;
+    }
+    
     /**
      * Méthode qui modifie les 3 grilles du jeu
      *
@@ -75,6 +98,15 @@ public class Jeu implements Parametres, Serializable {
      */
     public void setgrilles(ArrayList<Grille> nouvellesgrilles) {
         grilles = nouvellesgrilles;
+    }
+    
+    /**
+     * Méthode qui permet de modifier le booléen existePartiePrecedente
+     * 
+     * @param e : le nouveau booléen qui indique si une partie précédente existe ou non
+     */
+    public void setExistePartiePrecedente(boolean e){
+        this.existePartiePrecedente = e;
     }
 
     /**
@@ -237,38 +269,39 @@ public class Jeu implements Parametres, Serializable {
     private boolean deplacementUneCaseMD(int direction2, ArrayList<Case> deplaceMonterEtDesc, int localisationCases) {
         boolean deplacement = false;
         int caseVoisine;
-
-        if (direction2 == MONTERG) {
-            caseVoisine = localisationCases - 1;
-        } else {
-            caseVoisine = localisationCases + 1;
-        }
-
-        // Tant que mon voisin = 0, je me déplace avant de chercher à fusionner
-        while (caseVoisine >= 0 && caseVoisine < TAILLE && deplaceMonterEtDesc.get(caseVoisine).getValeur() == 0) {
-            deplaceMonterEtDesc.get(caseVoisine).setValeur(deplaceMonterEtDesc.get(localisationCases).getValeur());
-            deplaceMonterEtDesc.get(localisationCases).setValeur(0);
-            deplacement = true;
-            // mise à jour de mon index et celui de mon voisin
+        
+        if (deplaceMonterEtDesc.get(localisationCases).getValeur() > 0) { // Déplacement uniquement s'il s'agit d'une vraie case (avec une valeur)
             if (direction2 == MONTERG) {
-                caseVoisine--;
-                localisationCases--;
+                caseVoisine = localisationCases - 1;
             } else {
-                caseVoisine++;
-                localisationCases++;
+                caseVoisine = localisationCases + 1;
             }
-        }
 
-        if (caseVoisine >= 0 && caseVoisine < TAILLE) {
-            //Si mon voisin a la même valeur que moi, je fusionne
-            if (deplaceMonterEtDesc.get(caseVoisine).getValeur()
-                    == deplaceMonterEtDesc.get(localisationCases).getValeur()) {
-                deplaceMonterEtDesc.get(caseVoisine).getGrille().fusion(deplaceMonterEtDesc.get(caseVoisine));
+            // Tant que mon voisin = 0, je me déplace avant de chercher à fusionner
+            while (caseVoisine >= 0 && caseVoisine < TAILLE && deplaceMonterEtDesc.get(caseVoisine).getValeur() == 0) {
+                deplaceMonterEtDesc.get(caseVoisine).setValeur(deplaceMonterEtDesc.get(localisationCases).getValeur());
                 deplaceMonterEtDesc.get(localisationCases).setValeur(0);
                 deplacement = true;
+                // mise à jour de mon index et celui de mon voisin
+                if (direction2 == MONTERG) {
+                    caseVoisine--;
+                    localisationCases--;
+                } else {
+                    caseVoisine++;
+                    localisationCases++;
+                }
+            }
+
+            if (caseVoisine >= 0 && caseVoisine < TAILLE) {
+                //Si mon voisin a la même valeur que moi, je fusionne
+                if (deplaceMonterEtDesc.get(caseVoisine).getValeur()
+                        == deplaceMonterEtDesc.get(localisationCases).getValeur()) {
+                    boolean b = deplaceMonterEtDesc.get(caseVoisine).getGrille().fusion(deplaceMonterEtDesc.get(localisationCases), deplaceMonterEtDesc.get(caseVoisine));
+                    if (b) deplacement = true;
+                }
             }
         }
-
+        
         return deplacement;
     }
 
@@ -366,6 +399,15 @@ public class Jeu implements Parametres, Serializable {
 
         return true;
     }
+    
+    /**
+     * Méthode qui réinitialise l'attribut fusionne pour chaque grille
+     */
+    public void resetFusion() {
+        for (int i = 0 ; i < TAILLE ; i++) {
+            this.grilles.get(i).resetFusion();
+        }
+    }
 
     /**
      * Méthode qui vérifie que la partie est terminée
@@ -383,11 +425,13 @@ public class Jeu implements Parametres, Serializable {
     /**
      * Méthode lancement et déroulement du jeu Affectuer des déplacements selon
      * une direction saisie par le joueur + synchronisation du score + aide:
-     * l'odinateur joue un coup à la place du joueur s'il veut Fin du jeu
+     * l'ordinateur joue un coup à la place du joueur s'il veut Fin du jeu
      */
     public void lancementJeu() {
         Scanner sc1 = new Scanner(System.in);
         Random ra = new Random();
+        boolean retour = false; //faux car le retour n'a pas encore été utilisé
+        
         if (this.existePartiePrecedente) {// si le joueur choisit de terminer une partie précédente
             System.out.println(this);
         } else { // si le joueur commence une nouvelle partie
@@ -401,10 +445,19 @@ public class Jeu implements Parametres, Serializable {
             System.out.println("Déplacer vers la Droite (d), Gauche (g), Haut (h), ou Bas (b), niveau supérieur (e) niveau inférieur (q) ?");
             System.out.println("Si vous voulez nous laisser choisir pour vous, tapez '?' ");
             System.out.println("Pour quitter le jeu taper 'x'");
+            if (!retour && etatsPrecedents.size() > 0) { //on ne peut pas retourner en arrière si on l'a déjà fait ou si on n'a pas encore joué
+                System.out.println("Retourner en arrière ? Tapez r : vous pouvez retourner jusqu'à 5 coups en arrière. Attention ! Vous ne pouvez utiliser le retour en arrière qu'une fois par partie !");
+            }
+            
             String s = sc1.next();
             s = s.toLowerCase();
             if (s.equals("x")) {
                 this.quitter();
+            }
+            if (s.equals("r") && !retour && etatsPrecedents.size() > 0) {
+                this.undo();
+                System.out.println(this);
+                retour = true;
             }
             if (s.equals("?")) {
                 this.MouvementAlea();
@@ -435,6 +488,7 @@ public class Jeu implements Parametres, Serializable {
                         BAS;
                 };
 
+                enregistrement();
                 boolean b2 = this.deplacerCases3G(direction);
                 if (b2) {
                     int random = ra.nextInt(2) + 1;
@@ -442,9 +496,14 @@ public class Jeu implements Parametres, Serializable {
                         this.ajoutCases();
                     }
                 }
+                if (b2) {
+                    validerEnregistrement();
+                } else {
+                    annulerEnregistrement();
+                }
                 this.majScore();
+                this.resetFusion();
                 System.out.println(this);
-
             }
 
         }
@@ -455,7 +514,6 @@ public class Jeu implements Parametres, Serializable {
         }
 
     }
-
     
     /**
      *Methode qui demande au joueur s'il veut terminer une partie précédente ou 
@@ -464,7 +522,7 @@ public class Jeu implements Parametres, Serializable {
      */
     public boolean rechargerPartie() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Voulez-vous reprendre la partie précepente ?(oui/non)");
+        System.out.println("Voulez-vous reprendre la partie précédente ? (oui/non)");
         String s = sc.next();
         s.toLowerCase();
         while (!s.equals("oui") || !s.equals("non")) {
@@ -535,5 +593,92 @@ public class Jeu implements Parametres, Serializable {
         }
         return null;
     }
+    
+    /**
+     * méthode qui enregistre l'état actuel de la partie 
+     */
+    public void enregistrement() {          
+        etatsPrecedents.addFirst(this.clone()); 
+    }
+    
+    /**
+     * Méthode qui valide l'enregistrement du coup
+     * L'enregistrement est valide si des cases ont bien été déplacées
+     * La méthode supprime le 6ème état enregistré dès que la liste est supérieure à 5 
+     */
+    public void validerEnregistrement() { 
+        if (etatsPrecedents.size() > 5) { //on n'a besoin que de 5 états en arrière
+            etatsPrecedents.remove(5); //on supprime le 6ème
+        }
+        
+        /*
+        for (int i = 0; i < etatsPrecedents.size(); i++) {
+            System.out.println("Index " +i);
+            System.out.println(etatsPrecedents.get(i));
+        }*/
+    }
+    
+    /**
+     * Méthode qui annule un enregistrement qui n'a pas été validé = le joueur a choisi une direction mais aucune case n'a été déplacée
+     */
+    public void annulerEnregistrement() {
+        etatsPrecedents.remove(0);
+    }
+    
+    /**
+     * Méthode qui retourne en arrière, à utiliser une seule fois dans la partie
+     * La méthode gère jusqu'à 5 retours consécutifs
+     */
+    public void undo (){ 
+        Scanner sc = new Scanner(System.in);
+        String s = "oui";
+        
+        //tant qu'on veut encore retourner en arrière et qu'on n'a pas encore utilisé les 5 retours
+        while (s.equals("oui") && etatsPrecedents.size() > 0) {
+            retour();
 
+            int size = etatsPrecedents.size();
+            
+            if (size > 0) {
+                System.out.println(size + " retour(s) encore possible(s)");
+
+                System.out.println("Retourner encore en arrière ? Tapez oui/non");
+                s = sc.next();
+                s.toLowerCase();
+
+                while (!(s.equals("oui") || s.equals("non"))) {
+                    System.out.println("Vous devez saisir oui pour continuer à revenir en arrière, sinon non");
+                    s = sc.next();
+                    s.toLowerCase();
+                }
+            } else {
+                System.out.println("Vous ne pouvez plus revenir en arrière !");
+            }
+        } 
+    }
+    
+    /**
+     * Méthode qui effectue le retour en arrière : restauration de l'état précédent et suppression de son enregistrement
+     */
+    public void retour(){
+        /*
+        System.out.println("AVANT RETOUR");
+        System.out.println(this);*/
+        
+        //retour au coup d'avant
+        this.setgrilles(etatsPrecedents.get(0).getgrilles()); 
+        this.setScoreFinal(etatsPrecedents.get(0).getScoreFinal()); 
+        this.setExistePartiePrecedente(etatsPrecedents.get(0).getExistePartiePrecedente());  //à tester
+        etatsPrecedents.remove(0);
+
+        /*
+        //affichage de l'état précédent que le joueur a demandé 
+        System.out.println("APRÈS RETOUR");
+        System.out.println(this);*/
+    }
+    
+    public Jeu clone() {
+        return new Jeu(this);
+    }
 }
+
