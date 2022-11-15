@@ -34,17 +34,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Menu;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.ConnexionBDD;
 import modele.Jeu;
 import modele.Main;
+import modele.Personne;
 import variables.Parametres;
 
 /**
@@ -120,6 +126,19 @@ public class FXMLController implements Initializable, Parametres {
     private Menu fichier;
     @FXML
     private Label txtBDD;
+    @FXML
+    private ImageView haut;
+    @FXML
+    private ImageView bas;
+    @FXML
+    private ImageView gauhe;
+    @FXML
+    private ImageView droite;
+    @FXML
+    private ImageView descendre;
+    @FXML
+    private ImageView monter;
+    int deplacementBDD = 0;
 
     /* private boolean modeClassique = true;
     private boolean modeDaltonien = false;
@@ -173,7 +192,6 @@ public class FXMLController implements Initializable, Parametres {
         this.majGrillesApp();
         this.sauvegardePartie.setDisable(false);
         mouvOrdi.setDisable(false);
-       
 
     }
 
@@ -402,6 +420,30 @@ public class FXMLController implements Initializable, Parametres {
      *
      */
     private void afficheStat(ActionEvent event) {
+        // Création de personne avec la base de donnée
+        ArrayList<Personne> listePerso = new ArrayList<>();
+
+        Stage stat = new Stage();
+        TableView table = new TableView();
+        Scene scene = new Scene(new Group());
+        stat.setTitle("Table View Sample");
+        stat.setWidth(600);
+        stat.setHeight(1000);
+        final Label label = new Label("Classement");
+        label.setFont(new Font("Arial", 20));
+        table.setEditable(true);
+        TableColumn pseudoCol = new TableColumn("Pseudo");
+        TableColumn scoreCol = new TableColumn("Score");
+        TableColumn tempsCol = new TableColumn("Temps");
+        TableColumn deplacementCol = new TableColumn("Déplacement");
+        table.getColumns().addAll(pseudoCol, scoreCol, tempsCol, deplacementCol);
+        final VBox vbox = new VBox();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.getChildren().addAll(label, table);
+        ((Group) scene.getRoot()).getChildren().addAll(vbox);
+        stat.setScene(scene);
+        stat.show();
     }
 
     @FXML
@@ -454,6 +496,7 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     private void mouvJoueur(KeyEvent event) {
+        deplacementBDD = deplacementBDD + 1;
         if (dyslexique.isDisable()) {
             instructionJeu.setVisible(true);
             help.setVisible(false);
@@ -577,7 +620,7 @@ public class FXMLController implements Initializable, Parametres {
         // BDD Connexion
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         // BDD requête ajout Joueur(int,string,int,int,int) Joueur(id,pseudo,score,temps,deplacement)
-        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + 0 + "','" + compteMouv + "')";
+        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + 0 + "','" + deplacementBDD + "')";
         c.insertTuples(query);
 
     }
@@ -591,16 +634,9 @@ public class FXMLController implements Initializable, Parametres {
         String password = "root";
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         String infos;
-        // On faira différentes méthodes en fonction des besoins et différentes conditions
-        String queryScore = "SELECT pseudo FROM Joueur ORDER BY score ASC";
-        String queryTemps = "SELECT pseudo, temps FROM Joueur ORDER BY temps ASC";
-        String queryDéplacement = "SELECT  pseudo, nombreDéplacement FROM Joueur ORDER BY nombreDéplacement ASC ";
+        String queryScore = "SELECT pseudo, score, temps, nombreDéplacement FROM Joueur ORDER BY score ASC";
         ArrayList<String> pseudo = c.getTuples(queryScore);
-        txtBDD.setText("" + pseudo.size());
-
-        for (String elem : pseudo) {
-            txtBDD.setText(elem);
-        }
+        txtBDD.setText("" + pseudo);
 
     }
 

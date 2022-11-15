@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="808.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
+<AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="808.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
    <children>
       <AnchorPane layoutY="14.0" prefHeight="881.0" prefWidth="1018.0" AnchorPane.bottomAnchor="-67.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0">
          <children>
@@ -263,6 +263,7 @@
                               </ImageView>
                            </children>
                         </Pane>
+                        <Label fx:id="txtBDD" layoutX="41.0" layoutY="125.0" prefHeight="17.0" prefWidth="217.0" />
                      </children>
                   </Pane>
                </top>
