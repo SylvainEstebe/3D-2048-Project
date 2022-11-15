@@ -40,7 +40,7 @@ public class Jeu implements Parametres, Serializable {
         grilles.add(g1);
         grilles.add(g2);
         existePartiePrecedente = false;
-
+      
     }
     
     /**
@@ -618,8 +618,9 @@ public class Jeu implements Parametres, Serializable {
     /**
      * méthode qui enregistre l'état actuel de la partie 
      */
-    public void enregistrement() {          
+    public LinkedList<Jeu> enregistrement() {          
         etatsPrecedents.addFirst(this.clone()); 
+        return etatsPrecedents;
     }
     
     /**

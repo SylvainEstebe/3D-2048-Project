@@ -30,7 +30,7 @@ public class NewFXMain extends Application {
 
         Parent root = FXMLLoader.load(getClass().getResource("/application/FXML.fxml"));
         Scene scene = new Scene(root);
-        stage.setResizable(false);
+        //stage.setResizable(false);
         stage.setTitle("Jeu 2048 3D");
         boolean add = scene.getStylesheets().add("css/classique.css");
         stage.setScene(scene);

@@ -17,7 +17,7 @@
 
 <AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="808.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
    <children>
-      <AnchorPane layoutY="14.0" prefHeight="881.0" prefWidth="1018.0" AnchorPane.bottomAnchor="-67.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0">
+      <AnchorPane layoutX="3.0" layoutY="14.0" prefHeight="811.0" prefWidth="1018.0" AnchorPane.bottomAnchor="-17.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0">
          <children>
             <MenuBar layoutY="-15.0" prefHeight="38.0" prefWidth="1018.0">
               <menus>
@@ -47,37 +47,11 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <BorderPane prefHeight="823.0" prefWidth="1018.0" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
-               <bottom>
-                  <Pane prefHeight="63.0" prefWidth="1018.0" styleClass="paneBas" BorderPane.alignment="CENTER">
-                     <children>
-                        <Button fx:id="help" defaultButton="true" layoutX="798.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#aidePopUp" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Comment jouer ? " textAlignment="CENTER" textFill="#eee4da">
-                           <font>
-                              <Font name="Arial" size="18.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="mouvOrdi" defaultButton="true" disable="true" layoutX="466.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#mouvOrdiApp" prefHeight="34.0" prefWidth="217.0" styleClass="option" text="Mouvement ordinateur" textAlignment="CENTER" textFill="#eee4da">
-                           <font>
-                              <Font name="Arial" size="18.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="undo" disable="true" layoutX="44.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#undo" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Retour" textAlignment="CENTER" textFill="#eee4da">
-                           <font>
-                              <Font name="Arial" size="18.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="stopIA" disable="true" layoutX="250.0" layoutY="15.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Arrêter IA" textAlignment="CENTER" textFill="#eee4da">
-                           <font>
-                              <Font name="Arial" size="18.0" />
-                           </font>
-                        </Button>
-                     </children>
-                  </Pane>
-               </bottom>
+            <BorderPane layoutX="-12.0" prefHeight="855.0" prefWidth="1030.0" AnchorPane.bottomAnchor="-64.0" AnchorPane.leftAnchor="-12.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
                <top>
                   <Pane prefHeight="722.0" prefWidth="1018.0" styleClass="paneCentrale1" BorderPane.alignment="CENTER">
                      <children>
-                        <Pane layoutY="180.0" prefHeight="329.0" prefWidth="1018.0" styleClass="paneCentrale2">
+                        <Pane layoutX="7.0" layoutY="166.0" prefHeight="329.0" prefWidth="1018.0" styleClass="paneCentrale2">
                            <children>
                               <GridPane fx:id="grilleH" gridLinesVisible="true" layoutX="14.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
                                  <columnConstraints>
@@ -95,7 +69,7 @@
                                        <children>
                                           <Label layoutX="21.0" layoutY="20.0" prefHeight="60.0" prefWidth="59.0" text="32" textAlignment="CENTER" textFill="WHITE">
                                              <font>
-                                                <Font size="48.0" />
+                                                <Font size="35.0" />
                                              </font>
                                           </Label>
                                        </children>
@@ -194,7 +168,7 @@
                         </Label>
                         <Button fx:id="boutonBDD" layoutX="428.0" layoutY="132.0" mnemonicParsing="false" onMouseClicked="#enregistrementBDD" text="BASE DE DONNÉE" />
                         <Button fx:id="boutonBDD2" layoutX="579.0" layoutY="133.0" mnemonicParsing="false" onMouseClicked="#consultationBDD" prefHeight="26.0" prefWidth="130.0" text="Consulter BBDD" />
-                        <Pane fx:id="instructionJeu" layoutY="521.0" prefHeight="213.0" prefWidth="1018.0" visible="false">
+                        <Pane fx:id="instructionJeu" layoutY="521.0" prefHeight="196.0" prefWidth="1018.0" visible="false">
                            <children>
                               <ImageView fx:id="haut" fitHeight="59.0" fitWidth="61.0" layoutX="270.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -267,6 +241,32 @@
                      </children>
                   </Pane>
                </top>
+               <bottom>
+                  <Pane prefHeight="147.0" prefWidth="1030.0" styleClass="paneBas" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button fx:id="help" defaultButton="true" layoutX="798.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#aidePopUp" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Comment jouer ? " textAlignment="CENTER" textFill="#eee4da">
+                           <font>
+                              <Font name="Arial" size="18.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="mouvOrdi" defaultButton="true" disable="true" layoutX="466.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#mouvOrdiApp" prefHeight="34.0" prefWidth="217.0" styleClass="option" text="Mouvement ordinateur" textAlignment="CENTER" textFill="#eee4da">
+                           <font>
+                              <Font name="Arial" size="18.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="retour" disable="true" layoutX="44.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#retour" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Retour" textAlignment="CENTER" textFill="#eee4da" visible="true">
+                           <font>
+                              <Font name="Arial" size="18.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="stopIA" disable="true" layoutX="250.0" layoutY="15.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Arrêter IA" textAlignment="CENTER" textFill="#eee4da">
+                           <font>
+                              <Font name="Arial" size="18.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </Pane>
+               </bottom>
             </BorderPane>
          </children>
       </AnchorPane>
