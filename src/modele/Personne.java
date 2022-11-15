@@ -9,17 +9,32 @@ package modele;
  * @author sylvainestebe
  */
 public class Personne {
+
     String pseudo;
-    int score;
-    int temps;
-    int déplacement;
-         
-    public Personne(String p,int s,int t,int d){
+    String score;
+    String temps;
+    String déplacement;
+
+    public Personne(String p, String s, String t, String d) {
         this.pseudo = p;
         this.score = s;
         this.temps = t;
         this.déplacement = d;
     }
-    
-    
+
+    public String getPseudo() {
+        return this.pseudo;
+    }
+
+    public String getScore() {
+        return this.score;
+    }
+
+    public String getTemps() {
+        return this.temps;
+    }
+
+    public String getDéplacement() {
+        return this.déplacement;
+    }
 }

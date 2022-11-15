@@ -627,6 +627,7 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     private void consultationBDD(MouseEvent event) {
+        // Connection à la base de donnée
         String host = "localhost";
         String port = "3306";
         String dbname = "2048_game_Estebe";
@@ -634,10 +635,34 @@ public class FXMLController implements Initializable, Parametres {
         String password = "root";
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         String infos;
+        
+        // Requête pour la base de donnée
         String queryScore = "SELECT pseudo, score, temps, nombreDéplacement FROM Joueur ORDER BY score ASC";
+        // Récupération d'une liste de string avec toute les informations
         ArrayList<String> pseudo = c.getTuples(queryScore);
-        txtBDD.setText("" + pseudo);
+        
+        // Création de la liste de joueur
+        for(int i=0;i<pseudo.size();i++){
+        
+        // Récupération d'une personne 
+        String j =   pseudo.get(i);
+        
+        // Séparation du pseudo, score, temps, nombre déplacement
+        String[] pseudotab = new String[5];
+        pseudotab=j.split(";",4);
+        String pseudoP = pseudotab[0];
+        String  scoreP = pseudotab[1];
+        String tempsP = pseudotab[2];
+        String nombreP = pseudotab[3];
+        // Création d'une personne
+        Personne p = new Personne(pseudoP,scoreP,tempsP,nombreP);
+        // On met cette personne dans une liste
+        ArrayList<Personne> listePersonne = new ArrayList<Personne>();
+        listePersonne.add(p);
+        // On affiche
+        txtBDD.setText("" + listePersonne.get(0).getPseudo() + listePersonne.get(0).getScore());
 
+        }
     }
 
     @FXML
