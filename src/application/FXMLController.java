@@ -30,6 +30,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import java.sql.*;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
@@ -114,8 +115,11 @@ public class FXMLController implements Initializable, Parametres {
     private ArrayList<ArrayList<Label>> eltsGrilles;
 
     private Jeu jeuAppli = null;
-
+    // private int compteurCoups = 0;
+    private int nbRetour = 0;
+    private boolean retourUtilise = false;
     private ArrayList<GridPane> tabGrillesApp;
+    private LinkedList<Jeu> etatsPrecedents = null;
 
     @FXML
     private Label score;
@@ -123,6 +127,8 @@ public class FXMLController implements Initializable, Parametres {
     private Button boutonBDD;
     @FXML
     private Button boutonBDD2;
+    @FXML
+    private Button retour;
 
     int compteMouv;
     @FXML
@@ -149,9 +155,6 @@ public class FXMLController implements Initializable, Parametres {
     long chronos;
     long temps;
 
-    /* private boolean modeClassique = true;
-    private boolean modeDaltonien = false;
-    private boolean modeDyslexique = false;*/
     /**
      * Initializes the controller class.
      */
@@ -176,9 +179,8 @@ public class FXMLController implements Initializable, Parametres {
                 Jeu jeu = (Jeu) ois.readObject();
                 jeuAppli = jeu;
             } catch (final java.io.IOException e) {
-                e.printStackTrace();
             } catch (final ClassNotFoundException e) {
-                e.printStackTrace();
+
             }
         }
 
@@ -194,6 +196,8 @@ public class FXMLController implements Initializable, Parametres {
         sauvegardePartie.setDisable(false);
         this.majGrillesApp();
         mouvOrdi.setDisable(false);
+        nbRetour = 0;
+        retourUtilise = false;
 
     }
 
@@ -204,7 +208,9 @@ public class FXMLController implements Initializable, Parametres {
         this.majGrillesApp();
         this.sauvegardePartie.setDisable(false);
         mouvOrdi.setDisable(false);
-
+        mouvOrdi.setDisable(false);
+        nbRetour = 0;
+        retourUtilise = false;
     }
 
     @FXML
@@ -212,6 +218,24 @@ public class FXMLController implements Initializable, Parametres {
         //Lorsqu'on sauvegarde, le bouton de chargement devient actif
         jeuAppli.serialiser();
         chargePartie.setDisable(false);
+    }
+
+    @FXML
+    private void retour(MouseEvent event) {
+        if (!etatsPrecedents.isEmpty()) {
+            retourUtilise = true;
+            etatsPrecedents.removeFirst();
+            jeuAppli = etatsPrecedents.getFirst();
+            this.majGrillesApp();
+            this.majScoreApp();
+            etatsPrecedents.removeFirst();
+            nbRetour++;
+            if (nbRetour == 5) {
+                retour.setDisable(true);
+            }
+        } else {
+            retour.setDisable(true);
+        }
     }
 
     /**
@@ -513,10 +537,6 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
-    private void undo(MouseEvent event) {
-    }
-
-    @FXML
     private void quitter(ActionEvent event) {
 
         Stage abandonner = new Stage();
@@ -585,6 +605,8 @@ public class FXMLController implements Initializable, Parametres {
             b = jeuAppli.deplacerCases3G(DESCG);
         } else if (direction.equals("e")) {
             b = jeuAppli.deplacerCases3G(MONTERG);
+        } else {
+            System.out.println("Déplacement impossible");
         }
 
         jeuAppli.choixNbCasesAjout(b);
@@ -597,8 +619,19 @@ public class FXMLController implements Initializable, Parametres {
                 this.jeuPerduAppli();
             }
         }
+        if (b) {
+            etatsPrecedents = new LinkedList<Jeu>();
+            etatsPrecedents = jeuAppli.enregistrement();
+        }
+        
+        if (etatsPrecedents.size() >= 1 && !retourUtilise) {
+            retour.setDisable(false);
+        } else {
+            retour.setDisable(true);
+        }
 
     }
+
 
     public void victoireAppli() {
         Stage fenetre_aide = new Stage();
@@ -736,7 +769,7 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
-    private void mouvOrdiApp(MouseEvent event) {
+    private void mouvOrdiApp(MouseEvent event){
         if (jeuAppli != null) {
             boolean b2 = jeuAppli.MouvementAlea();
             jeuAppli.choixNbCasesAjout(b2);
