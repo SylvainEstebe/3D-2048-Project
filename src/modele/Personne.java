@@ -10,10 +10,10 @@ package modele;
  */
 public class Personne {
 
-    String pseudo;
-    String score;
-    String temps;
-    String déplacement;
+    private String pseudo;
+    private String score;
+    private String temps;
+    private String déplacement;
 
     public Personne(String p, String s, String t, String d) {
         this.pseudo = p;

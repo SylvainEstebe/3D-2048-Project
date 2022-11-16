@@ -32,6 +32,8 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -41,6 +43,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.TilePane;
@@ -138,7 +141,13 @@ public class FXMLController implements Initializable, Parametres {
     private ImageView descendre;
     @FXML
     private ImageView monter;
-    int deplacementBDD = 0;
+    int deplacementBDD;
+    @FXML
+    private Button stopchrono;
+    @FXML
+    private Label chrono;
+    long chronos;
+    long temps;
 
     /* private boolean modeClassique = true;
     private boolean modeDaltonien = false;
@@ -177,6 +186,9 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     public void nouvellePartie(ActionEvent event) {
+        deplacementBDD = 0;
+        chronos = java.lang.System.currentTimeMillis();
+
         jeuAppli = new Jeu();
         jeuAppli.lancementJeuAppli();
         sauvegardePartie.setDisable(false);
@@ -420,11 +432,49 @@ public class FXMLController implements Initializable, Parametres {
      *
      */
     private void afficheStat(ActionEvent event) {
-        // Création de personne avec la base de donnée
-        ArrayList<Personne> listePerso = new ArrayList<>();
+        // Connection à la base de donnée
+        String host = "localhost";
+        String port = "3306";
+        String dbname = "2048_game_Estebe";
+        String username = "root";
+        String password = "root";
+        ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
+        String infos;
+        ObservableList<Personne> listePerso = FXCollections.observableArrayList();
 
+        // Requête pour la base de donnée
+        String queryScore = "SELECT pseudo, score, temps, nombreDéplacement FROM Joueur ORDER BY score ASC";
+        // Récupération d'une liste de string avec toute les informations
+        ArrayList<String> pseudo = c.getTuples(queryScore);
+
+        // Création de la liste de joueur
+        for (int i = 0; i < pseudo.size(); i++) {
+
+            // Récupération d'une personne 
+            String j = pseudo.get(i);
+
+            // Séparation du pseudo, score, temps, nombre déplacement
+            String[] pseudotab = new String[5];
+            pseudotab = j.split(";", 4);
+            String pseudoP = pseudotab[0];
+            String scoreP = pseudotab[1];
+            String tempsP = pseudotab[2];
+            String nombreP = pseudotab[3];
+            // Création d'une personne
+            Personne p = new Personne(pseudoP, scoreP, tempsP, nombreP);
+            // On met cette personne dans une liste
+            ArrayList<Personne> listePersonne = new ArrayList<Personne>();
+            // Création de personne avec la base de donnée
+            listePerso.add(p);
+
+            listePersonne.add(p);
+            // On affiche
+            txtBDD.setText("" + listePersonne.get(0).getPseudo() + listePersonne.get(0).getScore());
+
+        }
         Stage stat = new Stage();
-        TableView table = new TableView();
+        TableView<Personne> table = new TableView<Personne>();
+        final ObservableList<Personne> data = listePerso;
         Scene scene = new Scene(new Group());
         stat.setTitle("Table View Sample");
         stat.setWidth(600);
@@ -432,15 +482,31 @@ public class FXMLController implements Initializable, Parametres {
         final Label label = new Label("Classement");
         label.setFont(new Font("Arial", 20));
         table.setEditable(true);
+
         TableColumn pseudoCol = new TableColumn("Pseudo");
+        pseudoCol.setCellValueFactory(
+                new PropertyValueFactory<Personne, String>("Pseudo"));
+
         TableColumn scoreCol = new TableColumn("Score");
+        scoreCol.setCellValueFactory(
+                new PropertyValueFactory<Personne, String>("Score"));
+
         TableColumn tempsCol = new TableColumn("Temps");
+        tempsCol.setCellValueFactory(
+                new PropertyValueFactory<Personne, String>("Temps"));
+
         TableColumn deplacementCol = new TableColumn("Déplacement");
+        deplacementCol.setCellValueFactory(
+                new PropertyValueFactory<Personne, String>("Déplacement"));
+
         table.getColumns().addAll(pseudoCol, scoreCol, tempsCol, deplacementCol);
+        table.setItems(data);
+
         final VBox vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().addAll(label, table);
+
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
         stat.setScene(scene);
         stat.show();
@@ -589,6 +655,10 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private void enregistrementBDD(MouseEvent event) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
+        // Stockage du temps
+        long chrono2 = java.lang.System.currentTimeMillis();
+        long temps = chrono2 - chronos;
+        chrono.setText("" + (temps / 1000));
         //Enregistrement du pseudo
         // create a tile pane
         TilePane r = new TilePane();
@@ -620,7 +690,7 @@ public class FXMLController implements Initializable, Parametres {
         // BDD Connexion
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         // BDD requête ajout Joueur(int,string,int,int,int) Joueur(id,pseudo,score,temps,deplacement)
-        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + 0 + "','" + deplacementBDD + "')";
+        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + temps + "','" + deplacementBDD + "')";
         c.insertTuples(query);
 
     }
@@ -635,32 +705,32 @@ public class FXMLController implements Initializable, Parametres {
         String password = "root";
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         String infos;
-        
+
         // Requête pour la base de donnée
         String queryScore = "SELECT pseudo, score, temps, nombreDéplacement FROM Joueur ORDER BY score ASC";
         // Récupération d'une liste de string avec toute les informations
         ArrayList<String> pseudo = c.getTuples(queryScore);
-        
+
         // Création de la liste de joueur
-        for(int i=0;i<pseudo.size();i++){
-        
-        // Récupération d'une personne 
-        String j =   pseudo.get(i);
-        
-        // Séparation du pseudo, score, temps, nombre déplacement
-        String[] pseudotab = new String[5];
-        pseudotab=j.split(";",4);
-        String pseudoP = pseudotab[0];
-        String  scoreP = pseudotab[1];
-        String tempsP = pseudotab[2];
-        String nombreP = pseudotab[3];
-        // Création d'une personne
-        Personne p = new Personne(pseudoP,scoreP,tempsP,nombreP);
-        // On met cette personne dans une liste
-        ArrayList<Personne> listePersonne = new ArrayList<Personne>();
-        listePersonne.add(p);
-        // On affiche
-        txtBDD.setText("" + listePersonne.get(0).getPseudo() + listePersonne.get(0).getScore());
+        for (int i = 0; i < pseudo.size(); i++) {
+
+            // Récupération d'une personne 
+            String j = pseudo.get(i);
+
+            // Séparation du pseudo, score, temps, nombre déplacement
+            String[] pseudotab = new String[5];
+            pseudotab = j.split(";", 4);
+            String pseudoP = pseudotab[0];
+            String scoreP = pseudotab[1];
+            String tempsP = pseudotab[2];
+            String nombreP = pseudotab[3];
+            // Création d'une personne
+            Personne p = new Personne(pseudoP, scoreP, tempsP, nombreP);
+            // On met cette personne dans une liste
+            ArrayList<Personne> listePersonne = new ArrayList<Personne>();
+            listePersonne.add(p);
+            // On affiche
+            txtBDD.setText("" + listePersonne.get(0).getPseudo() + listePersonne.get(0).getScore());
 
         }
     }
@@ -681,6 +751,13 @@ public class FXMLController implements Initializable, Parametres {
             }
         }
 
+    }
+
+    @FXML
+    private void stopchronometre(MouseEvent event) {
+        long chrono2 = java.lang.System.currentTimeMillis();
+        long temps = chrono2 - chronos;
+        chrono.setText("" + (temps / 1000));
     }
 
 }
