@@ -167,7 +167,6 @@
                            </font>
                         </Label>
                         <Button fx:id="boutonBDD" layoutX="428.0" layoutY="132.0" mnemonicParsing="false" onMouseClicked="#enregistrementBDD" text="BASE DE DONNÉE" />
-                        <Button fx:id="boutonBDD2" layoutX="579.0" layoutY="133.0" mnemonicParsing="false" onMouseClicked="#consultationBDD" prefHeight="26.0" prefWidth="130.0" text="Consulter BBDD" />
                         <Pane fx:id="instructionJeu" layoutY="521.0" prefHeight="196.0" prefWidth="1018.0" visible="false">
                            <children>
                               <ImageView fx:id="haut" fitHeight="59.0" fitWidth="61.0" layoutX="270.0" pickOnBounds="true" preserveRatio="true">
@@ -238,7 +237,6 @@
                            </children>
                         </Pane>
                         <Label fx:id="txtBDD" layoutX="41.0" layoutY="125.0" prefHeight="17.0" prefWidth="217.0" />
-                        <Button fx:id="stopchrono" layoutX="469.0" layoutY="62.0" mnemonicParsing="false" onMouseClicked="#stopchronometre" text="Stop et affiche chrono" />
                         <Label fx:id="chrono" layoutX="469.0" layoutY="93.0" prefHeight="26.0" prefWidth="230.0" />
                      </children>
                   </Pane>

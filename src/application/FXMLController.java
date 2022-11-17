@@ -77,8 +77,6 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private Button stopIA;
     @FXML
-    private Button undo;
-    @FXML
     private GridPane grilleH;
     @FXML
     private GridPane grilleM;
@@ -126,8 +124,6 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private Button boutonBDD;
     @FXML
-    private Button boutonBDD2;
-    @FXML
     private Button retour;
 
     int compteMouv;
@@ -148,8 +144,6 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private ImageView monter;
     int deplacementBDD;
-    @FXML
-    private Button stopchrono;
     @FXML
     private Label chrono;
     long chronos;
@@ -496,17 +490,18 @@ public class FXMLController implements Initializable, Parametres {
             txtBDD.setText("" + listePersonne.get(0).getPseudo() + listePersonne.get(0).getScore());
 
         }
+        // Création du tableau
         Stage stat = new Stage();
         TableView<Personne> table = new TableView<Personne>();
         final ObservableList<Personne> data = listePerso;
         Scene scene = new Scene(new Group());
-        stat.setTitle("Table View Sample");
+        stat.setTitle("Statistique de ");
         stat.setWidth(600);
         stat.setHeight(1000);
         final Label label = new Label("Classement");
         label.setFont(new Font("Arial", 20));
         table.setEditable(true);
-
+        scene.getStylesheets().add("css/classique.css");
         TableColumn pseudoCol = new TableColumn("Pseudo");
         pseudoCol.setCellValueFactory(
                 new PropertyValueFactory<Personne, String>("Pseudo"));
@@ -525,13 +520,13 @@ public class FXMLController implements Initializable, Parametres {
 
         table.getColumns().addAll(pseudoCol, scoreCol, tempsCol, deplacementCol);
         table.setItems(data);
-
+        
         final VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.setSpacing(10);
+        vbox.setPadding(new Insets(10, 0, 0, 0));
         vbox.getChildren().addAll(label, table);
-
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
+        
         stat.setScene(scene);
         stat.show();
     }
@@ -623,7 +618,7 @@ public class FXMLController implements Initializable, Parametres {
             etatsPrecedents = new LinkedList<Jeu>();
             etatsPrecedents = jeuAppli.enregistrement();
         }
-        
+
         if (etatsPrecedents.size() >= 1 && !retourUtilise) {
             retour.setDisable(false);
         } else {
@@ -631,7 +626,6 @@ public class FXMLController implements Initializable, Parametres {
         }
 
     }
-
 
     public void victoireAppli() {
         Stage fenetre_aide = new Stage();
@@ -684,92 +678,60 @@ public class FXMLController implements Initializable, Parametres {
         fenetre_aide.show();
     }
 
-    // Enregistrement lors du clic sur le bouton BDD
+    /**
+     * Méthode qui permet à un joueur de s'enregistrer en fin de partie * IL
+     * MANQUE LA CONVERSION DU TEMPS ET UNE REQUÊTE POUR VERIFIER SI LE PSEUDO
+     * N'EXISTE PAS DÈJA
+     *
+     */
     @FXML
     private void enregistrementBDD(MouseEvent event) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-        // Stockage du temps
+        // Stockage des informations 
+        // Temps 
         long chrono2 = java.lang.System.currentTimeMillis();
-        long temps = chrono2 - chronos;
-        chrono.setText("" + (temps / 1000));
-        //Enregistrement du pseudo
-        // create a tile pane
+        long timeSpentPlaying = chrono2 - chronos;
+
+        // Pseudonyme
         TilePane r = new TilePane();
-        // create a label to show the input in text dialog
-        Label l = new Label("Rentrez votre pseudo");
-        // create a text input dialog
+        Label l = new Label();
         TextInputDialog td = new TextInputDialog();
-        td.setTitle("Veuillez rentrer votre pseudonyme");
-        // create a button
         Button d = new Button("click");
-        // show the text input dialog
-        td.showAndWait();
-        // set the text of the label
-        l.setText(td.getEditor().getText());
+        td.setTitle("Veuillez rentrer votre pseudonyme");
+        // Boucle pour que le pseudo ne soit pas vide
+        while (l.getText().isEmpty()) {
+            r = new TilePane();
+            l = new Label();
+            td = new TextInputDialog();
+            d = new Button("click");
+            td.setTitle("Veuillez rentrer votre pseudonyme");
+            td.showAndWait();
+            l.setText(td.getEditor().getText());
+        }
         String pseudo = l.getText();
 
-        // Stockage du score du joueur
+        // Score
         int scoreJoueurFin = Integer.valueOf(score.getText());
 
-        // Création d'une condition si le pseudo existe dèja
-        // Récupérer les données de score, temps (existe pas encors) et déplacement (existe pas encore)
+        // Déplacement (traité dans la partie mouvJoueur)
+        // Création d'une condition si le pseudo existe dèja - A FAIRE
         // BDD infos
         String host = "localhost";
         String port = "3306";
         String dbname = "2048_game_Estebe";
         String username = "root";
         String password = "root";
-
         // BDD Connexion
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         // BDD requête ajout Joueur(int,string,int,int,int) Joueur(id,pseudo,score,temps,deplacement)
-        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + temps + "','" + deplacementBDD + "')";
+        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + timeSpentPlaying + "','" + deplacementBDD + "')";
         c.insertTuples(query);
-
     }
 
-    @FXML
-    private void consultationBDD(MouseEvent event) {
-        // Connection à la base de donnée
-        String host = "localhost";
-        String port = "3306";
-        String dbname = "2048_game_Estebe";
-        String username = "root";
-        String password = "root";
-        ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
-        String infos;
-
-        // Requête pour la base de donnée
-        String queryScore = "SELECT pseudo, score, temps, nombreDéplacement FROM Joueur ORDER BY score ASC";
-        // Récupération d'une liste de string avec toute les informations
-        ArrayList<String> pseudo = c.getTuples(queryScore);
-
-        // Création de la liste de joueur
-        for (int i = 0; i < pseudo.size(); i++) {
-
-            // Récupération d'une personne 
-            String j = pseudo.get(i);
-
-            // Séparation du pseudo, score, temps, nombre déplacement
-            String[] pseudotab = new String[5];
-            pseudotab = j.split(";", 4);
-            String pseudoP = pseudotab[0];
-            String scoreP = pseudotab[1];
-            String tempsP = pseudotab[2];
-            String nombreP = pseudotab[3];
-            // Création d'une personne
-            Personne p = new Personne(pseudoP, scoreP, tempsP, nombreP);
-            // On met cette personne dans une liste
-            ArrayList<Personne> listePersonne = new ArrayList<Personne>();
-            listePersonne.add(p);
-            // On affiche
-            txtBDD.setText("" + listePersonne.get(0).getPseudo() + listePersonne.get(0).getScore());
-
-        }
-    }
+    
 
     @FXML
-    private void mouvOrdiApp(MouseEvent event){
+    private void mouvOrdiApp(MouseEvent event) {
         if (jeuAppli != null) {
             boolean b2 = jeuAppli.MouvementAlea();
             jeuAppli.choixNbCasesAjout(b2);
@@ -784,13 +746,6 @@ public class FXMLController implements Initializable, Parametres {
             }
         }
 
-    }
-
-    @FXML
-    private void stopchronometre(MouseEvent event) {
-        long chrono2 = java.lang.System.currentTimeMillis();
-        long temps = chrono2 - chronos;
-        chrono.setText("" + (temps / 1000));
     }
 
 }
