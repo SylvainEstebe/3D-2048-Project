@@ -1,5 +1,6 @@
 package modele;
 
+import ia.IA2;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -271,7 +272,7 @@ public class Jeu implements Parametres, Serializable {
     private boolean deplacementUneCaseMD(int direction2, ArrayList<Case> deplaceMonterEtDesc, int localisationCases) {
         boolean deplacement = false;
         int caseVoisine;
-        
+        int gardeLocCase=localisationCases;
         if (deplaceMonterEtDesc.get(localisationCases).getValeur() > 0) { // Déplacement uniquement s'il s'agit d'une vraie case (avec une valeur)
             if (direction2 == MONTERG) {
                 caseVoisine = localisationCases - 1;
@@ -284,6 +285,7 @@ public class Jeu implements Parametres, Serializable {
                 deplaceMonterEtDesc.get(caseVoisine).setValeur(deplaceMonterEtDesc.get(localisationCases).getValeur());
                 deplaceMonterEtDesc.get(localisationCases).setValeur(0);
                 deplacement = true;
+                
                 // mise à jour de mon index et celui de mon voisin
                 if (direction2 == MONTERG) {
                     caseVoisine--;
@@ -292,6 +294,8 @@ public class Jeu implements Parametres, Serializable {
                     caseVoisine++;
                     localisationCases++;
                 }
+                //Pour le déplacement en thread. Permet de savoir la grille où s'est déplacée la case.
+                deplaceMonterEtDesc.get(gardeLocCase).setGrilleApDepl(deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
             }
 
             if (caseVoisine >= 0 && caseVoisine < TAILLE) {
@@ -339,7 +343,7 @@ public class Jeu implements Parametres, Serializable {
      *
      * @return true si le mouvement aléatoire a été effectué
      */
-    public boolean MouvementAlea() {
+    public boolean mouvementAlea() {
         Random ra = new Random();
         //on met les valeurs correspondant aux déplacements dans une liste
         ArrayList<Integer> valeurs = new ArrayList<>();
@@ -377,7 +381,7 @@ public class Jeu implements Parametres, Serializable {
      * @return un booléen qui indique si les déplacements MONTERG et DESCG sont
      * possible ou non
      */
-    public boolean DeplacementFini3G() {
+    public boolean deplacementFini3G() {
 
         for (int j = 0; j < TAILLE; j++) {
             for (int k = 0; k < TAILLE; k++) {
@@ -417,7 +421,7 @@ public class Jeu implements Parametres, Serializable {
      * @return booleen qui retourne true la partie est terminée sinon false
      */
     public boolean finJeu() {
-        if (grilles.get(0).DeplacementFiniG() && grilles.get(1).DeplacementFiniG() && grilles.get(2).DeplacementFiniG() && this.DeplacementFini3G()) {
+        if (grilles.get(0).deplacementFiniG() && grilles.get(1).deplacementFiniG() && grilles.get(2).deplacementFiniG() && this.deplacementFini3G()) {
             return true;
         } else {
             return false;
@@ -467,15 +471,21 @@ public class Jeu implements Parametres, Serializable {
             System.out.println(this);
         }
         while (!this.finJeu()) {
+            reinitNbDepl();
             System.out.println("Déplacer vers la Droite (d), Gauche (g), Haut (h), ou Bas (b), niveau supérieur (e) niveau inférieur (q) ?");
             System.out.println("Si vous voulez nous laisser choisir pour vous, tapez '?' ");
             System.out.println("Pour quitter le jeu taper 'x'");
+            System.out.println("Taper ii pour laisser l'IA jouer à votre place.");
             if (!retour && etatsPrecedents.size() > 0) { //on ne peut pas retourner en arrière si on l'a déjà fait ou si on n'a pas encore joué
                 System.out.println("Retourner en arrière ? Tapez r : vous pouvez retourner jusqu'à 5 coups en arrière. Attention ! Vous ne pouvez utiliser le retour en arrière qu'une fois par partie !");
             }
             
             String s = sc1.next();
             s = s.toLowerCase();
+            if (s.equals("ii")){
+                IA2 ia2=new IA2(this);
+                ia2.jeuIA2();  
+            }
             if (s.equals("x")) {
                 this.quitter();
             }
@@ -485,7 +495,7 @@ public class Jeu implements Parametres, Serializable {
                 retour = true;
             }
             if (s.equals("?")) {
-                boolean b2=this.MouvementAlea();
+                boolean b2=this.mouvementAlea();
                 choixNbCasesAjout(b2);
                 this.majScore();
                 System.out.println(this);
@@ -701,6 +711,17 @@ public class Jeu implements Parametres, Serializable {
     
     public Jeu clone() {
         return new Jeu(this);
+    }
+    
+    public void reinitNbDepl(){
+        for (int k=0;k<TAILLE;k++){
+            for (int i=0;i<TAILLE;i++){
+                for (int j=0;j<TAILLE;j++){
+                    grilles.get(k).getGrille().get(i).get(j).setNbDeplac(0);
+                    grilles.get(k).getGrille().get(i).get(j).setGrilleApDepl(grilles.get(k).getGrille().get(i).get(j).getGrille().getType());
+                }
+            }
+        }
     }
 }
 

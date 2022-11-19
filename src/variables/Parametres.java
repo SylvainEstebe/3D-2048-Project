@@ -20,4 +20,5 @@ public interface Parametres {
     static final int GRILLEH=-5; //grille du haut
     static final int GRILLEM=-6; //grille du milieu
     static final int GRILLEB=-7; //grille du bas
+    
 }

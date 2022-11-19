@@ -15,8 +15,10 @@ public class Case implements Parametres, Serializable {
 
     private int x, y, valeur; 
     private Grille grille;
+    private int grilleApDepl;
     private boolean fusionnee; //indique si la case a déjà été fusionnée durant un coup donné, réinitialisée à chaque coup
-
+    private int nbDeplacements=0;
+    
     /**
      * Constructeur de case
      * @param abs l'abscisse de la case
@@ -31,6 +33,14 @@ public class Case implements Parametres, Serializable {
         grille=g;
         this.fusionnee = false;
     }
+    
+    public void setGrilleApDepl(int grilleap){
+        this.grilleApDepl=grilleap;
+    }
+    
+    public int getGrilleApDepl(){
+        return grilleApDepl;
+    }
 
     /**
      * Méthode qui modifie la grille à laquelle est associée la case
@@ -40,12 +50,22 @@ public class Case implements Parametres, Serializable {
         this.grille = g;
     }
     
+   
+    
     /**
     * Méthode qui permet d'obtenir la grille dans laquelle se trouve la case 
     * @return la grille 
     */
     public Grille getGrille() {
         return this.grille;
+    }
+    
+    public int getNbDeplac(){
+        return nbDeplacements;
+    }
+    
+    public void setNbDeplac(int dep){
+        nbDeplacements=dep;
     }
 
     /**
@@ -79,15 +99,16 @@ public class Case implements Parametres, Serializable {
     public void setY(int y) {
         this.y = y;
     }
-
+    
     /**
      * Méthode qui permet de modifier la valeur de la case
      * @param valeur la nouvelle valeur
      */
     public void setValeur(int valeur) {
         this.valeur = valeur;
+       
     }
-
+    
     /**
      * Méthode qui permet de récupérer la valeur de la case
      * @return la valeur de la case

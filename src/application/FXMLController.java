@@ -51,6 +51,7 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import modele.Case;
 import modele.ConnexionBDD;
 import modele.Jeu;
 import modele.Main;
@@ -110,7 +111,7 @@ public class FXMLController implements Initializable, Parametres {
     private MenuItem newPartie;
     @FXML
     private MenuItem quitter;
-    private ArrayList<ArrayList<Label>> eltsGrilles;
+    private ArrayList<ArrayList<ArrayList<Label>>> eltsGrilles=null;
 
     private Jeu jeuAppli = null;
     // private int compteurCoups = 0;
@@ -241,11 +242,16 @@ public class FXMLController implements Initializable, Parametres {
         tabGrillesApp.add(grilleH);
         tabGrillesApp.add(grilleM);
         tabGrillesApp.add(grilleB);
+        eltsGrilles=null;
+        eltsGrilles=new ArrayList<ArrayList<ArrayList<Label>>>();
         //Boucle pour chaque grille
         for (int k = 0; k < TAILLE; k++) {
+            eltsGrilles.add(new ArrayList<ArrayList<Label>>());
             for (int i = 0; i < TAILLE; i++) {
+                eltsGrilles.get(k).add(new ArrayList<Label>());
                 for (int j = 0; j < TAILLE; j++) {
-                    Label caseJeu = new Label("" + jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur());
+                    eltsGrilles.get(k).get(i).add(new Label("" + jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()));
+                    Label caseJeu = eltsGrilles.get(k).get(i).get(j);
                     caseJeu.getStyleClass().add("caseJeu");
                     Pane caseJeuCouleur = new Pane();
 
@@ -586,24 +592,32 @@ public class FXMLController implements Initializable, Parametres {
             help.setVisible(true);
         }
         String direction = event.getText();
+        int dirThread=0;
         boolean b = false;
+        jeuAppli.reinitNbDepl();
         //Déplacement des cases selon la touche clavier
         if (direction.equals("g")) {
             b = jeuAppli.deplacerCases3G(GAUCHE);
+            dirThread=GAUCHE;
         } else if (direction.equals("d")) {
             b = jeuAppli.deplacerCases3G(DROITE);
+            dirThread=DROITE;
         } else if (direction.equals("h")) {
             b = jeuAppli.deplacerCases3G(HAUT);
+            dirThread=HAUT;
         } else if (direction.equals("b")) {
             b = jeuAppli.deplacerCases3G(BAS);
+            dirThread=BAS;
         } else if (direction.equals("q")) {
             b = jeuAppli.deplacerCases3G(DESCG);
+            dirThread=DESCG;
         } else if (direction.equals("e")) {
             b = jeuAppli.deplacerCases3G(MONTERG);
+            dirThread=MONTERG;
         } else {
             System.out.println("Déplacement impossible");
         }
-
+        deplacementThread(dirThread);
         jeuAppli.choixNbCasesAjout(b);
         this.majScoreApp();
         this.majGrillesApp();
@@ -733,7 +747,7 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private void mouvOrdiApp(MouseEvent event) {
         if (jeuAppli != null) {
-            boolean b2 = jeuAppli.MouvementAlea();
+            boolean b2 = jeuAppli.mouvementAlea();
             jeuAppli.choixNbCasesAjout(b2);
             this.majScoreApp();
             this.majGrillesApp();
@@ -747,5 +761,85 @@ public class FXMLController implements Initializable, Parametres {
         }
 
     }
+    
+    public void deplacementThread(int direction){
+        int minYCase=15, minXCaseGH=14, longCase=100,longGrille=300,minXCaseGM=353,minXCaseGB=692 ;
+        
+        for (int k=0;k<TAILLE;k++){
+            for (int i=0;i<TAILLE;i++){
+                for (int j=0;j<TAILLE;j++){
+                    Case caseBouge=jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
+                    int depl= caseBouge.getNbDeplac();
+                    int deplObj=0;
+                    switch (direction) {
+                        case HAUT -> deplObj=minYCase+caseBouge.getX()*longCase-depl*longCase;
+                        case BAS -> deplObj=minYCase+caseBouge.getX()*longCase+depl*longCase;
+                        case GAUCHE -> {
+                            switch(caseBouge.getGrille().getType()){
+                                case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase-depl*longCase;
+                                case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase-depl*longCase;
+                                case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase-depl*longCase;
+                            }
+                        }
+                        case DROITE -> {
+                            switch(caseBouge.getGrille().getType()){
+                                case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase+depl*longCase;
+                                case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase+depl*longCase;
+                                case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase+depl*longCase;
+                            }
+                        }
+                        case DESCG ->{
+                            if(caseBouge.getGrille().getType()==GRILLEH){
+                                switch(caseBouge.getGrilleApDepl()){
+                                    case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase;
+                                    case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase;
+                                    case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase;
+                                }
+                            }
+                            else if (caseBouge.getGrille().getType()==GRILLEM){
+                                switch(caseBouge.getGrilleApDepl()){
+                                    case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase;
+                                    case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase;
+                                }
+                            }
+                            else{
+                                deplObj=minXCaseGB+caseBouge.getY()*longCase;
+                            }
+                        }
+                        case MONTERG ->{
+                            if(caseBouge.getGrille().getType()==GRILLEH){
+                                deplObj=minXCaseGH+caseBouge.getY()*longCase;
+                            }    
+                            else if (caseBouge.getGrille().getType()==GRILLEM){
+                                switch(caseBouge.getGrilleApDepl()){
+                                    case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase;
+                                    case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase;
+                                    case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase;
+                                    
+                                }
+                            }
+                            else{
+                                switch(caseBouge.getGrilleApDepl()){
+                                    case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase;
+                                    case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase;
+                                    case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase;
+                                    
+                                }
+                            }
+                        }
+                        default -> {
+                        }
+                    }
+                    System.out.println(deplObj);
+                    int xCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutX();
+                    //System.out.println(xCase);
+                    int yCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutY();
+                    //System.out.println(yCase);
+                    Label caseABouge=eltsGrilles.get(k).get(i).get(j);
+                }
+            }
+        }
+    }
+
 
 }

@@ -120,7 +120,7 @@ public class Grille implements Parametres, Serializable{
      * @return un booléen qui indique s'il y a encore des déplacements possibles
      * ou non
      */
-    public boolean DeplacementFiniG() {
+    public boolean deplacementFiniG() {
         for (int i = 0; i < TAILLE; i++) {
             for (int j = 0; j < TAILLE; j++) {
                 if (grille.get(i).get(j).getValeur() == 0) {
@@ -158,18 +158,16 @@ public class Grille implements Parametres, Serializable{
      */
     public boolean fusion(Case c, Case voisin) {
         boolean fusion = false;
-        
-        if (!voisin.isFusionnee()) {
             voisin.setValeur(voisin.getValeur() * 2);
             voisin.setFusionnee(true);
             this.scoreg = scoreg + voisin.getValeur();
             c.setValeur(0);
             
             fusion = true;
-        }
         
         return fusion;
     }
+    
 
     /**
      * Méthode qui permet de déplacer toutes les cases dans une direction
@@ -248,7 +246,7 @@ public class Grille implements Parametres, Serializable{
      */
     private boolean deplacementUneCase(int direc2, ArrayList<Case> tabHB, int k) {
         boolean deplacement = false;
-        
+        Case caseBouge=tabHB.get(k);
         if (tabHB.get(k).getValeur() > 0) { // Déplacement uniquement s'il s'agit d'une vraie case (avec une valeur)
            int voisin;
            if (direc2 == GAUCHE || direc2 == HAUT) {
@@ -256,9 +254,9 @@ public class Grille implements Parametres, Serializable{
            } else {
                voisin = k + 1;
            }
-
+           
            // Tant que mon voisin = 0, je me déplace avant de chercher à fusionner
-           while (voisin >= 0 && voisin < TAILLE && tabHB.get(voisin).getValeur() == 0) {
+           while (voisin >= 0 && voisin < TAILLE && tabHB.get(voisin).getValeur() == 0 ) {
                tabHB.get(voisin).setValeur(tabHB.get(k).getValeur());
                tabHB.get(k).setValeur(0);
                deplacement = true;
@@ -275,17 +273,28 @@ public class Grille implements Parametres, Serializable{
 
            if (voisin >= 0 && voisin < TAILLE) {
                //Si mon voisin a la même valeur que moi, je fusionne
-               if (tabHB.get(voisin).getValeur()
-                       == tabHB.get(k).getValeur()) {
+               if (tabHB.get(voisin).getValeur() == tabHB.get(k).getValeur()) {
                    boolean b = fusion(tabHB.get(k), tabHB.get(voisin));
+                   if(direc2==GAUCHE || direc2==HAUT){
+                       k--;
+                   }
+                   else {
+                       k++;
+                   }
                    if (b) deplacement = true;
-               }
-           }   
+                   } 
+                }
+           
         }
-
+        if(direc2==HAUT || direc2==BAS){
+            caseBouge.setNbDeplac(k-caseBouge.getX());
+        }
+        else{
+            caseBouge.setNbDeplac(k-caseBouge.getY());
+        }
         return deplacement;
     }
-
+    
     /**
      * Méthode qui génère une nouvelle case dans la grille s'il reste des cases
      * vides
@@ -362,4 +371,7 @@ public class Grille implements Parametres, Serializable{
     public Grille clone(Jeu j) {
         return new Grille(this, j);
     }
+    
+    
 }
+
