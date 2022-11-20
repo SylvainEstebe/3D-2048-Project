@@ -71,12 +71,6 @@ public class Main implements Parametres {
             Client client = new Client(adresse, port);
             new Thread(client).start();
         }
-        
-        
-        
-        
-        
-        
         // FIN TEST MULTI
         
         
