@@ -472,12 +472,12 @@ public class Jeu implements Parametres, Serializable {
         }
         while (!this.finJeu()) {
             reinitNbDepl();
-            System.out.println("Déplacer vers la Droite (d), Gauche (g), Haut (h), ou Bas (b), niveau supérieur (e) niveau inférieur (q) ?");
+            System.out.println("Déplacer vers la Droite (d), Gauche (q), Haut (z), ou Bas (s), niveau supérieur (r) niveau inférieur (f) ?");
             System.out.println("Si vous voulez nous laisser choisir pour vous, tapez '?' ");
             System.out.println("Pour quitter le jeu taper 'x'");
             System.out.println("Taper ii pour laisser l'IA jouer à votre place.");
             if (!retour && etatsPrecedents.size() > 0) { //on ne peut pas retourner en arrière si on l'a déjà fait ou si on n'a pas encore joué
-                System.out.println("Retourner en arrière ? Tapez r : vous pouvez retourner jusqu'à 5 coups en arrière. Attention ! Vous ne pouvez utiliser le retour en arrière qu'une fois par partie !");
+                System.out.println("Retourner en arrière ? Tapez b : vous pouvez retourner jusqu'à 5 coups en arrière. Attention ! Vous ne pouvez utiliser le retour en arrière qu'une fois par partie !");
             }
             
             String s = sc1.next();
@@ -489,7 +489,7 @@ public class Jeu implements Parametres, Serializable {
             if (s.equals("x")) {
                 this.quitter();
             }
-            if (s.equals("r") && !retour && etatsPrecedents.size() > 0) {
+            if (s.equals("b") && !retour && etatsPrecedents.size() > 0) {
                 this.undo();
                 System.out.println(this);
                 retour = true;
@@ -501,24 +501,24 @@ public class Jeu implements Parametres, Serializable {
                 System.out.println(this);
 
             } else if (!(s.equals("d") || s.equals("droite")
-                    || s.equals("g") || s.equals("gauche")
-                    || s.equals("h") || s.equals("haut")
-                    || s.equals("b") || s.equals("bas")
-                    || s.equals("e") || s.equals("niveau supérieur")
-                    || s.equals("q") || s.equals("niveau inférieur"))) {
-                System.out.println("Vous devez écrire d pour Droite, g pour Gauche, h pour Haut ou b pour Bas, e pour supérieur, q pour inférieur");
+                    || s.equals("q") || s.equals("gauche")
+                    || s.equals("z") || s.equals("haut")
+                    || s.equals("s") || s.equals("bas")
+                    || s.equals("r") || s.equals("niveau supérieur")
+                    || s.equals("f") || s.equals("niveau inférieur"))) {
+                System.out.println("Vous devez écrire d pour Droite, q pour Gauche, z pour Haut ou s pour Bas, r pour supérieur, f pour inférieur");
             } else {
                 int direction;
                 direction = switch (s) {
-                    case "q", "niveau inférieur" ->
+                    case "f", "niveau inférieur" ->
                         DESCG;
-                    case "e", "niveau supérieur" ->
+                    case "r", "niveau supérieur" ->
                         MONTERG;
                     case "d", "droite" ->
                         DROITE;
-                    case "g", "gauche" ->
+                    case "q", "gauche" ->
                         GAUCHE;
-                    case "h", "haut" ->
+                    case "z", "haut" ->
                         HAUT;
                     default ->
                         BAS;

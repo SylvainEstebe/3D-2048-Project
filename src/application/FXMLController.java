@@ -33,8 +33,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -369,6 +371,7 @@ public class FXMLController implements Initializable, Parametres {
         help.setVisible(true);
         help.setDisable(false);
         instructionJeu.setVisible(false);
+        majGrillesApp();
     }
 
     @FXML
@@ -381,6 +384,7 @@ public class FXMLController implements Initializable, Parametres {
         help.setVisible(true);
         help.setDisable(false);
         instructionJeu.setVisible(false);
+        majGrillesApp();
 
     }
 
@@ -395,6 +399,7 @@ public class FXMLController implements Initializable, Parametres {
         this.classique.setDisable(false);
         instructionJeu.setVisible(true);
         help.setVisible(false);
+        majGrillesApp();
 
     }
 
@@ -421,9 +426,9 @@ public class FXMLController implements Initializable, Parametres {
         boxText_expli.setPrefWidth(400);
 
         Label text_expli = new Label(" Presser D pour aller à droite"
-                + "\n Presser G pour aller à gauche." + "\n Presser H pour aller en haut."
-                + "\n Presser B pour aller en bas.\n Presser E pour aller au niveau supérieur."
-                + "\n Presser Q pour aller au niveau inférieur.");
+                + "\n Presser Q pour aller à gauche." + "\n Presser Z pour aller en haut."
+                + "\n Presser S pour aller en bas.\n Presser R pour aller au niveau supérieur."
+                + "\n Presser F pour aller au niveau inférieur.");
         text_expli.getStyleClass().add("text_horsjeu2");
         boxText_expli.getChildren().add(text_expli);
         root.setLeft(boxText_expli);
@@ -596,26 +601,28 @@ public class FXMLController implements Initializable, Parametres {
         boolean b = false;
         jeuAppli.reinitNbDepl();
         //Déplacement des cases selon la touche clavier
-        if (direction.equals("g")) {
+        if (direction.equals("q")) {
             b = jeuAppli.deplacerCases3G(GAUCHE);
             dirThread=GAUCHE;
         } else if (direction.equals("d")) {
             b = jeuAppli.deplacerCases3G(DROITE);
             dirThread=DROITE;
-        } else if (direction.equals("h")) {
+        } else if (direction.equals("z")) {
             b = jeuAppli.deplacerCases3G(HAUT);
             dirThread=HAUT;
-        } else if (direction.equals("b")) {
+        } else if (direction.equals("s")) {
             b = jeuAppli.deplacerCases3G(BAS);
             dirThread=BAS;
-        } else if (direction.equals("q")) {
+        } else if (direction.equals("f")) {
             b = jeuAppli.deplacerCases3G(DESCG);
             dirThread=DESCG;
-        } else if (direction.equals("e")) {
+        } else if (direction.equals("r")) {
             b = jeuAppli.deplacerCases3G(MONTERG);
             dirThread=MONTERG;
         } else {
-            System.out.println("Déplacement impossible");
+            System.out.println("Attention, vous n'avez pas appuyé sur une touche valide! Par défaut, vous allez à gauche");
+            b = jeuAppli.deplacerCases3G(GAUCHE);
+            dirThread=GAUCHE;
         }
         deplacementThread(dirThread);
         jeuAppli.choixNbCasesAjout(b);
@@ -830,15 +837,51 @@ public class FXMLController implements Initializable, Parametres {
                         default -> {
                         }
                     }
-                    System.out.println(deplObj);
+                    //System.out.println(deplObj);
                     int xCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutX();
                     //System.out.println(xCase);
                     int yCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutY();
                     //System.out.println(yCase);
                     Label caseABouge=eltsGrilles.get(k).get(i).get(j);
+//                  Task task = new Task<Void>() {
+//                        @Override
+//                        protected Void call() throws Exception {
+//
+//                            while (xCase != deplObj) { //si on veut que deplObj et xCase soient utilisables, ici on les met en private int dans la classe FXMLController
+//                                if (xCase < deplObj) {
+//
+//                                    xCase+= 1; // si on va vers la droite, on modifie la position de la tuile pixel par pixel vers la droite
+//                                } else {
+//                                    xCase -= 1; // si on va vers la gauche, idem en décrémentant la valeur de x
+//                                }
+//                                // Platform.runLater est nécessaire en JavaFX car la GUI ne peut être modifiée que par le Thread courant, contrairement à Swing où on peut utiliser un autre Thread pour ça
+//                                Platform.runLater(new Runnable() { // classe anonyme
+//                                    @Override
+//                                    public void run() {
+//                                        //javaFX operations should go here
+//                                        caseABouge.relocate(xCase, yCase); // on déplace la tuile d'un pixel sur la vue, on attend 5ms et on recommence jusqu'à atteindre l'objectif
+//                                        caseABouge.setVisible(true);
+//                                        System.out.println(caseABouge.getLayoutX());
+//                                    }
+//
+//                                }
+//                                );
+//                                Thread.sleep(500);
+//                            } // end while
+//                            return null;
+//                        }   
+//                    };
                 }
             }
         }
+         //Cette partie est utilisée avec la méthode : utilisation d'une classe extérieure DeplacementTask.
+//        for (int i=0;i<deplacementsCases.size();i++){
+//            Thread th = new Thread(task); // on crée un contrôleur de Thread
+//            th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
+//            th.start(); // et on exécute le Thread pour mettre à jour la vue (déplacement continu de la tuile horizontalement)
+//            //deplacementsCases.add(new DeplacementTask(xCase,yCase,deplObj,caseABougeGraph));
+//        }
+         
     }
 
 
