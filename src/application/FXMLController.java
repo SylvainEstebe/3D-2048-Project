@@ -351,9 +351,11 @@ public class FXMLController implements Initializable, Parametres {
                     caseJeuCouleur.getStyleClass().add("couleurCase");
                     caseJeu.setVisible(true);
                     caseJeuCouleur.setVisible(true);
+                    
                     tabGrillesApp.get(k).setHalignment(caseJeu, HPos.CENTER);
                     tabGrillesApp.get(k).add(caseJeuCouleur, i, j);
                     tabGrillesApp.get(k).add(caseJeu, i, j);
+                    
                 }
             }
 
@@ -771,7 +773,7 @@ public class FXMLController implements Initializable, Parametres {
     
     public void deplacementThread(int direction){
         int minYCase=15, minXCaseGH=14, longCase=100,longGrille=300,minXCaseGM=353,minXCaseGB=692 ;
-        
+        ArrayList<Task> deplacementCases=new ArrayList<Task>();
         for (int k=0;k<TAILLE;k++){
             for (int i=0;i<TAILLE;i++){
                 for (int j=0;j<TAILLE;j++){
@@ -843,44 +845,18 @@ public class FXMLController implements Initializable, Parametres {
                     int yCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutY();
                     //System.out.println(yCase);
                     Label caseABouge=eltsGrilles.get(k).get(i).get(j);
-//                  Task task = new Task<Void>() {
-//                        @Override
-//                        protected Void call() throws Exception {
-//
-//                            while (xCase != deplObj) { //si on veut que deplObj et xCase soient utilisables, ici on les met en private int dans la classe FXMLController
-//                                if (xCase < deplObj) {
-//
-//                                    xCase+= 1; // si on va vers la droite, on modifie la position de la tuile pixel par pixel vers la droite
-//                                } else {
-//                                    xCase -= 1; // si on va vers la gauche, idem en décrémentant la valeur de x
-//                                }
-//                                // Platform.runLater est nécessaire en JavaFX car la GUI ne peut être modifiée que par le Thread courant, contrairement à Swing où on peut utiliser un autre Thread pour ça
-//                                Platform.runLater(new Runnable() { // classe anonyme
-//                                    @Override
-//                                    public void run() {
-//                                        //javaFX operations should go here
-//                                        caseABouge.relocate(xCase, yCase); // on déplace la tuile d'un pixel sur la vue, on attend 5ms et on recommence jusqu'à atteindre l'objectif
-//                                        caseABouge.setVisible(true);
-//                                        System.out.println(caseABouge.getLayoutX());
-//                                    }
-//
-//                                }
-//                                );
-//                                Thread.sleep(500);
-//                            } // end while
-//                            return null;
-//                        }   
-//                    };
+                    deplacementCases.add(new DeplacementTask(xCase,yCase,deplObj,caseABouge));
                 }
             }
         }
          //Cette partie est utilisée avec la méthode : utilisation d'une classe extérieure DeplacementTask.
-//        for (int i=0;i<deplacementsCases.size();i++){
-//            Thread th = new Thread(task); // on crée un contrôleur de Thread
-//            th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
-//            th.start(); // et on exécute le Thread pour mettre à jour la vue (déplacement continu de la tuile horizontalement)
-//            //deplacementsCases.add(new DeplacementTask(xCase,yCase,deplObj,caseABougeGraph));
-//        }
+        for (int i=0;i<deplacementCases.size();i++){
+            Thread th = new Thread(deplacementCases.get(i)); // on crée un contrôleur de Thread
+            th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
+            th.start();
+            
+            //deplacementsCases.add(new DeplacementTask(xCase,yCase,deplObj,caseABougeGraph));
+        }
          
     }
 

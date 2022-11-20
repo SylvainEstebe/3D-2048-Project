@@ -47,7 +47,7 @@ public class DeplacementTask extends Task<Void>{
                 
             }
             );
-            Thread.sleep(500);
+            Thread.sleep(5);
         } // end while
         return null;
     }   
