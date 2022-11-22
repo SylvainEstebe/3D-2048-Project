@@ -36,6 +36,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.Group;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -523,8 +524,6 @@ public class FXMLController implements Initializable, Parametres {
             listePerso.add(p);
 
             listePersonne.add(p);
-            // On affiche
-            txtBDD.setText("" + listePersonne.get(0).getPseudo() + listePersonne.get(0).getScore());
 
         }
         // Création du tableau
@@ -557,13 +556,13 @@ public class FXMLController implements Initializable, Parametres {
 
         table.getColumns().addAll(pseudoCol, scoreCol, tempsCol, deplacementCol);
         table.setItems(data);
-        
+
         final VBox vbox = new VBox();
         vbox.setSpacing(10);
         vbox.setPadding(new Insets(10, 0, 0, 0));
         vbox.getChildren().addAll(label, table);
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
-        
+
         stat.setScene(scene);
         stat.show();
     }
@@ -623,32 +622,32 @@ public class FXMLController implements Initializable, Parametres {
             help.setVisible(true);
         }
         String direction = event.getText();
-        int dirThread=0;
+        int dirThread = 0;
         boolean b = false;
         jeuAppli.reinitNbDepl();
         //Déplacement des cases selon la touche clavier
         if (direction.equals("q")) {
             b = jeuAppli.deplacerCases3G(GAUCHE);
-            dirThread=GAUCHE;
+            dirThread = GAUCHE;
         } else if (direction.equals("d")) {
             b = jeuAppli.deplacerCases3G(DROITE);
-            dirThread=DROITE;
+            dirThread = DROITE;
         } else if (direction.equals("z")) {
             b = jeuAppli.deplacerCases3G(HAUT);
-            dirThread=HAUT;
+            dirThread = HAUT;
         } else if (direction.equals("s")) {
             b = jeuAppli.deplacerCases3G(BAS);
-            dirThread=BAS;
+            dirThread = BAS;
         } else if (direction.equals("f")) {
             b = jeuAppli.deplacerCases3G(DESCG);
-            dirThread=DESCG;
+            dirThread = DESCG;
         } else if (direction.equals("r")) {
             b = jeuAppli.deplacerCases3G(MONTERG);
-            dirThread=MONTERG;
+            dirThread = MONTERG;
         } else {
             System.out.println("Attention, vous n'avez pas appuyé sur une touche valide! Par défaut, vous allez à gauche");
             b = jeuAppli.deplacerCases3G(GAUCHE);
-            dirThread=GAUCHE;
+            dirThread = GAUCHE;
         }
         deplacementThread(dirThread);
         
@@ -736,27 +735,22 @@ public class FXMLController implements Initializable, Parametres {
      */
     @FXML
     private void enregistrementBDD(MouseEvent event) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-
-        // Stockage des informations 
         // Temps 
         long chrono2 = java.lang.System.currentTimeMillis();
         long timeSpentPlaying = chrono2 - chronos;
-
         // Pseudonyme
-        TilePane r = new TilePane();
         Label l = new Label();
         TextInputDialog td = new TextInputDialog();
-        Button d = new Button("click");
-        td.setTitle("Veuillez rentrer votre pseudonyme");
+        
         // Boucle pour que le pseudo ne soit pas vide
         while (l.getText().isEmpty()) {
-            r = new TilePane();
-            l = new Label();
-            td = new TextInputDialog();
-            d = new Button("click");
-            td.setTitle("Veuillez rentrer votre pseudonyme");
+            td.setTitle("Pseudonyme");
+            td.setHeaderText("Vous devez rentrer un pseudonyme !!!");
             td.showAndWait();
             l.setText(td.getEditor().getText());
+            td.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+
+            
         }
         String pseudo = l.getText();
 
@@ -765,20 +759,8 @@ public class FXMLController implements Initializable, Parametres {
 
         // Déplacement (traité dans la partie mouvJoueur)
         // Création d'une condition si le pseudo existe dèja - A FAIRE
-        // BDD infos
-        String host = "localhost";
-        String port = "3306";
-        String dbname = "2048_game_Estebe";
-        String username = "root";
-        String password = "root";
-        // BDD Connexion
-        ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
-        // BDD requête ajout Joueur(int,string,int,int,int) Joueur(id,pseudo,score,temps,deplacement)
-        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + timeSpentPlaying + "','" + deplacementBDD + "')";
-        c.insertTuples(query);
+        ConnexionBDD.ajoutJoueur(0, pseudo, scoreJoueurFin, timeSpentPlaying, deplacementBDD);
     }
-
-    
 
     @FXML
     private void mouvOrdiApp(MouseEvent event) {
@@ -809,8 +791,10 @@ public class FXMLController implements Initializable, Parametres {
                     int depl= caseBouge.getNbDeplac();
                     int deplObj=0;
                     switch (direction) {
-                        case HAUT -> deplObj=minYCase+caseBouge.getX()*longCase-depl*longCase;
-                        case BAS -> deplObj=minYCase+caseBouge.getX()*longCase+depl*longCase;
+                        case HAUT ->
+                            deplObj = minYCase + caseBouge.getX() * longCase - depl * longCase;
+                        case BAS ->
+                            deplObj = minYCase + caseBouge.getX() * longCase + depl * longCase;
                         case GAUCHE -> {
                             switch(caseBouge.getGrille().getType()){
                                 case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase-(abs(depl)*longCase);
@@ -819,48 +803,58 @@ public class FXMLController implements Initializable, Parametres {
                             }
                         }
                         case DROITE -> {
-                            switch(caseBouge.getGrille().getType()){
-                                case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase+depl*longCase;
-                                case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase+depl*longCase;
-                                case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase+depl*longCase;
+                            switch (caseBouge.getGrille().getType()) {
+                                case GRILLEH ->
+                                    deplObj = minXCaseGH + caseBouge.getY() * longCase + depl * longCase;
+                                case GRILLEM ->
+                                    deplObj = minXCaseGM + caseBouge.getY() * longCase + depl * longCase;
+                                case GRILLEB ->
+                                    deplObj = minXCaseGB + caseBouge.getY() * longCase + depl * longCase;
                             }
                         }
-                        case DESCG ->{
-                            if(caseBouge.getGrille().getType()==GRILLEH){
-                                switch(caseBouge.getGrilleApDepl()){
-                                    case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase;
-                                    case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase;
-                                    case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase;
+                        case DESCG -> {
+                            if (caseBouge.getGrille().getType() == GRILLEH) {
+                                switch (caseBouge.getGrilleApDepl()) {
+                                    case GRILLEH ->
+                                        deplObj = minXCaseGH + caseBouge.getY() * longCase;
+                                    case GRILLEM ->
+                                        deplObj = minXCaseGM + caseBouge.getY() * longCase;
+                                    case GRILLEB ->
+                                        deplObj = minXCaseGB + caseBouge.getY() * longCase;
                                 }
-                            }
-                            else if (caseBouge.getGrille().getType()==GRILLEM){
-                                switch(caseBouge.getGrilleApDepl()){
-                                    case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase;
-                                    case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase;
+                            } else if (caseBouge.getGrille().getType() == GRILLEM) {
+                                switch (caseBouge.getGrilleApDepl()) {
+                                    case GRILLEM ->
+                                        deplObj = minXCaseGM + caseBouge.getY() * longCase;
+                                    case GRILLEB ->
+                                        deplObj = minXCaseGB + caseBouge.getY() * longCase;
                                 }
-                            }
-                            else{
-                                deplObj=minXCaseGB+caseBouge.getY()*longCase;
+                            } else {
+                                deplObj = minXCaseGB + caseBouge.getY() * longCase;
                             }
                         }
-                        case MONTERG ->{
-                            if(caseBouge.getGrille().getType()==GRILLEH){
-                                deplObj=minXCaseGH+caseBouge.getY()*longCase;
-                            }    
-                            else if (caseBouge.getGrille().getType()==GRILLEM){
-                                switch(caseBouge.getGrilleApDepl()){
-                                    case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase;
-                                    case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase;
-                                    case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase;
-                                    
+                        case MONTERG -> {
+                            if (caseBouge.getGrille().getType() == GRILLEH) {
+                                deplObj = minXCaseGH + caseBouge.getY() * longCase;
+                            } else if (caseBouge.getGrille().getType() == GRILLEM) {
+                                switch (caseBouge.getGrilleApDepl()) {
+                                    case GRILLEH ->
+                                        deplObj = minXCaseGH + caseBouge.getY() * longCase;
+                                    case GRILLEM ->
+                                        deplObj = minXCaseGM + caseBouge.getY() * longCase;
+                                    case GRILLEB ->
+                                        deplObj = minXCaseGB + caseBouge.getY() * longCase;
+
                                 }
-                            }
-                            else{
-                                switch(caseBouge.getGrilleApDepl()){
-                                    case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase;
-                                    case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase;
-                                    case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase;
-                                    
+                            } else {
+                                switch (caseBouge.getGrilleApDepl()) {
+                                    case GRILLEH ->
+                                        deplObj = minXCaseGH + caseBouge.getY() * longCase;
+                                    case GRILLEM ->
+                                        deplObj = minXCaseGM + caseBouge.getY() * longCase;
+                                    case GRILLEB ->
+                                        deplObj = minXCaseGB + caseBouge.getY() * longCase;
+
                                 }
                             }
                         }
@@ -888,6 +882,5 @@ public class FXMLController implements Initializable, Parametres {
             
         }         
     }
-
 
 }

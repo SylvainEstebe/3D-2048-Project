@@ -13,6 +13,9 @@ import java.util.ArrayList;
 
 public class Case implements Parametres, Serializable {
 
+    /**
+     * Coordonnées et valeur de la case
+     */
     private int x, y, valeur; 
     private Grille grille;
     private int grilleApDepl;

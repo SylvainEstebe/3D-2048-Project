@@ -112,4 +112,20 @@ public class ConnexionBDD {
             this.closeConnexion();
         }
     }
+    
+    public static void ajoutJoueur(int id, String pseudo, int scoreJoueurFin, long timeSpentPlaying, int deplacementBDD){
+        
+        // BDD infos
+        String host = "localhost";
+        String port = "3306";
+        String dbname = "2048_game_Estebe";
+        String username = "root";
+        String password = "root";
+        // BDD Connexion
+        ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
+        // BDD requête ajout Joueur(int,string,int,int,int) Joueur(id,pseudo,score,temps,deplacement)
+        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + timeSpentPlaying + "','" + deplacementBDD + "')";
+        c.insertTuples(query);
+
+    }
 }
