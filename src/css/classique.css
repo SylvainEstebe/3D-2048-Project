@@ -153,6 +153,7 @@ gridPane{
 
 .couleurCase{
     -fx-background-color : #eee4da;
-    -fx-border-color :  black;
+    -fx-border-width :2;
+    -fx-border-color : grey;
 }
 

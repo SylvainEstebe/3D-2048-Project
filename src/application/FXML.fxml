@@ -49,9 +49,9 @@
             </MenuBar>
             <BorderPane layoutX="-12.0" prefHeight="855.0" prefWidth="1030.0" AnchorPane.bottomAnchor="-64.0" AnchorPane.leftAnchor="-12.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
                <top>
-                  <Pane prefHeight="722.0" prefWidth="1018.0" styleClass="paneCentrale1" BorderPane.alignment="CENTER">
+                  <Pane fx:id="fond" prefHeight="722.0" prefWidth="1018.0" styleClass="paneCentrale1" BorderPane.alignment="CENTER">
                      <children>
-                        <Pane layoutX="7.0" layoutY="166.0" prefHeight="329.0" prefWidth="1018.0" styleClass="paneCentrale2">
+                        <Pane fx:id="fondGrille" layoutX="7.0" layoutY="166.0" prefHeight="329.0" prefWidth="1018.0" styleClass="paneCentrale2">
                            <children>
                               <GridPane fx:id="grilleH" gridLinesVisible="true" layoutX="14.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
                                  <columnConstraints>
@@ -67,9 +67,9 @@
                                  <children>
                                     <Pane prefHeight="92.0" prefWidth="100.0" styleClass="case32" GridPane.columnIndex="2">
                                        <children>
-                                          <Label layoutX="21.0" layoutY="20.0" prefHeight="60.0" prefWidth="59.0" text="32" textAlignment="CENTER" textFill="WHITE">
+                                          <Label layoutX="21.0" layoutY="15.0" prefHeight="60.0" prefWidth="59.0" text="32" textAlignment="JUSTIFY" textFill="WHITE">
                                              <font>
-                                                <Font size="35.0" />
+                                                <Font size="48.0" />
                                              </font>
                                           </Label>
                                        </children>

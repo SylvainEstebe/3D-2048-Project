@@ -286,10 +286,11 @@ public class Grille implements Parametres, Serializable{
                 }
            
         }
-        if(direc2==HAUT || direc2==BAS){
+        //Element qui sert au thread deplacement des cases graphiques
+        if((direc2==HAUT || direc2==BAS)  ){
             caseBouge.setNbDeplac(k-caseBouge.getX());
         }
-        else{
+        else if((direc2==DROITE || direc2==GAUCHE)){
             caseBouge.setNbDeplac(k-caseBouge.getY());
         }
         return deplacement;

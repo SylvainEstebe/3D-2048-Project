@@ -7,6 +7,7 @@ package application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 
 /**
  *
@@ -16,9 +17,9 @@ public class DeplacementTask extends Task<Void>{
     private int x=0;
     private int y=0;
     private int deplObj=0;
-    Label caseABougeGraph;
+    Pane caseABougeGraph;
     
-    public DeplacementTask(int x,int y,int deplobj, Label caseABougeGraph){
+    public DeplacementTask(int x,int y,int deplobj, Pane caseABougeGraph){
         this.x=x;
         this.y=y;
         this.deplObj=deplobj;
@@ -42,7 +43,7 @@ public class DeplacementTask extends Task<Void>{
                     //javaFX operations should go here
                     caseABougeGraph.relocate(x, y); // on déplace la tuile d'un pixel sur la vue, on attend 5ms et on recommence jusqu'à atteindre l'objectif
                     caseABougeGraph.setVisible(true);
-                    System.out.println(caseABougeGraph.getLayoutX());
+                    //System.out.println(caseABougeGraph.getLayoutX());
                 }
                 
             }
