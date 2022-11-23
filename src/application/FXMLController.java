@@ -1,12 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import static java.lang.Math.abs;
 import java.net.URL;
@@ -18,8 +13,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -30,8 +23,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -44,7 +35,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -107,7 +97,7 @@ public class FXMLController implements Initializable, Parametres {
     private MenuItem newPartie;
     @FXML
     private MenuItem quitter;
-    private ArrayList<ArrayList<ArrayList<Pane>>> eltsGrilles=null;
+    private ArrayList<ArrayList<ArrayList<Label>>> eltsGrilles=null;
 
     private Jeu jeuAppli = null;
     // private int compteurCoups = 0;
@@ -240,44 +230,41 @@ public class FXMLController implements Initializable, Parametres {
 
     /**
      * Méthode pour afficher les 3 grilles du jeu
-     * IDEE : faire un affichage au début où on initialise le tab, puis ensuite on change juste les couleurs
-     * des panes et les valeurs des labels dans majGrillesApp
+     *
      */
     private void majGrillesApp() {
         tabGrillesApp = new ArrayList<GridPane>();
         tabGrillesApp.add(grilleH);
         tabGrillesApp.add(grilleM);
         tabGrillesApp.add(grilleB);
-        eltsGrilles=null;
-        eltsGrilles=new ArrayList<ArrayList<ArrayList<Pane>>>();
+        eltsGrilles = null;
+        eltsGrilles = new ArrayList<ArrayList<ArrayList<Label>>>();
         //Boucle pour chaque grille
         for (int k = 0; k < TAILLE; k++) {
-            eltsGrilles.add(new ArrayList<ArrayList<Pane>>());
+            eltsGrilles.add(new ArrayList<ArrayList<Label>>());
             for (int i = 0; i < TAILLE; i++) {
-                eltsGrilles.get(k).add(new ArrayList<Pane>());
+                eltsGrilles.get(k).add(new ArrayList<Label>());
                 for (int j = 0; j < TAILLE; j++) {
-                    //eltsGrilles.get(k).get(i).add(new Label("" + jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()));
-                    eltsGrilles.get(k).get(i).add(new Pane());
-                    Case caseModele=jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
-                    Label caseJeu = new Label("" + caseModele.getValeur());
+                    eltsGrilles.get(k).get(i).add(new Label("" + jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()));
+                    Label caseJeu = eltsGrilles.get(k).get(i).get(j);
                     caseJeu.getStyleClass().add("caseJeu");
-                    Pane caseJeuCouleur = eltsGrilles.get(k).get(i).get(j);
+                    Pane caseJeuCouleur = new Pane();
 
                     //Gestion des bordures des grilles
-//                    if (j != 2 && i != 2) {
-//                        caseJeuCouleur.setStyle("-fx-border-width : 1px 0px 0px 1px ");
-//                    } else if (j == 2 && i != 2) {
-//                        caseJeuCouleur.setStyle("-fx-border-width : 1px 0px 1px 1px ");
-//                    } else if (j != 2 && i == 2) {
-//                        caseJeuCouleur.setStyle("-fx-border-width : 1px 1px 0px 1px ");
-//
-//                    } else {
-//                        caseJeuCouleur.setStyle("-fx-border-width : 1px 1px 1px 1px ");
-//                    }
+                    if (j != 2 && i != 2) {
+                        caseJeuCouleur.setStyle("-fx-border-width : 1px 0px 0px 1px ");
+                    } else if (j == 2 && i != 2) {
+                        caseJeuCouleur.setStyle("-fx-border-width : 1px 0px 1px 1px ");
+                    } else if (j != 2 && i == 2) {
+                        caseJeuCouleur.setStyle("-fx-border-width : 1px 1px 0px 1px ");
+
+                    } else {
+                        caseJeuCouleur.setStyle("-fx-border-width : 1px 1px 1px 1px ");
+                    }
 
                     if (classique.isDisable()) {
                         //Gestion des couleurs des cases
-                        switch (jeuAppli.getGrilles().get(k).getGrille().get(i).get(j).getValeur()) {
+                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
                             case 2 ->
                                 caseJeuCouleur.setStyle("-fx-background-color : #FFFADF;");
                             case 4 ->
@@ -302,7 +289,7 @@ public class FXMLController implements Initializable, Parametres {
                                 caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
                         }
                     } else if (daltonien.isDisable()) {
-                        switch (jeuAppli.getGrilles().get(k).getGrille().get(i).get(j).getValeur()) {
+                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
                             case 2 ->
                                 caseJeuCouleur.setStyle("-fx-background-color : #E0431C;");
                             case 4 ->
@@ -328,7 +315,7 @@ public class FXMLController implements Initializable, Parametres {
                         }
 
                     } else if (dyslexique.isDisable()) {
-                        switch (jeuAppli.getGrilles().get(k).getGrille().get(i).get(j).getValeur()) {
+                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
                             case 2 ->
                                 caseJeuCouleur.setStyle("-fx-background-color :  #00FA9A;");
                             case 4 ->
@@ -355,32 +342,13 @@ public class FXMLController implements Initializable, Parametres {
                     }
 
                     caseJeuCouleur.getStyleClass().add("couleurCase");
-                    fondGrille.getChildren().add(caseJeuCouleur);
-                    if(caseModele.getGrille().getType()==GRILLEH){
-                        xCase=minXCaseGH+caseModele.getY()*longCase;
-                       
-                    }
-                    else if(caseModele.getGrille().getType()==GRILLEM){
-                        xCase=minXCaseGM+caseModele.getY()*longCase;
-                    }
-                    else{
-                        xCase=minXCaseGB+caseModele.getY()*longCase;
-                    }
-                    yCase=minYCase+caseModele.getX()*longCase;
-                    
-                    caseJeuCouleur.setPrefSize(100,100);
-                    caseJeuCouleur.setLayoutX(xCase);
-                    caseJeuCouleur.setLayoutY(yCase);
                     caseJeu.setVisible(true);
                     caseJeuCouleur.setVisible(true);
-                    caseJeu.layoutXProperty().bind(caseJeuCouleur.widthProperty().subtract(caseJeu.widthProperty()).divide(2));
-                    caseJeuCouleur.getChildren().add(caseJeu);
-                    
+
                     tabGrillesApp.get(k).setHalignment(caseJeu, HPos.CENTER);
-                    //tabGrillesApp.get(k).add(caseJeuCouleur, i, j);
-                    
-                    //tabGrillesApp.get(k).add(caseJeu, i, j);
-                    
+                    tabGrillesApp.get(k).add(caseJeuCouleur, i, j);
+                    tabGrillesApp.get(k).add(caseJeu, i, j);
+
                 }
             }
 
@@ -649,13 +617,13 @@ public class FXMLController implements Initializable, Parametres {
             b = jeuAppli.deplacerCases3G(GAUCHE);
             dirThread = GAUCHE;
         }
-        deplacementThread(dirThread);
+        //deplacementThread(dirThread);
         
         
         jeuAppli.choixNbCasesAjout(b);
         
         this.majScoreApp();
-        //this.majGrillesApp();
+        this.majGrillesApp();
         if (jeuAppli.finJeu()) {
             if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
                 this.victoireAppli();
@@ -867,8 +835,8 @@ public class FXMLController implements Initializable, Parametres {
                     //System.out.println(xCase);
                     yCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutY();
                     //System.out.println(yCase);
-                    Pane caseABouge=eltsGrilles.get(k).get(i).get(j);
-                    deplacementCases.add(new DeplacementTask(xCase,yCase,deplObj,caseABouge));
+                    //Label caseABouge=eltsGrilles.get(k).get(i).get(j);
+                    //deplacementCases.add(new DeplacementTask(xCase,yCase,deplObj,caseABouge));
                 }
             }
         }

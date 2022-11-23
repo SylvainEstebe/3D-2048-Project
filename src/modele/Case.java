@@ -17,9 +17,21 @@ public class Case implements Parametres, Serializable {
      * Coordonnées et valeur de la case
      */
     private int x, y, valeur; 
+    /**
+     * Grille à laquelle est associée la case
+     */
     private Grille grille;
+    /**
+     * Type de la grille où la case est après un déplacement
+     */
     private int grilleApDepl;
+    /**
+     * Booléen qui indique si la case a été fusionnée durant un déplacement
+     */
     private boolean fusionnee; //indique si la case a déjà été fusionnée durant un coup donné, réinitialisée à chaque coup
+    /**
+     * Indique le nombre de déplacement qu'a réalisé la case lors d'un coup
+     */
     private int nbDeplacements=0;
     
     /**
@@ -37,10 +49,18 @@ public class Case implements Parametres, Serializable {
         this.fusionnee = false;
     }
     
+    /**
+     * Modifie le type de la grille où la case s'est déplacée après un coup
+     * @param grilleap le type de la nouvelle grille
+     */
     public void setGrilleApDepl(int grilleap){
         this.grilleApDepl=grilleap;
     }
     
+    /**
+     * Donne le type de la grille où est la case après un coup
+     * @return 
+     */
     public int getGrilleApDepl(){
         return grilleApDepl;
     }
@@ -63,10 +83,18 @@ public class Case implements Parametres, Serializable {
         return this.grille;
     }
     
+    /**
+     * Donne le nombre de déplacements effectué par la case lors d'un coup
+     * @return le nombre de déplacements
+     */
     public int getNbDeplac(){
         return nbDeplacements;
     }
     
+    /**
+     * Modifie le nombre de déplacements effectué par la case lors d'un coup
+     * @param dep le nouveau nombre de déplacements
+     */
     public void setNbDeplac(int dep){
         nbDeplacements=dep;
     }

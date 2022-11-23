@@ -1,22 +1,25 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modele;
 
 import java.util.Scanner;
 import variables.Parametres;
 
 /**
- *
+ * Thread qui permet l'affichage de l'IA en console
  * @author Alexanne
  */
 public class ThreadAffichIACons extends Thread implements Parametres{
     
+    /**
+     * Constructeur vide
+     */
     public ThreadAffichIACons(){
         
     }
 
+    /**
+     * Méthode qui permet de faire fonctionner l'IA en console 
+     * tant que la touche s n'est pas enfoncée
+     */
     @Override
     public void run() {
         Scanner sc1 = new Scanner(System.in);
@@ -24,14 +27,9 @@ public class ThreadAffichIACons extends Thread implements Parametres{
         s = s.toLowerCase();
         boolean est_stoppe=false;
         while (!est_stoppe){
-            
             if(s.equals("s")){
-                est_stoppe=true;
-                
+                est_stoppe=true; 
             }
         }
-        
-    }
-    
-    
+    }  
 }

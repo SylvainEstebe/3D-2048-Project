@@ -11,9 +11,21 @@ import variables.Parametres;
  */
 public class Grille implements Parametres, Serializable{
 
+    /**
+     * Tableau de cases qui représente la grille
+     */
     private  ArrayList<ArrayList<Case>> grille;
+    /**
+     * Score de la grille
+     */
     private int scoreg;
+    /**
+     * Type de la grille (haut, milieu, bas)
+     */
     private int type; //indique si c'est une grille du haut, du milieu ou du bas
+    /**
+     * Jeu auquel est associée la grille
+     */
     private Jeu jeu; //jeu auquel appartient la grille
     
     /**
@@ -369,6 +381,11 @@ public class Grille implements Parametres, Serializable{
         }
     }
 
+    /**
+     * Méthode qui clone une grille
+     * @param j le jeu associé à la grille
+     * @return La grille copie
+     */
     public Grille clone(Jeu j) {
         return new Grille(this, j);
     }

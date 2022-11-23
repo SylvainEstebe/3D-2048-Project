@@ -4,31 +4,41 @@ import ia.IA2;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 import variables.Parametres;
-import java.io.FileNotFoundException;
 
 /**
- *
+ * Classe qui instancie un modèle de jeu 2048 3D
  * @author Manon
  */
 public class Jeu implements Parametres, Serializable {
 
-    private ArrayList<Grille> grilles = new ArrayList<Grille>();
-    private int scoreFinal = 0;
-    private boolean existePartiePrecedente;
-    private LinkedList<Jeu> etatsPrecedents = new LinkedList<>();
     /**
-     * Constructeur qui initialise la liste des grilles
+     * Tableau des grilles du jeu
+     */
+    private ArrayList<Grille> grilles = new ArrayList<Grille>();
+    /**
+     * Score final du jeu
+     */
+    private int scoreFinal = 0;
+    /**
+     * indique s'il existe une version antérieure de ce jeu
+     */
+    private boolean existePartiePrecedente;
+    /**
+     * Tableau des états précédents du jeu
+     */
+    private LinkedList<Jeu> etatsPrecedents = new LinkedList<>();
+    
+    
+    /**
+     * Constructeur qui initialise le jeu
      */
     public Jeu() {
         Grille g, g1, g2;
@@ -45,7 +55,7 @@ public class Jeu implements Parametres, Serializable {
     }
     
     /**
-     * Crée une copie du Jeu
+     * Constructeur qui permet la copie d'un jeu
      * 
      * @param j Jeu à copier 
      */
@@ -427,10 +437,11 @@ public class Jeu implements Parametres, Serializable {
             return false;
         }
     }
-    /*
-    *Methode pour lancer une nouvelle partie sur l'interface graphique
-    */
-
+    
+    /**
+     * Méthode qui lance le jeu de manière à ce qu'il soit utilisable 
+     * dans l'application
+     */
     public void lancementJeuAppli(){
         //le jeu commence avec 2 cases
         this.ajoutCases();
@@ -438,6 +449,11 @@ public class Jeu implements Parametres, Serializable {
         
     }
     
+    /**
+     * Méthode qui permet de choisir le nombre de cases à ajouter dans le jeu
+     * et les ajoute
+     * @param b2 pour savoir si on peut ajouter des cases
+     */
     public void choixNbCasesAjout(Boolean b2){
         Random ra = new Random();
         if (b2) {
@@ -470,8 +486,10 @@ public class Jeu implements Parametres, Serializable {
             System.out.println("Début du jeu");
             System.out.println(this);
         }
+        //Tant que le jeu n'est pas fini
         while (!this.finJeu()) {
             reinitNbDepl();
+            //Affichage des différentes fonctionnalités
             System.out.println("Déplacer vers la Droite (d), Gauche (q), Haut (z), ou Bas (s), niveau supérieur (r) niveau inférieur (f) ?");
             System.out.println("Si vous voulez nous laisser choisir pour vous, tapez '?' ");
             System.out.println("Pour quitter le jeu taper 'x'");
@@ -482,24 +500,28 @@ public class Jeu implements Parametres, Serializable {
             
             String s = sc1.next();
             s = s.toLowerCase();
+            //Action de l'IA 2
             if (s.equals("ii")){
                 IA2 ia2=new IA2(this);
                 ia2.jeuIA2();  
             }
+            //Quitter le jeu
             if (s.equals("x")) {
                 this.quitter();
             }
+            //Annulation de coups
             if (s.equals("b") && !retour && etatsPrecedents.size() > 0) {
                 this.undo();
                 System.out.println(this);
                 retour = true;
             }
+            //Mouvement aléatoire de l'ordinateur
             if (s.equals("?")) {
                 boolean b2=this.mouvementAlea();
                 choixNbCasesAjout(b2);
                 this.majScore();
                 System.out.println(this);
-
+              //Déplacement fait par un joueur
             } else if (!(s.equals("d") || s.equals("droite")
                     || s.equals("q") || s.equals("gauche")
                     || s.equals("z") || s.equals("haut")
@@ -538,6 +560,7 @@ public class Jeu implements Parametres, Serializable {
             }
 
         }
+        //Fin du jeu, affichage de l'état du jeu
         if (this.getValeurMaxJeu() >= OBJECTIF) {
             this.victoire();
         } else {
@@ -709,10 +732,12 @@ public class Jeu implements Parametres, Serializable {
         System.out.println(this);*/
     }
     
+    //Méthode qui clone un jeu
     public Jeu clone() {
         return new Jeu(this);
     }
     
+    //Méthode qui réinitialise le nombre de déplacements pour chaque case du jeu
     public void reinitNbDepl(){
         for (int k=0;k<TAILLE;k++){
             for (int i=0;i<TAILLE;i++){
