@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
 import static java.lang.Math.abs;
+import static java.lang.Thread.State.TERMINATED;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -115,7 +116,6 @@ public class FXMLController implements Initializable, Parametres {
     private ArrayList<Pane> eltsGrilles = null;
 
     private Jeu jeuAppli = null;
-    // private int compteurCoups = 0;
     private int nbRetour = 0;
     private boolean retourUtilise = false;
     private ArrayList<GridPane> tabGrillesApp;
