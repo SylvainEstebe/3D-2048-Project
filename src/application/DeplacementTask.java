@@ -6,6 +6,7 @@ package application;
 
 import static java.lang.Thread.State.TERMINATED;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -26,6 +27,7 @@ import static variables.Parametres.TAILLE;
  */
 public class DeplacementTask extends Task<Void> implements Parametres {
 
+    static CountDownLatch latchToWaitForJavaFx = null;
     private int x = 0;
     private int y = 0;
     private int deplObj = 0;
@@ -45,13 +47,14 @@ public class DeplacementTask extends Task<Void> implements Parametres {
 
     }
 
-    public void majAffichage() {
-
-    }
-
     @Override
     protected Void call() throws Exception {
         cord = 0;
+        System.out.println( latchToWaitForJavaFx);
+        if (latchToWaitForJavaFx == null) {
+            System.out.println(controleur.getDeplThread().size());
+            latchToWaitForJavaFx = new CountDownLatch(controleur.getDeplThread().size());
+        }
         if (direction == HAUT || direction == BAS) {
             cord = y;
         } else {
@@ -75,29 +78,25 @@ public class DeplacementTask extends Task<Void> implements Parametres {
                     //javaFX operations should go here
                     caseABougeGraph.relocate(x, y); // on déplace la tuile d'un pixel sur la vue, on attend 5ms et on recommence jusqu'à atteindre l'objectif
                     caseABougeGraph.setVisible(true);
+
                 }
             }
             );
-            Thread.sleep(5);
-        } // end while
+            Thread.sleep(2);
 
+        } // end while
+        latchToWaitForJavaFx.countDown();
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if (controleur.getNbTasks() == controleur.getCompteurTasks()) {
-                   /* int index = 0;
-                    while (controleur.getDeplThread().size() != index) {
-                        for (int i = 0; i < controleur.getDeplThread().size(); i++) {
-                            if (controleur.getDeplThread().get(i).getState().equals(TERMINATED)) {
-                                index++; 
-                            }
-                        }
-                    }*/
+                   // System.out.println( latchToWaitForJavaFx);
+                    //latchToWaitForJavaFx.
+                    if (controleur.getNbTasks() == controleur.getCompteurTasks()) {                       
+                        //  latchToWaitForJavaFx.await();
                         Jeu jeuAppli = controleur.getJeuAppli();
                         controleur.resetFondGrille();
                         controleur.resetEltsGrilles();
                         //mise à jour des cases
-
                         for (int k = 0; k < TAILLE; k++) {
                             for (int i = 0; i < TAILLE; i++) {
                                 for (int j = 0; j < TAILLE; j++) {
@@ -117,18 +116,17 @@ public class DeplacementTask extends Task<Void> implements Parametres {
                                 }
                             }
                         }
+                  
                     }
-                }
+                    //latchToWaitForJavaFx.countDown();
+                    //  System.out.println(latchToWaitForJavaFx);
+                  //  latchToWaitForJavaFx = null;
+
             }
-            );
-
-        
-    
-
-        
-    
-
-return null;
+        }
+        );
+        //  latchToWaitForJavaFx.await();
+        return null;
     }
 
 }

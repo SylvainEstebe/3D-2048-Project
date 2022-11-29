@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.effect.ColorAdjust?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -15,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="808.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
+<AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="808.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
    <children>
       <AnchorPane layoutX="3.0" layoutY="14.0" prefHeight="811.0" prefWidth="1018.0" AnchorPane.bottomAnchor="-17.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0">
          <children>
@@ -49,9 +51,9 @@
             </MenuBar>
             <BorderPane layoutX="-12.0" prefHeight="855.0" prefWidth="1030.0" AnchorPane.bottomAnchor="-64.0" AnchorPane.leftAnchor="-12.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
                <top>
-                  <Pane fx:id="fond" prefHeight="722.0" prefWidth="1018.0" styleClass="paneCentrale1" BorderPane.alignment="CENTER">
+                  <Pane fx:id="fond" cache="true" prefHeight="722.0" prefWidth="1018.0" styleClass="paneCentrale1" BorderPane.alignment="CENTER">
                      <children>
-                        <Pane fx:id="fondGrille" layoutX="7.0" layoutY="166.0" prefHeight="329.0" prefWidth="1018.0" styleClass="paneCentrale2">
+                        <Pane cache="true" layoutX="7.0" layoutY="166.0" prefHeight="329.0" prefWidth="1018.0" styleClass="paneCentrale2">
                            <children>
                               <GridPane fx:id="grilleH" gridLinesVisible="true" layoutX="14.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
                                  <columnConstraints>
@@ -65,7 +67,7 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Pane prefHeight="92.0" prefWidth="100.0" styleClass="case32" GridPane.columnIndex="2">
+                                    <Pane fx:id="case32" prefHeight="92.0" prefWidth="100.0" styleClass="case32" GridPane.columnIndex="2">
                                        <children>
                                           <Label layoutX="21.0" layoutY="15.0" prefHeight="60.0" prefWidth="59.0" text="32" textAlignment="JUSTIFY" textFill="WHITE">
                                              <font>
@@ -111,7 +113,7 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Pane prefHeight="92.0" prefWidth="60.0" styleClass="case2" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Pane fx:id="case2" prefHeight="92.0" prefWidth="60.0" styleClass="case2" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <children>
                                           <Label layoutX="36.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="2" textAlignment="CENTER" textFill="#776e65">
                                              <font>
@@ -120,7 +122,7 @@
                                           </Label>
                                        </children>
                                     </Pane>
-                                    <Pane prefHeight="92.0" prefWidth="100.0" styleClass="case8" GridPane.columnIndex="2">
+                                    <Pane fx:id="case8" prefHeight="92.0" prefWidth="100.0" styleClass="case8" GridPane.columnIndex="2">
                                        <children>
                                           <Label layoutX="36.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="8" textAlignment="CENTER" textFill="WHITE">
                                              <font>
@@ -171,32 +173,32 @@
                            <children>
                               <ImageView fx:id="haut" fitHeight="59.0" fitWidth="61.0" layoutX="270.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../img/h.png" />
+                                    <Image url="@../img/z.png" />
                                  </image>
                               </ImageView>
                               <ImageView fx:id="bas" fitHeight="60.0" fitWidth="57.0" layoutX="272.0" layoutY="137.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../img/b.png" />
+                                    <Image url="@../img/s.png" />
                                  </image>
                               </ImageView>
-                              <ImageView fx:id="gauhe" fitHeight="75.0" fitWidth="59.0" layoutX="200.0" layoutY="68.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../img/g.png" />
-                                 </image>
-                              </ImageView>
-                              <ImageView fx:id="droite" fitHeight="65.0" fitWidth="58.0" layoutX="348.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../img/d.png" />
-                                 </image>
-                              </ImageView>
-                              <ImageView fx:id="descendre" fitHeight="65.0" fitWidth="90.0" layoutX="413.0" layoutY="109.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="droite" fitHeight="75.0" fitWidth="59.0" layoutX="200.0" layoutY="68.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../img/q.png" />
                                  </image>
                               </ImageView>
+                              <ImageView fx:id="gauche" fitHeight="65.0" fitWidth="58.0" layoutX="348.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/g.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="descendre" fitHeight="65.0" fitWidth="90.0" layoutX="413.0" layoutY="109.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/f.png" />
+                                 </image>
+                              </ImageView>
                               <ImageView fx:id="monter" fitHeight="65.0" fitWidth="90.0" layoutX="413.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../img/e.png" />
+                                    <Image url="@../img/R.png" />
                                  </image>
                               </ImageView>
                               <Label layoutX="21.0" layoutY="17.0" prefHeight="50.0" prefWidth="197.0" text="Pour Jouer : ">
@@ -238,6 +240,13 @@
                         </Pane>
                         <Label fx:id="txtBDD" layoutX="41.0" layoutY="125.0" prefHeight="17.0" prefWidth="217.0" />
                         <Label fx:id="chrono" layoutX="469.0" layoutY="93.0" prefHeight="26.0" prefWidth="230.0" />
+                        <Pane fx:id="fondGrille" layoutX="7.0" layoutY="166.0" prefHeight="329.0" prefWidth="1018.0" style="-fx-background-color: #00000000;" styleClass="paneCentrale2">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <effect>
+                              <ColorAdjust />
+                           </effect></Pane>
                      </children>
                   </Pane>
                </top>

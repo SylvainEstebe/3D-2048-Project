@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
 import static java.lang.Math.abs;
+import static java.lang.Thread.State.TERMINATED;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -43,6 +44,16 @@ import modele.ConnexionBDD;
 import modele.Jeu;
 import modele.Personne;
 import variables.Parametres;
+import static variables.Parametres.BAS;
+import static variables.Parametres.DESCG;
+import static variables.Parametres.DROITE;
+import static variables.Parametres.GAUCHE;
+import static variables.Parametres.GRILLEB;
+import static variables.Parametres.GRILLEH;
+import static variables.Parametres.GRILLEM;
+import static variables.Parametres.HAUT;
+import static variables.Parametres.MONTERG;
+import static variables.Parametres.TAILLE;
 
 /**
  * FXML Controller class
@@ -70,7 +81,7 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private Pane instructionJeu;
     @FXML
-    private Pane tuile;
+    private Pane tuile, case8, case2, case32;
     @FXML
     private Label valTuile;
     @FXML
@@ -97,10 +108,9 @@ public class FXMLController implements Initializable, Parametres {
     private MenuItem newPartie;
     @FXML
     private MenuItem quitter;
-    private ArrayList<ArrayList<ArrayList<Label>>> eltsGrilles=null;
+    private ArrayList<Pane> eltsGrilles = null;
 
     private Jeu jeuAppli = null;
-    // private int compteurCoups = 0;
     private int nbRetour = 0;
     private boolean retourUtilise = false;
     private ArrayList<GridPane> tabGrillesApp;
@@ -137,12 +147,14 @@ public class FXMLController implements Initializable, Parametres {
     long temps;
     @FXML
     private Pane fond;
-    
-    private final int minYCase=15, minXCaseGH=14, longCase=100,longGrille=300,minXCaseGM=353,minXCaseGB=692 ;
-    private int xCase=0,yCase=0;
+
+    private final int minYCase = 15, minXCaseGH = 14, longCase = 100, longGrille = 300, minXCaseGM = 353, minXCaseGB = 692;
+    private int xCase = 0, yCase = 0, compteurTask = 0, nbTask = 0;
+    private boolean threadDead = false;
     @FXML
     private Pane fondGrille;
-    private ArrayList <Thread> threadDepl=new ArrayList<Thread>();
+    private ArrayList<Thread> threadDepl = null;
+    private ArrayList<Task> deplacementCases = new ArrayList<Task>();
 
     /**
      * Initializes the controller class.
@@ -188,6 +200,10 @@ public class FXMLController implements Initializable, Parametres {
         mouvOrdi.setDisable(false);
         nbRetour = 0;
         retourUtilise = false;
+        tuile.setVisible(false);
+        case8.setVisible(false);
+        case2.setVisible(false);
+        case32.setVisible(false);
 
     }
 
@@ -201,6 +217,10 @@ public class FXMLController implements Initializable, Parametres {
         mouvOrdi.setDisable(false);
         nbRetour = 0;
         retourUtilise = false;
+        tuile.setVisible(false);
+        case8.setVisible(false);
+        case2.setVisible(false);
+        case32.setVisible(false);
     }
 
     @FXML
@@ -229,129 +249,138 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     /**
-     * Méthode pour afficher les 3 grilles du jeu
-     *
+     * Méthode pour afficher les 3 grilles du jeu IDEE : faire un affichage au
+     * début où on initialise le tab, puis ensuite on change juste les couleurs
+     * des panes et les valeurs des labels dans majGrillesApp
      */
     private void majGrillesApp() {
+
         tabGrillesApp = new ArrayList<GridPane>();
         tabGrillesApp.add(grilleH);
         tabGrillesApp.add(grilleM);
         tabGrillesApp.add(grilleB);
         eltsGrilles = null;
-        eltsGrilles = new ArrayList<ArrayList<ArrayList<Label>>>();
+        eltsGrilles = new ArrayList<Pane>();
+        fondGrille.getChildren().clear();
         //Boucle pour chaque grille
         for (int k = 0; k < TAILLE; k++) {
-            eltsGrilles.add(new ArrayList<ArrayList<Label>>());
             for (int i = 0; i < TAILLE; i++) {
-                eltsGrilles.get(k).add(new ArrayList<Label>());
                 for (int j = 0; j < TAILLE; j++) {
-                    eltsGrilles.get(k).get(i).add(new Label("" + jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()));
-                    Label caseJeu = eltsGrilles.get(k).get(i).get(j);
-                    caseJeu.getStyleClass().add("caseJeu");
-                    Pane caseJeuCouleur = new Pane();
-
-                    //Gestion des bordures des grilles
-                    if (j != 2 && i != 2) {
-                        caseJeuCouleur.setStyle("-fx-border-width : 1px 0px 0px 1px ");
-                    } else if (j == 2 && i != 2) {
-                        caseJeuCouleur.setStyle("-fx-border-width : 1px 0px 1px 1px ");
-                    } else if (j != 2 && i == 2) {
-                        caseJeuCouleur.setStyle("-fx-border-width : 1px 1px 0px 1px ");
-
-                    } else {
-                        caseJeuCouleur.setStyle("-fx-border-width : 1px 1px 1px 1px ");
+                    Case caseModele = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
+                    if (caseModele.getValeur() != 0) {
+                        Label caseJeu = new Label("" + caseModele.getValeur());
+                        caseJeu.getStyleClass().add("caseJeu");
+                        Pane caseJeuCouleur = new Pane();
+                        caseJeuCouleur.getChildren().add(caseJeu);
+                        caseJeuCouleur.getStyleClass().add("couleurCase");
+                        eltsGrilles.add(caseJeuCouleur);
+                        this.couleursCases(caseJeuCouleur, caseModele.getValeur());
+                        this.positionPane(caseJeuCouleur, caseModele, caseJeu, k);
+                        fondGrille.getChildren().add(caseJeuCouleur);
                     }
-
-                    if (classique.isDisable()) {
-                        //Gestion des couleurs des cases
-                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
-                            case 2 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFFADF;");
-                            case 4 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #F3E9BE;");
-                            case 8 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #F3C076;");
-                            case 16 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FD9C4C;");
-                            case 32 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FF7440;");
-                            case 64 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FF513F;");
-                            case 128 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            case 256 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            case 512 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            case 1024 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            case 2048 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                        }
-                    } else if (daltonien.isDisable()) {
-                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
-                            case 2 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #E0431C;");
-                            case 4 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #00926a;");
-                            case 8 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #c67bd5;");
-                            case 16 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFD53A;");
-                            case 32 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
-                            case 64 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FF513F;");
-                            case 128 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #00926a;");
-                            case 256 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #c67bd5;");
-                            case 512 ->
-                                caseJeuCouleur.setStyle("-fx-background-color :#bae1f5;");
-                            case 1024 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
-                            case 2048 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
-                        }
-
-                    } else if (dyslexique.isDisable()) {
-                        switch (jeuAppli.getGrilles().get(k).getGrille().get(j).get(i).getValeur()) {
-                            case 2 ->
-                                caseJeuCouleur.setStyle("-fx-background-color :  #00FA9A;");
-                            case 4 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #7FFFD4;");
-                            case 8 ->
-                                caseJeuCouleur.setStyle("-fx-background-color :  #f2b179 ;");
-                            case 16 ->
-                                caseJeuCouleur.setStyle("-fx-background-color :#DDA0DD;");
-                            case 32 ->
-                                caseJeuCouleur.setStyle("-fx-background-color :  #5F9EA0;");
-                            case 64 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #90EE90;");
-                            case 128 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #5F9EA0;");
-                            case 256 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            case 512 ->
-                                caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
-                            case 1024 ->
-                                caseJeuCouleur.setStyle("-fx-background-color :  #90EE90;");
-                            case 2048 ->
-                                caseJeuCouleur.setStyle("-fx-background-color :  #90EE90;");
-                        }
-                    }
-
-                    caseJeuCouleur.getStyleClass().add("couleurCase");
-                    caseJeu.setVisible(true);
-                    caseJeuCouleur.setVisible(true);
-
-                    tabGrillesApp.get(k).setHalignment(caseJeu, HPos.CENTER);
-                    tabGrillesApp.get(k).add(caseJeuCouleur, i, j);
-                    tabGrillesApp.get(k).add(caseJeu, i, j);
-
                 }
             }
+        }
+    }
 
+    public void positionPane(Pane caseJeuCouleur, Case caseModele, Label caseJeu, int k) {
+        if (caseModele.getGrille().getType() == GRILLEH) {
+            xCase = minXCaseGH + caseModele.getY() * longCase;
+        } else if (caseModele.getGrille().getType() == GRILLEM) {
+            xCase = minXCaseGM + caseModele.getY() * longCase;
+        } else {
+            xCase = minXCaseGB + caseModele.getY() * longCase;
+        }
+        yCase = minYCase + caseModele.getX() * longCase;
+        caseJeuCouleur.setPrefSize(100, 100);
+        caseJeuCouleur.setLayoutX(xCase);
+        caseJeuCouleur.setLayoutY(yCase);
+        caseJeu.setVisible(true);
+        caseJeuCouleur.setVisible(true);
+
+        caseJeuCouleur.setOpacity(1);
+        caseJeu.layoutXProperty().bind(caseJeuCouleur.widthProperty().subtract(caseJeu.widthProperty()).divide(2));
+        tabGrillesApp.get(k).setHalignment(caseJeu, HPos.CENTER);
+    }
+
+    public void couleursCases(Pane caseJeuCouleur, int valeur) {
+        if (classique.isDisable()) {
+            //Gestion des couleurs des cases
+            switch (valeur) {
+                case 2 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFFADF;");
+                case 4 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #F3E9BE;");
+                case 8 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #F3C076;");
+                case 16 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FD9C4C;");
+                case 32 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FF7440;");
+                case 64 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FF513F;");
+                case 128 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                case 256 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                case 512 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                case 1024 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                case 2048 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+            }
+        } else if (daltonien.isDisable()) {
+            switch (valeur) {
+                case 2 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #E0431C;");
+                case 4 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #00926a;");
+                case 8 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #c67bd5;");
+                case 16 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFD53A;");
+                case 32 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
+                case 64 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FF513F;");
+                case 128 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #00926a;");
+                case 256 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #c67bd5;");
+                case 512 ->
+                    caseJeuCouleur.setStyle("-fx-background-color :#bae1f5;");
+                case 1024 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
+                case 2048 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #bae1f5;");
+            }
+
+        } else if (dyslexique.isDisable()) {
+            switch (valeur) {
+                case 2 ->
+                    caseJeuCouleur.setStyle("-fx-background-color :  #00FA9A;");
+                case 4 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #7FFFD4;");
+                case 8 ->
+                    caseJeuCouleur.setStyle("-fx-background-color :  #f2b179 ;");
+                case 16 ->
+                    caseJeuCouleur.setStyle("-fx-background-color :#DDA0DD;");
+                case 32 ->
+                    caseJeuCouleur.setStyle("-fx-background-color :  #5F9EA0;");
+                case 64 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #90EE90;");
+                case 128 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #5F9EA0;");
+                case 256 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                case 512 ->
+                    caseJeuCouleur.setStyle("-fx-background-color : #FFE76C;");
+                case 1024 ->
+                    caseJeuCouleur.setStyle("-fx-background-color :  #90EE90;");
+                case 2048 ->
+                    caseJeuCouleur.setStyle("-fx-background-color :  #90EE90;");
+            }
         }
 
     }
@@ -613,17 +642,12 @@ public class FXMLController implements Initializable, Parametres {
             b = jeuAppli.deplacerCases3G(MONTERG);
             dirThread = MONTERG;
         } else {
-            System.out.println("Attention, vous n'avez pas appuyé sur une touche valide! Par défaut, vous allez à gauche");
-            b = jeuAppli.deplacerCases3G(GAUCHE);
-            dirThread = GAUCHE;
+            System.out.println("Attention, vous n'avez pas appuyé sur une touche valide!");
+            /*  b = jeuAppli.deplacerCases3G(GAUCHE);
+            dirThread = GAUCHE;*/
         }
-        //deplacementThread(dirThread);
-        
-        
-        jeuAppli.choixNbCasesAjout(b);
-        
+        deplacementThread(dirThread, b);
         this.majScoreApp();
-        this.majGrillesApp();
         if (jeuAppli.finJeu()) {
             if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
                 this.victoireAppli();
@@ -635,7 +659,6 @@ public class FXMLController implements Initializable, Parametres {
             etatsPrecedents = new LinkedList<Jeu>();
             etatsPrecedents = jeuAppli.enregistrement();
         }
-
         if (etatsPrecedents.size() >= 1 && !retourUtilise) {
             retour.setDisable(false);
         } else {
@@ -709,7 +732,7 @@ public class FXMLController implements Initializable, Parametres {
         // Pseudonyme
         Label l = new Label();
         TextInputDialog td = new TextInputDialog();
-        
+
         // Boucle pour que le pseudo ne soit pas vide
         while (l.getText().isEmpty()) {
             td.setTitle("Pseudonyme");
@@ -718,7 +741,6 @@ public class FXMLController implements Initializable, Parametres {
             l.setText(td.getEditor().getText());
             td.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 
-            
         }
         String pseudo = l.getText();
 
@@ -734,9 +756,11 @@ public class FXMLController implements Initializable, Parametres {
     private void mouvOrdiApp(MouseEvent event) {
         if (jeuAppli != null) {
             boolean b2 = jeuAppli.mouvementAlea();
-            jeuAppli.choixNbCasesAjout(b2);
+            int direction = jeuAppli.getDirectionMouvAleo();
+            // jeuAppli.choixNbCasesAjout(b2);
+            this.deplacementThread(direction, b2);
             this.majScoreApp();
-            this.majGrillesApp();
+            // this.majGrillesApp();
             if (jeuAppli.finJeu()) {
                 if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
                     this.victoireAppli();
@@ -747,108 +771,158 @@ public class FXMLController implements Initializable, Parametres {
         }
 
     }
-    
-    public void deplacementThread(int direction){
-        
-        ArrayList<Task> deplacementCases=new ArrayList<Task>();
-        for (int k=0;k<TAILLE;k++){
-            for (int i=0;i<TAILLE;i++){
-                for (int j=0;j<TAILLE;j++){
-                    Case caseBouge=jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
-                    
-                    int depl= caseBouge.getNbDeplac();
-                    int deplObj=0;
-                    switch (direction) {
-                        case HAUT ->
-                            deplObj = minYCase + caseBouge.getX() * longCase - depl * longCase;
-                        case BAS ->
-                            deplObj = minYCase + caseBouge.getX() * longCase + depl * longCase;
-                        case GAUCHE -> {
-                            switch(caseBouge.getGrille().getType()){
-                                case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase-(abs(depl)*longCase);
-                                case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase-(abs(depl)*longCase);
-                                case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase-(abs(depl)*longCase);
-                            }
-                        }
-                        case DROITE -> {
-                            switch (caseBouge.getGrille().getType()) {
-                                case GRILLEH ->
-                                    deplObj = minXCaseGH + caseBouge.getY() * longCase + depl * longCase;
-                                case GRILLEM ->
-                                    deplObj = minXCaseGM + caseBouge.getY() * longCase + depl * longCase;
-                                case GRILLEB ->
-                                    deplObj = minXCaseGB + caseBouge.getY() * longCase + depl * longCase;
-                            }
-                        }
-                        case DESCG -> {
-                            if (caseBouge.getGrille().getType() == GRILLEH) {
-                                switch (caseBouge.getGrilleApDepl()) {
-                                    case GRILLEH ->
-                                        deplObj = minXCaseGH + caseBouge.getY() * longCase;
-                                    case GRILLEM ->
-                                        deplObj = minXCaseGM + caseBouge.getY() * longCase;
-                                    case GRILLEB ->
-                                        deplObj = minXCaseGB + caseBouge.getY() * longCase;
-                                }
-                            } else if (caseBouge.getGrille().getType() == GRILLEM) {
-                                switch (caseBouge.getGrilleApDepl()) {
-                                    case GRILLEM ->
-                                        deplObj = minXCaseGM + caseBouge.getY() * longCase;
-                                    case GRILLEB ->
-                                        deplObj = minXCaseGB + caseBouge.getY() * longCase;
-                                }
-                            } else {
-                                deplObj = minXCaseGB + caseBouge.getY() * longCase;
-                            }
-                        }
-                        case MONTERG -> {
-                            if (caseBouge.getGrille().getType() == GRILLEH) {
-                                deplObj = minXCaseGH + caseBouge.getY() * longCase;
-                            } else if (caseBouge.getGrille().getType() == GRILLEM) {
-                                switch (caseBouge.getGrilleApDepl()) {
-                                    case GRILLEH ->
-                                        deplObj = minXCaseGH + caseBouge.getY() * longCase;
-                                    case GRILLEM ->
-                                        deplObj = minXCaseGM + caseBouge.getY() * longCase;
-                                    case GRILLEB ->
-                                        deplObj = minXCaseGB + caseBouge.getY() * longCase;
 
+    public void deplacementThread(int direction, boolean b) {
+        ArrayList<Task> deplacementCases = new ArrayList<Task>();
+       threadDepl = new ArrayList<Thread>();
+        threadDepl.clear();
+        nbTask = 0;
+        if (b) {
+            int compteur = 0;
+            for (int k = 0; k < TAILLE; k++) {
+                for (int i = 0; i < TAILLE; i++) {
+                    for (int j = 0; j < TAILLE; j++) {
+                        Case caseBouge = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
+                        if (caseBouge.getValeur() != 0) {
+                            int depl = caseBouge.getNbDeplac();
+                            int deplObj = 0;
+                            switch (direction) {
+                                case HAUT ->
+                                    deplObj = minYCase + caseBouge.getX() * longCase - depl * longCase;
+                                case BAS ->
+                                    deplObj = minYCase + caseBouge.getX() * longCase + depl * longCase;
+                                case GAUCHE -> {
+                                    switch (caseBouge.getGrille().getType()) {
+                                        case GRILLEH ->
+                                            deplObj = minXCaseGH + caseBouge.getY() * longCase - (abs(depl) * longCase);
+                                        case GRILLEM ->
+                                            deplObj = minXCaseGM + caseBouge.getY() * longCase - (abs(depl) * longCase);
+                                        case GRILLEB ->
+                                            deplObj = minXCaseGB + caseBouge.getY() * longCase - (abs(depl) * longCase);
+                                    }
                                 }
-                            } else {
-                                switch (caseBouge.getGrilleApDepl()) {
-                                    case GRILLEH ->
-                                        deplObj = minXCaseGH + caseBouge.getY() * longCase;
-                                    case GRILLEM ->
-                                        deplObj = minXCaseGM + caseBouge.getY() * longCase;
-                                    case GRILLEB ->
+                                case DROITE -> {
+                                    switch (caseBouge.getGrille().getType()) {
+                                        case GRILLEH ->
+                                            deplObj = minXCaseGH + caseBouge.getY() * longCase + depl * longCase;
+                                        case GRILLEM ->
+                                            deplObj = minXCaseGM + caseBouge.getY() * longCase + depl * longCase;
+                                        case GRILLEB ->
+                                            deplObj = minXCaseGB + caseBouge.getY() * longCase + depl * longCase;
+                                    }
+                                }
+                                case DESCG -> {
+                                    if (caseBouge.getGrille().getType() == GRILLEH) {
+                                        switch (caseBouge.getGrilleApDepl()) {
+                                            case GRILLEH ->
+                                                deplObj = minXCaseGH + caseBouge.getY() * longCase;
+                                            case GRILLEM ->
+                                                deplObj = minXCaseGM + caseBouge.getY() * longCase;
+                                            case GRILLEB ->
+                                                deplObj = minXCaseGB + caseBouge.getY() * longCase;
+                                        }
+                                    } else if (caseBouge.getGrille().getType() == GRILLEM) {
+                                        switch (caseBouge.getGrilleApDepl()) {
+                                            case GRILLEM ->
+                                                deplObj = minXCaseGM + caseBouge.getY() * longCase;
+                                            case GRILLEB ->
+                                                deplObj = minXCaseGB + caseBouge.getY() * longCase;
+                                        }
+                                   } else {
                                         deplObj = minXCaseGB + caseBouge.getY() * longCase;
+                                    }
+                                }
+                                case MONTERG -> {
+                                    if (caseBouge.getGrille().getType() == GRILLEH) {
+                                        deplObj = minXCaseGH + caseBouge.getY() * longCase;
+                                    } else if (caseBouge.getGrille().getType() == GRILLEM) {
+                                        switch (caseBouge.getGrilleApDepl()) {
+                                            case GRILLEH ->
+                                                deplObj = minXCaseGH + caseBouge.getY() * longCase;
+                                            case GRILLEM ->
+                                                deplObj = minXCaseGM + caseBouge.getY() * longCase;
+                                            case GRILLEB ->
+                                                deplObj = minXCaseGB + caseBouge.getY() * longCase;
 
+                                        }
+                                    } else {
+                                        switch (caseBouge.getGrilleApDepl()) {
+                                            case GRILLEH ->
+                                                deplObj = minXCaseGH + caseBouge.getY() * longCase;
+                                            case GRILLEM ->
+                                                deplObj = minXCaseGM + caseBouge.getY() * longCase;
+                                            case GRILLEB ->
+                                                deplObj = minXCaseGB + caseBouge.getY() * longCase;
+
+                                        }
+                                    }
+                                }
+                                default -> {
                                 }
                             }
-                        }
-                        default -> {
+                            xCase = (int) eltsGrilles.get(compteur).getLayoutX();
+                            yCase = (int) eltsGrilles.get(compteur).getLayoutY();
+                            Pane caseABouge = eltsGrilles.get(compteur);
+                            deplacementCases.add(new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this));
+                            compteur++;
+
                         }
                     }
-                    //System.out.println(deplObj);
-                    //System.out.println(jeuAppli.toString());
-                    xCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutX();
-                    //System.out.println(xCase);
-                    yCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutY();
-                    //System.out.println(yCase);
-                    //Label caseABouge=eltsGrilles.get(k).get(i).get(j);
-                    //deplacementCases.add(new DeplacementTask(xCase,yCase,deplObj,caseABouge));
                 }
             }
-        }
-         //Cette partie est utilisée avec la méthode : utilisation d'une classe extérieure DeplacementTask.
-        
-        for (int i=0;i<deplacementCases.size();i++){
-            Thread th = new Thread(deplacementCases.get(i)); // on crée un contrôleur de Thread
-            threadDepl.add(th);
-            th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
-            th.start();
+            nbTask = deplacementCases.size();
+            compteurTask = 0;
+            //Cette partie est utilisée avec la méthode : utilisation d'une classe extérieure DeplacementTask.
+            for (int i = 0; i < deplacementCases.size(); i++) {
+                Thread th = new Thread(deplacementCases.get(i)); // on crée un contrôleur de Thread
+                compteurTask++;
+                threadDepl.add(th);
+                th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
+                th.start();
+            }
             
-        }         
+        }
+        jeuAppli.choixNbCasesAjout(b);
+    }
+
+    public Jeu getJeuAppli() {
+        return this.jeuAppli;
+    }
+
+    public Pane getFondGrille() {
+        return this.fondGrille;
+    }
+
+    public ArrayList<Pane> getEltsGrilles() {
+        return this.eltsGrilles;
+    }
+
+    public void setEltsGrilles(ArrayList<Pane> l) {
+        this.eltsGrilles = l;
+    }
+
+    public void setFonfGrille(Pane p) {
+        fondGrille = p;
+    }
+
+    public void resetFondGrille() {
+        fondGrille.getChildren().clear();
+    }
+
+    public void resetEltsGrilles() {
+        eltsGrilles.clear();
+    }
+
+    public int getCompteurTasks() {
+        return compteurTask;
+    }
+
+    public int getNbTasks() {
+        return nbTask;
+    }
+
+    public ArrayList<Thread> getDeplThread() {
+        return threadDepl;
     }
 
 }
