@@ -24,6 +24,7 @@ public class Serveur implements Runnable {
     private final int LIMIT;
     private ServerSocket serveur = null;
     private ArrayList<Connexion> clients;
+    private boolean competitif = false;
     
     /**
      * Constructeur
@@ -39,6 +40,9 @@ public class Serveur implements Runnable {
     }
     
     @Override
+    /**
+     * Lancement du serveur
+     */
     public void run() {
         try {
             System.out.println("[SERVEUR] Lancement du serveur");
@@ -95,5 +99,23 @@ public class Serveur implements Runnable {
      */
     public ArrayList<Connexion> getClients() {
         return this.clients;
+    }
+    
+    /**
+     * Setter du mode compétitif
+     * 
+     * @param c Mode compétitif activé ou non 
+     */
+    public void setCompetitif(boolean c) {
+        this.competitif = c;
+    }
+    
+    /**
+     * Getter du mode compétitif
+     * 
+     * @return Mode compétitif 
+     */
+    public boolean estCompetitif() {
+        return this.competitif;
     }
 }

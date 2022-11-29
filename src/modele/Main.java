@@ -12,7 +12,8 @@ import multijoueur.client.Client;
 import multijoueur.serveur.Serveur;
 
 /**
- * Classe principale qui lance le programme
+ * Classe principale 
+ * qui lance le programme
  *
  * @author Alexanne WORM
  */
@@ -20,24 +21,30 @@ public class Main implements Parametres {
 
     public static void main(String[] args) {
         
+        boolean multi = false;
+        boolean estServeur = false;
+        
         // TEST MULTI
         Scanner sc = new Scanner(System.in);
         System.out.println("Voulez-vous jouer en multijoueur ? (oui/non)");
         
         String s = sc.nextLine();
         s = s.toLowerCase();
-        while(!(s.equals("oui") || s.equals("non"))) {
+        while (!(s.equals("oui") || s.equals("non"))) {
             System.out.println("oui ou non ?");
             s = sc.nextLine();
             s = s.toLowerCase();
         }
         
         if (s.equals("oui")) {
+            multi = true;
+            Serveur serveur = null;
+            
             System.out.println("Voulez-vous être hôte de la partie ? (oui/non)");
         
             s = sc.nextLine();
             s = s.toLowerCase();
-            while(!(s.equals("oui") || s.equals("non"))) {
+            while (!(s.equals("oui") || s.equals("non"))) {
                 System.out.println("oui ou non ?");
                 s = sc.nextLine();
                 s = s.toLowerCase();
@@ -46,8 +53,9 @@ public class Main implements Parametres {
             String adresse = null;
             int port = 0;
             if (s.equals("oui")) {
+                estServeur = true;
                 // Lancement du serveur
-                Serveur serveur = new Serveur(3333, 4);
+                serveur = new Serveur(3333, 4);
                 new Thread(serveur).start();
                 
                 // Attente d'une seconde pour que le serveur ait le temps de se lancer (trouver autre chose de mieux)
@@ -59,6 +67,18 @@ public class Main implements Parametres {
                 
                 adresse = serveur.getHost();
                 port = serveur.getPort();
+                
+                System.out.println("Partie compétitive ? (oui/non)");
+        
+                s = sc.nextLine();
+                s = s.toLowerCase();
+                while (!(s.equals("oui") || s.equals("non"))) {
+                    System.out.println("oui ou non ?");
+                    s = sc.nextLine();
+                    s = s.toLowerCase();
+                }
+                
+                serveur.setCompetitif(s.equals("oui"));
             } else {
                 System.out.println("Adresse du serveur :");
                 adresse = sc.nextLine();
@@ -70,7 +90,15 @@ public class Main implements Parametres {
             // Lancement du client
             Client client = new Client(adresse, port);
             new Thread(client).start();
-        }
+            
+            System.out.println("Votre pseudo ?");
+        
+            s = sc.nextLine();
+            while (s == null || s.equals("") || !client.getConnexion().enregistrerJoueur(s)) {
+                System.out.println("Veuillez saisir votre pseudo");
+                s = sc.nextLine();
+            }
+        }        
         // FIN TEST MULTI
         
         

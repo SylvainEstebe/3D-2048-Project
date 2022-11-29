@@ -6,9 +6,7 @@
 package multijoueur.client;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,33 +33,39 @@ public class Client implements Runnable {
     }
 
     @Override
+    /**
+     * Lancement du client
+     */
     public void run() {
         try {
-            System.out.println("[CLIENT] Conexion au serveur " + this.ADDRESSE + ":" + this.PORT);
+            System.out.println("[CLIENT] Connexion au serveur " + this.ADDRESSE + ":" + this.PORT);
             this.socket = new Socket(this.ADDRESSE, this.PORT);
             System.out.println("[CLIENT] Connecté au serveur");
             
-            this.connexion = new Connexion(this.socket);
-            
-            PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
+            this.connexion = new Connexion(this.socket, this);
             
             // Lancement de l'écoute
             new Thread(this.connexion).start();
-            
-            // Saisie des commandes
-            Scanner sc = new Scanner(System.in);
-            while(true) {
-                System.out.println("Commande :");
-                
-                String commande = sc.nextLine();
-                
-                if (commande.equals("quitter")) break;
-                out.println(commande);
-            }
-            
-            this.socket.close();
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * Fermeture du client
+     * 
+     * @throws IOException 
+     */
+    protected void closeClient() throws IOException {
+        this.socket.close();
+    }
+    
+    /**
+     * Getter de la connexion
+     * 
+     * @return Connexion 
+     */
+    public Connexion getConnexion() {
+        return this.connexion;
     }
 }

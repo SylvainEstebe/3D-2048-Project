@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import multijoueur.Routes;
 
 /**
  * Connexion d'un client au serveur
@@ -22,6 +23,8 @@ public class Connexion implements Runnable {
     private Serveur serveur;
     private BufferedReader in;
     private PrintWriter out;
+    
+    private String pseudo;
 
     /**
      * Consructeur
@@ -42,6 +45,9 @@ public class Connexion implements Runnable {
     }
 
     @Override
+    /**
+     * Lancement de la connexion
+     */
     public void run() {
         try {
             while (true) {
@@ -50,13 +56,18 @@ public class Connexion implements Runnable {
                 
                 if (ligne == null) break;
                 
-                // Gestion de la commande "aTous"
-                if (ligne.startsWith("aTous")) {
+                if (ligne.startsWith(Routes.CHAT)) { // Message
                     int premierEspace = ligne.indexOf(" ");
-                    envoyerATous(ligne.substring(premierEspace + 1));
+                    this.envoyerATous(ligne.substring(premierEspace + 1));
+                } else if (ligne.startsWith(Routes.VERIF_PSEUDO)) { // Vérification disponibilité pseudo
+                    int premierEspace = ligne.indexOf(" ");
+                    this.pseudoDispo(ligne.substring(premierEspace + 1));
+                } else if (ligne.startsWith(Routes.ENREG_PSEUDO)) { // Enregistrement pseudo
+                    int premierEspace = ligne.indexOf(" ");
+                    this.enregistrerJoueur(ligne.substring(premierEspace + 1));
+                } else {
+                    this.out.println(ligne);
                 }
-                
-                this.out.println(ligne);
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -69,7 +80,11 @@ public class Connexion implements Runnable {
         }
     }
 
-    // Envoie un message à tous les clients autre que celui lancant la commande (FONCTION DE TEST)
+    /**
+     * Envoie un message à tous les autres clients
+     * 
+     * @param message Message à envoyer  
+     */
     private void envoyerATous(String message) {
         for (Connexion client : this.serveur.getClients()) {
             // Pour les clients autres que celui qui a envoyé le message (equals a implémenter pour aue cela fonctionne)
@@ -79,7 +94,45 @@ public class Connexion implements Runnable {
         }
     }
     
-    // Égalité entre deux Connexion (différentes si sockets différents)
+    /**
+     * Vérifie la disponibilité d'un pseudo
+     * @param p 
+     */
+    private void pseudoDispo(String p) {
+        boolean dispo = true;
+        
+        for (Connexion client : this.serveur.getClients()) {
+            if (dispo && client.pseudo != null && client.pseudo.toLowerCase().equals(p.toLowerCase())) dispo = false;
+        }
+        
+        this.out.println(Routes.VERIF_PSEUDO + " " + dispo);
+    }
+    
+    /**
+     * Enregistre le pseudo du joueur associe a cette connexion
+     * @param p 
+     */
+    private void enregistrerJoueur(String p) {
+        this.pseudo = p;
+        
+        this.out.println(p + " enregistré");
+    }
+    
+    /**
+     * Getter du pseudo
+     * 
+     * @return Pseudo du joueur associé à cette connexion
+     */
+    public String getPseudo() {
+        return this.pseudo;
+    }
+    
+    /**
+     * Vérifie l'égalite avec une autre connexion (vérification de l'égalité entre les sockets)
+     * 
+     * @param c Autre connexion
+     * @return true si égaux, false sinon
+     */
     public boolean equals (Connexion c) {
         return this.socket.equals(c.socket);
     }
