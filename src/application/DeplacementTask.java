@@ -51,6 +51,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
 
     @Override
     protected Void call() throws Exception {
+        /*
         cord = 0;
         if (direction == HAUT || direction == BAS) {
             cord = y;
@@ -92,7 +93,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
                                 index++; 
                             }
                         }
-                    }*/
+                    }
                         Jeu jeuAppli = controleur.getJeuAppli();
                         controleur.resetFondGrille();
                         controleur.resetEltsGrilles();
@@ -126,7 +127,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
     
 
         
-    
+    */
 
 return null;
     }

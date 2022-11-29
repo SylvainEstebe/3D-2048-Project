@@ -23,10 +23,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import java.util.LinkedList;
+import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.Group;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.TableColumn;
@@ -97,7 +100,7 @@ public class FXMLController implements Initializable, Parametres {
     private MenuItem newPartie;
     @FXML
     private MenuItem quitter;
-    private ArrayList<ArrayList<ArrayList<Label>>> eltsGrilles=null;
+    private ArrayList<ArrayList<ArrayList<Label>>> eltsGrilles = null;
 
     private Jeu jeuAppli = null;
     // private int compteurCoups = 0;
@@ -137,12 +140,12 @@ public class FXMLController implements Initializable, Parametres {
     long temps;
     @FXML
     private Pane fond;
-    
-    private final int minYCase=15, minXCaseGH=14, longCase=100,longGrille=300,minXCaseGM=353,minXCaseGB=692 ;
-    private int xCase=0,yCase=0;
+
+    private final int minYCase = 15, minXCaseGH = 14, longCase = 100, longGrille = 300, minXCaseGM = 353, minXCaseGB = 692;
+    private int xCase = 0, yCase = 0;
     @FXML
     private Pane fondGrille;
-    private ArrayList <Thread> threadDepl=new ArrayList<Thread>();
+    private ArrayList<Thread> threadDepl = new ArrayList<Thread>();
 
     /**
      * Initializes the controller class.
@@ -618,10 +621,9 @@ public class FXMLController implements Initializable, Parametres {
             dirThread = GAUCHE;
         }
         //deplacementThread(dirThread);
-        
-        
+
         jeuAppli.choixNbCasesAjout(b);
-        
+
         this.majScoreApp();
         this.majGrillesApp();
         if (jeuAppli.finJeu()) {
@@ -703,28 +705,31 @@ public class FXMLController implements Initializable, Parametres {
      */
     @FXML
     private void enregistrementBDD(MouseEvent event) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        // Temps 
+// Temps 
         long chrono2 = java.lang.System.currentTimeMillis();
-        long timeSpentPlaying = chrono2 - chronos;
+        long timeSpentPlaying = (chrono2 - chronos) / 1000;
+
         // Pseudonyme
-        Label l = new Label();
         TextInputDialog td = new TextInputDialog();
-        
-        // Boucle pour que le pseudo ne soit pas vide
-        while (l.getText().isEmpty()) {
-            td.setTitle("Pseudonyme");
-            td.setHeaderText("Vous devez rentrer un pseudonyme !!!");
-            td.showAndWait();
-            l.setText(td.getEditor().getText());
-            td.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+        td.setTitle("Pseudonyme");
+        td.setHeaderText("Veuillez rentrer un pseudonyme");
 
-            
+        Optional<String> resultat = td.showAndWait();
+        if (resultat.isPresent()) {
+            while (td.getEditor().getText().isEmpty() && resultat.isPresent()) {
+                if (td.getEditor().getText().isEmpty()) {
+                    Alert alert = new Alert(AlertType.WARNING);
+                    alert.showAndWait();
+                    td.setTitle("Pseudonyme");
+                    td.setHeaderText("Veuillez rentrer un pseudonyme");
+                    resultat = td.showAndWait();
+                }
+
+            }
         }
-        String pseudo = l.getText();
-
+        String pseudo = td.getEditor().getText();
         // Score
         int scoreJoueurFin = Integer.valueOf(score.getText());
-
         // Déplacement (traité dans la partie mouvJoueur)
         // Création d'une condition si le pseudo existe dèja - A FAIRE
         ConnexionBDD.ajoutJoueur(0, pseudo, scoreJoueurFin, timeSpentPlaying, deplacementBDD);
@@ -747,27 +752,30 @@ public class FXMLController implements Initializable, Parametres {
         }
 
     }
-    
-    public void deplacementThread(int direction){
-        
-        ArrayList<Task> deplacementCases=new ArrayList<Task>();
-        for (int k=0;k<TAILLE;k++){
-            for (int i=0;i<TAILLE;i++){
-                for (int j=0;j<TAILLE;j++){
-                    Case caseBouge=jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
-                    
-                    int depl= caseBouge.getNbDeplac();
-                    int deplObj=0;
+
+    public void deplacementThread(int direction) {
+
+        ArrayList<Task> deplacementCases = new ArrayList<Task>();
+        for (int k = 0; k < TAILLE; k++) {
+            for (int i = 0; i < TAILLE; i++) {
+                for (int j = 0; j < TAILLE; j++) {
+                    Case caseBouge = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
+
+                    int depl = caseBouge.getNbDeplac();
+                    int deplObj = 0;
                     switch (direction) {
                         case HAUT ->
                             deplObj = minYCase + caseBouge.getX() * longCase - depl * longCase;
                         case BAS ->
                             deplObj = minYCase + caseBouge.getX() * longCase + depl * longCase;
                         case GAUCHE -> {
-                            switch(caseBouge.getGrille().getType()){
-                                case GRILLEH -> deplObj=minXCaseGH+caseBouge.getY()*longCase-(abs(depl)*longCase);
-                                case GRILLEM -> deplObj=minXCaseGM+caseBouge.getY()*longCase-(abs(depl)*longCase);
-                                case GRILLEB -> deplObj=minXCaseGB+caseBouge.getY()*longCase-(abs(depl)*longCase);
+                            switch (caseBouge.getGrille().getType()) {
+                                case GRILLEH ->
+                                    deplObj = minXCaseGH + caseBouge.getY() * longCase - (abs(depl) * longCase);
+                                case GRILLEM ->
+                                    deplObj = minXCaseGM + caseBouge.getY() * longCase - (abs(depl) * longCase);
+                                case GRILLEB ->
+                                    deplObj = minXCaseGB + caseBouge.getY() * longCase - (abs(depl) * longCase);
                             }
                         }
                         case DROITE -> {
@@ -831,24 +839,24 @@ public class FXMLController implements Initializable, Parametres {
                     }
                     //System.out.println(deplObj);
                     //System.out.println(jeuAppli.toString());
-                    xCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutX();
+                    xCase = (int) eltsGrilles.get(k).get(i).get(j).getLayoutX();
                     //System.out.println(xCase);
-                    yCase=(int)eltsGrilles.get(k).get(i).get(j).getLayoutY();
+                    yCase = (int) eltsGrilles.get(k).get(i).get(j).getLayoutY();
                     //System.out.println(yCase);
                     //Label caseABouge=eltsGrilles.get(k).get(i).get(j);
                     //deplacementCases.add(new DeplacementTask(xCase,yCase,deplObj,caseABouge));
                 }
             }
         }
-         //Cette partie est utilisée avec la méthode : utilisation d'une classe extérieure DeplacementTask.
-        
-        for (int i=0;i<deplacementCases.size();i++){
+        //Cette partie est utilisée avec la méthode : utilisation d'une classe extérieure DeplacementTask.
+
+        for (int i = 0; i < deplacementCases.size(); i++) {
             Thread th = new Thread(deplacementCases.get(i)); // on crée un contrôleur de Thread
             threadDepl.add(th);
             th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
             th.start();
-            
-        }         
+
+        }
     }
 
 }
