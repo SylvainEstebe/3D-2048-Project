@@ -460,11 +460,11 @@ public class FXMLController implements Initializable, Parametres {
      */
     private void afficheStat(ActionEvent event) {
         // Connection à la base de donnée
-        String host = "localhost";
+        String host = "mysql-estebe.alwaysdata.net";
         String port = "3306";
-        String dbname = "2048_game_Estebe";
-        String username = "root";
-        String password = "root";
+        String dbname = "estebe_2048_game";
+        String username = "estebe";
+        String password = "pepignon";
         ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
         String infos;
         ObservableList<Personne> listePerso = FXCollections.observableArrayList();
