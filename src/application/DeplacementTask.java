@@ -27,7 +27,8 @@ import static variables.Parametres.TAILLE;
  */
 public class DeplacementTask extends Task<Void> implements Parametres {
 
-    static CountDownLatch latchToWaitForJavaFx = null;
+    private CountDownLatch debut;
+    private CountDownLatch fin;
     private int x = 0;
     private int y = 0;
     private int deplObj = 0;
@@ -47,14 +48,18 @@ public class DeplacementTask extends Task<Void> implements Parametres {
 
     }
 
+    public void setFin(CountDownLatch f) {
+        this.fin = f;
+    }
+
+    public void setDebut(CountDownLatch d) {
+        this.debut = d;
+    }
+
     @Override
     protected Void call() throws Exception {
         cord = 0;
-        System.out.println( latchToWaitForJavaFx);
-        if (latchToWaitForJavaFx == null) {
-            System.out.println(controleur.getDeplThread().size());
-            latchToWaitForJavaFx = new CountDownLatch(controleur.getDeplThread().size());
-        }
+        debut.await();
         if (direction == HAUT || direction == BAS) {
             cord = y;
         } else {
@@ -72,7 +77,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
                 x = cord;
             }
             // Platform.runLater est nécessaire en JavaFX car la GUI ne peut être modifiée que par le Thread courant, contrairement à Swing où on peut utiliser un autre Thread pour ça
-            Platform.runLater(new Runnable() { // classe anonyme
+            Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
                     //javaFX operations should go here
@@ -83,49 +88,12 @@ public class DeplacementTask extends Task<Void> implements Parametres {
             }
             );
             Thread.sleep(2);
-
         } // end while
-        latchToWaitForJavaFx.countDown();
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                   // System.out.println( latchToWaitForJavaFx);
-                    //latchToWaitForJavaFx.
-                    if (controleur.getNbTasks() == controleur.getCompteurTasks()) {                       
-                        //  latchToWaitForJavaFx.await();
-                        Jeu jeuAppli = controleur.getJeuAppli();
-                        controleur.resetFondGrille();
-                        controleur.resetEltsGrilles();
-                        //mise à jour des cases
-                        for (int k = 0; k < TAILLE; k++) {
-                            for (int i = 0; i < TAILLE; i++) {
-                                for (int j = 0; j < TAILLE; j++) {
-                                    Case caseModele = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
-                                    if (caseModele.getValeur() != 0) {
-                                        Label caseJeu = new Label("" + caseModele.getValeur());
-                                        caseJeu.getStyleClass().add("caseJeu");
-                                        Pane caseJeuCouleur = new Pane();
-                                        caseJeuCouleur.getChildren().add(caseJeu);
-                                        caseJeuCouleur.getStyleClass().add("couleurCase");
-                                        controleur.getEltsGrilles().add(caseJeuCouleur);
-                                        controleur.couleursCases(caseJeuCouleur, caseModele.getValeur());
-                                        controleur.positionPane(caseJeuCouleur, caseModele, caseJeu, k);
-                                        controleur.getFondGrille().getChildren().add(caseJeuCouleur);
+        fin.countDown();
 
-                                    }
-                                }
-                            }
-                        }
-                  
-                    }
-                    //latchToWaitForJavaFx.countDown();
-                    //  System.out.println(latchToWaitForJavaFx);
-                  //  latchToWaitForJavaFx = null;
-
-            }
-        }
-        );
-        //  latchToWaitForJavaFx.await();
+        fin.await();
+        Thread th = new Thread((new MajJeu(controleur)));
+        th.start();
         return null;
     }
 

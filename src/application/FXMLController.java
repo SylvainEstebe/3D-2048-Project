@@ -24,6 +24,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import java.util.LinkedList;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -773,12 +776,12 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     public void deplacementThread(int direction, boolean b) {
-        ArrayList<Task> deplacementCases = new ArrayList<Task>();
-       threadDepl = new ArrayList<Thread>();
+        deplacementCases = new ArrayList<Task>();
+        threadDepl = new ArrayList<Thread>();
+        deplacementCases.clear();
         threadDepl.clear();
-        nbTask = 0;
+        int compteur = 0;
         if (b) {
-            int compteur = 0;
             for (int k = 0; k < TAILLE; k++) {
                 for (int i = 0; i < TAILLE; i++) {
                     for (int j = 0; j < TAILLE; j++) {
@@ -828,7 +831,7 @@ public class FXMLController implements Initializable, Parametres {
                                             case GRILLEB ->
                                                 deplObj = minXCaseGB + caseBouge.getY() * longCase;
                                         }
-                                   } else {
+                                    } else {
                                         deplObj = minXCaseGB + caseBouge.getY() * longCase;
                                     }
                                 }
@@ -863,26 +866,27 @@ public class FXMLController implements Initializable, Parametres {
                             xCase = (int) eltsGrilles.get(compteur).getLayoutX();
                             yCase = (int) eltsGrilles.get(compteur).getLayoutY();
                             Pane caseABouge = eltsGrilles.get(compteur);
-                            deplacementCases.add(new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this));
+                            DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this);
+                            deplacementCases.add(d);
                             compteur++;
-
                         }
                     }
                 }
             }
-            nbTask = deplacementCases.size();
-            compteurTask = 0;
-            //Cette partie est utilisée avec la méthode : utilisation d'une classe extérieure DeplacementTask.
+            CountDownLatch startSignal = new CountDownLatch(1);
+            CountDownLatch doneSignal = new CountDownLatch(deplacementCases.size());
             for (int i = 0; i < deplacementCases.size(); i++) {
+                DeplacementTask d = (DeplacementTask) deplacementCases.get(i);
+                d.setDebut(startSignal);
+                d.setFin(doneSignal);
                 Thread th = new Thread(deplacementCases.get(i)); // on crée un contrôleur de Thread
-                compteurTask++;
                 threadDepl.add(th);
                 th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
                 th.start();
             }
-            
+            jeuAppli.choixNbCasesAjout(b);
+            startSignal.countDown();
         }
-        jeuAppli.choixNbCasesAjout(b);
     }
 
     public Jeu getJeuAppli() {
@@ -911,14 +915,6 @@ public class FXMLController implements Initializable, Parametres {
 
     public void resetEltsGrilles() {
         eltsGrilles.clear();
-    }
-
-    public int getCompteurTasks() {
-        return compteurTask;
-    }
-
-    public int getNbTasks() {
-        return nbTask;
     }
 
     public ArrayList<Thread> getDeplThread() {
