@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package application;
 
 import static java.lang.Thread.State.TERMINATED;
@@ -87,7 +84,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
                 }
             }
             );
-            Thread.sleep(2);
+            Thread.sleep(1);
         } // end while
         fin.countDown();
 

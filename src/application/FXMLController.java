@@ -624,7 +624,7 @@ public class FXMLController implements Initializable, Parametres {
         String direction = event.getText();
         int dirThread = 0;
         boolean b = false;
-        jeuAppli.reinitNbDepl();
+        //jeuAppli.reinitNbDepl();
         //Déplacement des cases selon la touche clavier
         if (direction.equals("q")) {
             b = jeuAppli.deplacerCases3G(GAUCHE);
@@ -650,6 +650,7 @@ public class FXMLController implements Initializable, Parametres {
             dirThread = GAUCHE;*/
         }
         deplacementThread(dirThread, b);
+        
         this.majScoreApp();
         if (jeuAppli.finJeu()) {
             if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
@@ -786,18 +787,23 @@ public class FXMLController implements Initializable, Parametres {
                 for (int i = 0; i < TAILLE; i++) {
                     for (int j = 0; j < TAILLE; j++) {
                         Case caseBouge = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
-                        if (caseBouge.getValeur() != 0) {
+                        //System.out.println("Valeur " +caseBouge.getValAv());
+                        //System.out.println("X : "+caseBouge.getY());
+                        //System.out.println("Y : "+caseBouge.getX());
+                        if (caseBouge.getValAv()!=0) {
                             int depl = caseBouge.getNbDeplac();
+                            //System.out.println("Grille"+ caseBouge.getGrilleApDepl()+"Valeur " +caseBouge.getValAv()+" xCase "+ caseBouge.getX()+"yCase"+caseBouge.getY()+"depl "+depl + "grille "+caseBouge.getGrille().getType());
                             int deplObj = 0;
                             switch (direction) {
                                 case HAUT ->
-                                    deplObj = minYCase + caseBouge.getX() * longCase - depl * longCase;
+                                    deplObj = minYCase + caseBouge.getX() * longCase - (abs(depl)) * longCase;
                                 case BAS ->
                                     deplObj = minYCase + caseBouge.getX() * longCase + depl * longCase;
                                 case GAUCHE -> {
                                     switch (caseBouge.getGrille().getType()) {
                                         case GRILLEH ->
                                             deplObj = minXCaseGH + caseBouge.getY() * longCase - (abs(depl) * longCase);
+                                            
                                         case GRILLEM ->
                                             deplObj = minXCaseGM + caseBouge.getY() * longCase - (abs(depl) * longCase);
                                         case GRILLEB ->
@@ -865,6 +871,7 @@ public class FXMLController implements Initializable, Parametres {
                             }
                             xCase = (int) eltsGrilles.get(compteur).getLayoutX();
                             yCase = (int) eltsGrilles.get(compteur).getLayoutY();
+                            //System.out.println(deplObj+" xCase"+caseBouge.getX()+"yCase"+caseBouge.getY());
                             Pane caseABouge = eltsGrilles.get(compteur);
                             DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this);
                             deplacementCases.add(d);
@@ -886,6 +893,7 @@ public class FXMLController implements Initializable, Parametres {
             }
             jeuAppli.choixNbCasesAjout(b);
             startSignal.countDown();
+            //System.out.println("OOOOOOOOOOOOOOOOOOO");
         }
     }
 

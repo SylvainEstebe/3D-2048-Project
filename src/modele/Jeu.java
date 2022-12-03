@@ -284,8 +284,10 @@ public class Jeu implements Parametres, Serializable {
      * @return un booleen qui indique si on a déplacé une case ou non
      */
     private boolean deplacementUneCaseMD(int direction2, ArrayList<Case> deplaceMonterEtDesc, int localisationCases) {
-        boolean deplacement = false;
+        boolean deplacement = false,fusionFaite=false;
         int caseVoisine;
+        //System.out.println("Val importante"+deplaceMonterEtDesc.get(localisationCases).getValeur());
+        deplaceMonterEtDesc.get(localisationCases).setValAv(deplaceMonterEtDesc.get(localisationCases).getValeur());
         int gardeLocCase = localisationCases;
         if (deplaceMonterEtDesc.get(localisationCases).getValeur() > 0) { // Déplacement uniquement s'il s'agit d'une vraie case (avec une valeur)
             if (direction2 == MONTERG) {
@@ -307,9 +309,7 @@ public class Jeu implements Parametres, Serializable {
                 } else {
                     caseVoisine++;
                     localisationCases++;
-                }
-                //Pour le déplacement en thread. Permet de savoir la grille où s'est déplacée la case.
-                deplaceMonterEtDesc.get(gardeLocCase).setGrilleApDepl(deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
+                }                
             }
 
             if (caseVoisine >= 0 && caseVoisine < TAILLE) {
@@ -320,10 +320,19 @@ public class Jeu implements Parametres, Serializable {
                     if (b) {
                         deplacement = true;
                     }
+                    if(direction2==MONTERG){
+                        localisationCases--;
+                    }
+                    else{
+                        localisationCases++;
+                    }
                 }
             }
         }
-
+//        System.out.println("Avant "+deplaceMonterEtDesc.get(gardeLocCase).getGrille().getType());
+//        System.out.println("Après"+ deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
+//        System.out.println("Localisation case"+(localisationCases-gardeLocCase));
+        deplaceMonterEtDesc.get(gardeLocCase).setGrilleApDepl(deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
         return deplacement;
     }
 
@@ -759,6 +768,7 @@ public class Jeu implements Parametres, Serializable {
                 for (int j = 0; j < TAILLE; j++) {
                     grilles.get(k).getGrille().get(i).get(j).setNbDeplac(0);
                     grilles.get(k).getGrille().get(i).get(j).setGrilleApDepl(grilles.get(k).getGrille().get(i).get(j).getGrille().getType());
+                    grilles.get(k).getGrille().get(i).get(j).setValAv(0);
                 }
             }
         }

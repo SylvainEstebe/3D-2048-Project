@@ -16,7 +16,7 @@ public class Case implements Parametres, Serializable {
     /**
      * Coordonnées et valeur de la case
      */
-    private int x, y, valeur; 
+    private int x, y, valeur,valAv; 
     /**
      * Grille à laquelle est associée la case
      */
@@ -63,6 +63,13 @@ public class Case implements Parametres, Serializable {
      */
     public int getGrilleApDepl(){
         return grilleApDepl;
+    }
+    
+    public int getValAv(){
+        return valAv;
+    }
+    public void setValAv(int i){
+        valAv=i;
     }
 
     /**
@@ -243,5 +250,7 @@ public class Case implements Parametres, Serializable {
         return "Case(" + this.x + "," + this.y + "," + this.valeur + ")";
     }
 }
+
+
 
 
