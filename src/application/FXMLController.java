@@ -45,6 +45,7 @@ import modele.Case;
 import modele.ConnexionBDD;
 import modele.Jeu;
 import modele.Personne;
+import static modele.Personne.recupPersonne;
 import variables.Parametres;
 
 /**
@@ -455,58 +456,23 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     /**
-     * Méthode qui affiches les statistiques dans l'interface *
+     * Méthode affiche une fenêtre du classement des joueurs
+     *
      *
      */
     private void afficheStat(ActionEvent event) {
-        // Connection à la base de donnée
-        String host = "mysql-estebe.alwaysdata.net";
-        String port = "3306";
-        String dbname = "estebe_2048_game";
-        String username = "estebe";
-        String password = "pepignon";
-        ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
-        String infos;
         ObservableList<Personne> listePerso = FXCollections.observableArrayList();
+        listePerso = recupPersonne();
 
-        // Requête pour la base de donnée
-        String queryScore = "SELECT pseudo, score, temps, nombreDéplacement FROM Joueur ORDER BY score ASC";
-        // Récupération d'une liste de string avec toute les informations
-        ArrayList<String> pseudo = c.getTuples(queryScore);
-
-        // Création de la liste de joueur
-        for (int i = 0; i < pseudo.size(); i++) {
-
-            // Récupération d'une personne 
-            String j = pseudo.get(i);
-
-            // Séparation du pseudo, score, temps, nombre déplacement
-            String[] pseudotab = new String[5];
-            pseudotab = j.split(";", 4);
-            String pseudoP = pseudotab[0];
-            String scoreP = pseudotab[1];
-            String tempsP = pseudotab[2];
-            String nombreP = pseudotab[3];
-            // Création d'une personne
-            Personne p = new Personne(pseudoP, scoreP, tempsP, nombreP);
-            // On met cette personne dans une liste
-            ArrayList<Personne> listePersonne = new ArrayList<Personne>();
-            // Création de personne avec la base de donnée
-            listePerso.add(p);
-
-            listePersonne.add(p);
-
-        }
         // Création du tableau
         Stage stat = new Stage();
         TableView<Personne> table = new TableView<Personne>();
         final ObservableList<Personne> data = listePerso;
         Scene scene = new Scene(new Group());
         stat.setTitle("Statistique de ");
-        stat.setWidth(600);
-        stat.setHeight(1000);
-        final Label label = new Label("Classement");
-        label.setFont(new Font("Arial", 20));
+
+        final Label classement = new Label("Classement");
+        classement.setFont(new Font("Arial", 20));
         table.setEditable(true);
         scene.getStylesheets().add("css/classique.css");
         TableColumn pseudoCol = new TableColumn("Pseudo");
@@ -531,9 +497,10 @@ public class FXMLController implements Initializable, Parametres {
         final VBox vbox = new VBox();
         vbox.setSpacing(10);
         vbox.setPadding(new Insets(10, 0, 0, 0));
-        vbox.getChildren().addAll(label, table);
+        vbox.getChildren().addAll(classement, table);
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
-
+        stat.setWidth(table.getWidth());
+        stat.setHeight(table.getHeight());
         stat.setScene(scene);
         stat.show();
     }
@@ -651,7 +618,7 @@ public class FXMLController implements Initializable, Parametres {
         fenetre_aide.setTitle("VICTOIRE");
         BorderPane root = new BorderPane();
         root.getStyleClass().add("pane");
-
+        // enregistrementBDD();
         Label victoire = new Label("Félicitations, vous avez gagné!");
         Label scoreAff = new Label("Votre score : " + jeuAppli.getScoreFinal());
         victoire.getStyleClass().add("text_horsjeu");
@@ -698,18 +665,16 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     /**
-     * Méthode qui permet à un joueur de s'enregistrer en fin de partie * IL
-     * MANQUE LA CONVERSION DU TEMPS ET UNE REQUÊTE POUR VERIFIER SI LE PSEUDO
-     * N'EXISTE PAS DÈJA
+     * Méthhode qui permet l'enregistrement du pseudonyme, du temps de partie, du score, du nombre de déplacement du Joueur.
      *
      */
     @FXML
-    private void enregistrementBDD(MouseEvent event) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-// Temps 
+    private void enregistrementBDD(MouseEvent event) {
+        // Récupération du temps de jeux et conversion en seconde 
         long chrono2 = java.lang.System.currentTimeMillis();
         long timeSpentPlaying = (chrono2 - chronos) / 1000;
 
-        // Pseudonyme
+        // Récupératon du pseudonyme avec l'obligation de rentrer au moins une lettre ou un chiffre
         TextInputDialog td = new TextInputDialog();
         td.setTitle("Pseudonyme");
         td.setHeaderText("Veuillez rentrer un pseudonyme");
@@ -717,22 +682,26 @@ public class FXMLController implements Initializable, Parametres {
         Optional<String> resultat = td.showAndWait();
         if (resultat.isPresent()) {
             while (td.getEditor().getText().isEmpty() && resultat.isPresent()) {
-                if (td.getEditor().getText().isEmpty()) {
-                    Alert alert = new Alert(AlertType.WARNING);
-                    alert.showAndWait();
-                    td.setTitle("Pseudonyme");
-                    td.setHeaderText("Veuillez rentrer un pseudonyme");
-                    resultat = td.showAndWait();
-                }
 
+                Alert alert = new Alert(AlertType.WARNING);
+                alert.setHeaderText("Veuillez mettre au minimum une lettre/chiffre pour le pseudonyme");
+                alert.showAndWait();
+                td.setTitle("Pseudonyme");
+                td.setHeaderText("Veuillez rentrer un pseudonyme");
+                resultat = td.showAndWait();
+            }
+            if (resultat.isPresent()) {
+                String pseudo = td.getEditor().getText();
+                // Récupération du score de la partie actuelle du joueur
+                int scoreJoueurFin = Integer.valueOf(score.getText());
+                // Le compteur de déplacement est situé dans la méthode mouvJoueur
+                // Confirmation de l'enregistrement
+                Personne.ajoutPersonne(0, pseudo, scoreJoueurFin, timeSpentPlaying, deplacementBDD);
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setHeaderText("Vous êtes bien enregistrer, votre score est de " + scoreJoueurFin);
+                alert.showAndWait();
             }
         }
-        String pseudo = td.getEditor().getText();
-        // Score
-        int scoreJoueurFin = Integer.valueOf(score.getText());
-        // Déplacement (traité dans la partie mouvJoueur)
-        // Création d'une condition si le pseudo existe dèja - A FAIRE
-        ConnexionBDD.ajoutJoueur(0, pseudo, scoreJoueurFin, timeSpentPlaying, deplacementBDD);
     }
 
     @FXML

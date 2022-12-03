@@ -7,17 +7,28 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
- * @author castagno
- * Classe utilisée pour établir une connexion avec la base de données, interroger la base et insérer de nouveaux tuples dans la base
+ * @author Sylvain 
+ * Class utilisée pour établir une connexion avec la base de
+ * données, interroger la base et insérer de nouveaux tuples dans la base
  */
 public class ConnexionBDD {
 
     private final String host, port, dbname, username, password;
     private Connection con = null;
-
+    
+      /**
+     * Construteur de la classe connexionBDD
+     * @param b hote de connexion
+     * @param po port de connexion
+     * @param dbn nom de la base de donnée
+     * @param u nom de l'utilisateur
+     * @param p mot de passe
+     */
     public ConnexionBDD(String h, String po, String dbn, String u, String p) {
         this.host = h;
         this.port = po;
@@ -55,16 +66,15 @@ public class ConnexionBDD {
             try {
                 this.con.close();
                 System.out.println("Database connection terminated.");
-            } catch (Exception e) { /* ignore close errors */ }
+            } catch (Exception e) {
+                /* ignore close errors */ }
         }
     }
 
-    /*
-     * Interroge la base de données avec la requête passée en paramètre
-     * et retourne les résultats sous forme d'une liste de String.
-     * Il faut utiliser la méthode executeQuery dans la classe Statement (voir cours 12).
-     * Indice : comme on ne sait pas à l'avance combien d'attributs (colonnes) on a dans nos tuples,
-     * on peut utiliser la classe ResultSetMetaData (voir méthodes getMetaData() de la classe ResultSet et getColumnCount() de la classe ResultSetMetaData)
+      /**
+     * Interroge la base de donnée et récupère les informations
+     * @param query requête sql
+     * @return retourne une liste de String avec les informations à la suite
      */
     public ArrayList<String> getTuples(String query) {
         ArrayList<String> res = null;
@@ -79,8 +89,8 @@ public class ConnexionBDD {
                 tuple = "";
                 for (int i = 1; i <= metadata.getColumnCount(); i++) {
                     tuple += rs.getString(i);
-                    if (i<metadata.getColumnCount()) {
-                        tuple +=";";
+                    if (i < metadata.getColumnCount()) {
+                        tuple += ";";
                     }
                 }
                 res.add(tuple);
@@ -93,17 +103,17 @@ public class ConnexionBDD {
         }
         return res;
     }
-    
-    /*
-     * Insère un ou plusieurs tuples dans la base à partir de la requête passée en paramètre
-     * Pour cela, il faut utiliser la méthode executeUpdate dans la classe Statement
+
+      /**
+     * Insert dans la base de donnée 
+     * @param updateQuery requête sql
      */
     public void insertTuples(String updateQuery) {
         try {
             this.openConnexion();
             Statement stmt = this.con.createStatement();
             int n = stmt.executeUpdate(updateQuery);
-            System.out.println(n+" tuples inseres");
+            System.out.println(n + " tuples inseres");
             stmt.close();
         } catch (SQLException e) {
             System.out.println("Probleme avec la requete d'insertion");
@@ -112,20 +122,7 @@ public class ConnexionBDD {
             this.closeConnexion();
         }
     }
-    
-    public static void ajoutJoueur(int id, String pseudo, int scoreJoueurFin, long timeSpentPlaying, int deplacementBDD){
-        
-        // BDD infos
-        String host = "mysql-estebe.alwaysdata.net";
-        String port = "3306";
-        String dbname = "estebe_2048_game";
-        String username = "estebe";
-        String password = "pepignon";
-        // BDD Connexion
-        ConnexionBDD c = new ConnexionBDD(host, port, dbname, username, password);
-        // BDD requête ajout Joueur(int,string,int,int,int) Joueur(id,pseudo,score,temps,deplacement)
-        String query = "INSERT INTO Joueur VALUES ('" + 0 + "','" + pseudo + "','" + scoreJoueurFin + "','" + timeSpentPlaying + "','" + deplacementBDD + "')";
-        c.insertTuples(query);
 
-    }
+
+    
 }
