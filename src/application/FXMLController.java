@@ -761,6 +761,7 @@ public class FXMLController implements Initializable, Parametres {
                         Case caseBouge = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
                         if (caseBouge.getValAv() != 0) {
                             int depl = caseBouge.getNbDeplac();
+                            //System.out.println("Grille"+ caseBouge.getGrilleApDepl()+"Valeur " +caseBouge.getValAv()+" xCase "+ caseBouge.getX()+"yCase"+caseBouge.getY()+"depl "+depl + "grille "+caseBouge.getGrille().getType());
                             int deplObj = 0;
                             switch (direction) {
                                 case HAUT ->
