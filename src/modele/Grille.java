@@ -3,6 +3,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 import variables.Parametres;
+import static variables.Parametres.BAS;
+import static variables.Parametres.DROITE;
+import static variables.Parametres.GAUCHE;
+import static variables.Parametres.HAUT;
+import static variables.Parametres.TAILLE;
 
 /**
  * Classe qui réalise toutes les fonctionnalités sur une grille précise du jeu
@@ -257,8 +262,11 @@ public class Grille implements Parametres, Serializable{
      * @return qui indique si on a déplacé une case ou non 
      */
     private boolean deplacementUneCase(int direc2, ArrayList<Case> tabHB, int k) {
+        
+        tabHB.get(k).setValAv(tabHB.get(k).getValeur());
         boolean deplacement = false;
         Case caseBouge=tabHB.get(k);
+        
         if (tabHB.get(k).getValeur() > 0) { // Déplacement uniquement s'il s'agit d'une vraie case (avec une valeur)
            int voisin;
            if (direc2 == GAUCHE || direc2 == HAUT) {
@@ -268,7 +276,8 @@ public class Grille implements Parametres, Serializable{
            }
            
            // Tant que mon voisin = 0, je me déplace avant de chercher à fusionner
-           while (voisin >= 0 && voisin < TAILLE && tabHB.get(voisin).getValeur() == 0 ) {
+            while (voisin >= 0 && voisin < TAILLE && tabHB.get(voisin).getValeur() == 0 ) {
+               
                tabHB.get(voisin).setValeur(tabHB.get(k).getValeur());
                tabHB.get(k).setValeur(0);
                deplacement = true;
@@ -281,8 +290,8 @@ public class Grille implements Parametres, Serializable{
                    voisin++;
                    k++;
                }
+               
            }
-
            if (voisin >= 0 && voisin < TAILLE) {
                //Si mon voisin a la même valeur que moi, je fusionne
                if (tabHB.get(voisin).getValeur() == tabHB.get(k).getValeur()) {
@@ -296,15 +305,22 @@ public class Grille implements Parametres, Serializable{
                    if (b) deplacement = true;
                    } 
                 }
+                   //Element qui sert au thread deplacement des cases graphiques
+            if((direc2==HAUT || direc2==BAS)  ){
+
+                caseBouge.setNbDeplac(k-caseBouge.getX());
+            }
+            else if((direc2==DROITE || direc2==GAUCHE)){
+                caseBouge.setNbDeplac(k-caseBouge.getY()); 
+                
+
+
+            }
            
+            return deplacement;
         }
-        //Element qui sert au thread deplacement des cases graphiques
-        if((direc2==HAUT || direc2==BAS)  ){
-            caseBouge.setNbDeplac(k-caseBouge.getX());
-        }
-        else if((direc2==DROITE || direc2==GAUCHE)){
-            caseBouge.setNbDeplac(k-caseBouge.getY());
-        }
+        caseBouge.setNbDeplac(0);
+
         return deplacement;
     }
     

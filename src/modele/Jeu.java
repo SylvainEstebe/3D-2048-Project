@@ -12,9 +12,21 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 import variables.Parametres;
+import static variables.Parametres.BAS;
+import static variables.Parametres.DESCG;
+import static variables.Parametres.DROITE;
+import static variables.Parametres.GAUCHE;
+import static variables.Parametres.GRILLEB;
+import static variables.Parametres.GRILLEH;
+import static variables.Parametres.GRILLEM;
+import static variables.Parametres.HAUT;
+import static variables.Parametres.MONTERG;
+import static variables.Parametres.OBJECTIF;
+import static variables.Parametres.TAILLE;
 
 /**
  * Classe qui instancie un modèle de jeu 2048 3D
+ *
  * @author Manon
  */
 public class Jeu implements Parametres, Serializable {
@@ -35,8 +47,9 @@ public class Jeu implements Parametres, Serializable {
      * Tableau des états précédents du jeu
      */
     private LinkedList<Jeu> etatsPrecedents = new LinkedList<>();
-    
-    
+
+    private int directionMouvAleo = 0;
+
     /**
      * Constructeur qui initialise le jeu
      */
@@ -51,13 +64,13 @@ public class Jeu implements Parametres, Serializable {
         grilles.add(g1);
         grilles.add(g2);
         existePartiePrecedente = false;
-      
+
     }
-    
+
     /**
      * Constructeur qui permet la copie d'un jeu
-     * 
-     * @param j Jeu à copier 
+     *
+     * @param j Jeu à copier
      */
     private Jeu(Jeu j) {
         this.grilles.add(j.grilles.get(0).clone(this));
@@ -94,16 +107,17 @@ public class Jeu implements Parametres, Serializable {
     public ArrayList<Grille> getGrilles() {
         return grilles;
     }
-    
+
     /**
-     * Méthode qui retourne le booléen existePartiePrecedente : faux si elle n'y en a pas
+     * Méthode qui retourne le booléen existePartiePrecedente : faux si elle n'y
+     * en a pas
      *
      * @return faux s'il n'y en a pas de partie précédente
      */
     public boolean getExistePartiePrecedente() {
         return existePartiePrecedente;
     }
-    
+
     /**
      * Méthode qui modifie les 3 grilles du jeu
      *
@@ -112,13 +126,14 @@ public class Jeu implements Parametres, Serializable {
     public void setgrilles(ArrayList<Grille> nouvellesgrilles) {
         grilles = nouvellesgrilles;
     }
-    
+
     /**
      * Méthode qui permet de modifier le booléen existePartiePrecedente
-     * 
-     * @param e : le nouveau booléen qui indique si une partie précédente existe ou non
+     *
+     * @param e : le nouveau booléen qui indique si une partie précédente existe
+     * ou non
      */
-    public void setExistePartiePrecedente(boolean e){
+    public void setExistePartiePrecedente(boolean e) {
         this.existePartiePrecedente = e;
     }
 
@@ -280,9 +295,11 @@ public class Jeu implements Parametres, Serializable {
      * @return un booleen qui indique si on a déplacé une case ou non
      */
     private boolean deplacementUneCaseMD(int direction2, ArrayList<Case> deplaceMonterEtDesc, int localisationCases) {
-        boolean deplacement = false;
+        boolean deplacement = false,fusionFaite=false;
         int caseVoisine;
-        int gardeLocCase=localisationCases;
+        //System.out.println("Val importante"+deplaceMonterEtDesc.get(localisationCases).getValeur());
+        deplaceMonterEtDesc.get(localisationCases).setValAv(deplaceMonterEtDesc.get(localisationCases).getValeur());
+        int gardeLocCase = localisationCases;
         if (deplaceMonterEtDesc.get(localisationCases).getValeur() > 0) { // Déplacement uniquement s'il s'agit d'une vraie case (avec une valeur)
             if (direction2 == MONTERG) {
                 caseVoisine = localisationCases - 1;
@@ -295,7 +312,7 @@ public class Jeu implements Parametres, Serializable {
                 deplaceMonterEtDesc.get(caseVoisine).setValeur(deplaceMonterEtDesc.get(localisationCases).getValeur());
                 deplaceMonterEtDesc.get(localisationCases).setValeur(0);
                 deplacement = true;
-                
+
                 // mise à jour de mon index et celui de mon voisin
                 if (direction2 == MONTERG) {
                     caseVoisine--;
@@ -303,9 +320,7 @@ public class Jeu implements Parametres, Serializable {
                 } else {
                     caseVoisine++;
                     localisationCases++;
-                }
-                //Pour le déplacement en thread. Permet de savoir la grille où s'est déplacée la case.
-                deplaceMonterEtDesc.get(gardeLocCase).setGrilleApDepl(deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
+                }                
             }
 
             if (caseVoisine >= 0 && caseVoisine < TAILLE) {
@@ -313,11 +328,22 @@ public class Jeu implements Parametres, Serializable {
                 if (deplaceMonterEtDesc.get(caseVoisine).getValeur()
                         == deplaceMonterEtDesc.get(localisationCases).getValeur()) {
                     boolean b = deplaceMonterEtDesc.get(caseVoisine).getGrille().fusion(deplaceMonterEtDesc.get(localisationCases), deplaceMonterEtDesc.get(caseVoisine));
-                    if (b) deplacement = true;
+                    if (b) {
+                        deplacement = true;
+                    }
+                    if(direction2==MONTERG){
+                        localisationCases--;
+                    }
+                    else{
+                        localisationCases++;
+                    }
                 }
             }
         }
-        
+//        System.out.println("Avant "+deplaceMonterEtDesc.get(gardeLocCase).getGrille().getType());
+//        System.out.println("Après"+ deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
+//        System.out.println("Localisation case"+(localisationCases-gardeLocCase));
+        deplaceMonterEtDesc.get(gardeLocCase).setGrilleApDepl(deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
         return deplacement;
     }
 
@@ -381,9 +407,13 @@ public class Jeu implements Parametres, Serializable {
             index = ra.nextInt(valeurs.size());
         }
 
+        directionMouvAleo = valeurs.get(index);
         return true;
     }
 
+    public int getDirectionMouvAleo(){
+    return directionMouvAleo;
+    }
     /**
      * Méthode qui vérifie si les déplacements MONTERG et DESCG sont possible ou
      * pas dans une partie
@@ -415,12 +445,12 @@ public class Jeu implements Parametres, Serializable {
 
         return true;
     }
-    
+
     /**
      * Méthode qui réinitialise l'attribut fusionne pour chaque grille
      */
     public void resetFusion() {
-        for (int i = 0 ; i < TAILLE ; i++) {
+        for (int i = 0; i < TAILLE; i++) {
             this.grilles.get(i).resetFusion();
         }
     }
@@ -437,24 +467,25 @@ public class Jeu implements Parametres, Serializable {
             return false;
         }
     }
-    
+
     /**
-     * Méthode qui lance le jeu de manière à ce qu'il soit utilisable 
-     * dans l'application
+     * Méthode qui lance le jeu de manière à ce qu'il soit utilisable dans
+     * l'application
      */
-    public void lancementJeuAppli(){
+    public void lancementJeuAppli() {
         //le jeu commence avec 2 cases
         this.ajoutCases();
         this.ajoutCases();
-        
+
     }
-    
+
     /**
-     * Méthode qui permet de choisir le nombre de cases à ajouter dans le jeu
-     * et les ajoute
+     * Méthode qui permet de choisir le nombre de cases à ajouter dans le jeu et
+     * les ajoute
+     *
      * @param b2 pour savoir si on peut ajouter des cases
      */
-    public void choixNbCasesAjout(Boolean b2){
+    public void choixNbCasesAjout(Boolean b2) {
         Random ra = new Random();
         if (b2) {
             int random = ra.nextInt(2) + 1;
@@ -463,9 +494,8 @@ public class Jeu implements Parametres, Serializable {
             }
         }
         this.majScore();
-        
+
     }
-    
 
     /**
      * Méthode lancement et déroulement du jeu Affectuer des déplacements selon
@@ -476,7 +506,7 @@ public class Jeu implements Parametres, Serializable {
         Scanner sc1 = new Scanner(System.in);
         Random ra = new Random();
         boolean retour = false; //faux car le retour n'a pas encore été utilisé
-        
+
         if (this.existePartiePrecedente) {// si le joueur choisit de terminer une partie précédente
             System.out.println(this);
         } else { // si le joueur commence une nouvelle partie
@@ -497,13 +527,13 @@ public class Jeu implements Parametres, Serializable {
             if (!retour && etatsPrecedents.size() > 0) { //on ne peut pas retourner en arrière si on l'a déjà fait ou si on n'a pas encore joué
                 System.out.println("Retourner en arrière ? Tapez b : vous pouvez retourner jusqu'à 5 coups en arrière. Attention ! Vous ne pouvez utiliser le retour en arrière qu'une fois par partie !");
             }
-            
+
             String s = sc1.next();
             s = s.toLowerCase();
             //Action de l'IA 2
-            if (s.equals("ii")){
-                IA2 ia2=new IA2(this);
-                ia2.jeuIA2();  
+            if (s.equals("ii")) {
+                IA2 ia2 = new IA2(this);
+                ia2.jeuIA2();
             }
             //Quitter le jeu
             if (s.equals("x")) {
@@ -517,11 +547,11 @@ public class Jeu implements Parametres, Serializable {
             }
             //Mouvement aléatoire de l'ordinateur
             if (s.equals("?")) {
-                boolean b2=this.mouvementAlea();
+                boolean b2 = this.mouvementAlea();
                 choixNbCasesAjout(b2);
                 this.majScore();
                 System.out.println(this);
-              //Déplacement fait par un joueur
+                //Déplacement fait par un joueur
             } else if (!(s.equals("d") || s.equals("droite")
                     || s.equals("q") || s.equals("gauche")
                     || s.equals("z") || s.equals("haut")
@@ -568,11 +598,13 @@ public class Jeu implements Parametres, Serializable {
         }
 
     }
-    
+
     /**
-     *Methode qui demande au joueur s'il veut terminer une partie précédente ou 
+     * Methode qui demande au joueur s'il veut terminer une partie précédente ou
      * commencer une nouvelle
-     * @return booléen ture: pour terminer une partie précedente et false: pour une nouvelle
+     *
+     * @return booléen ture: pour terminer une partie précedente et false: pour
+     * une nouvelle
      */
     public boolean rechargerPartie() {
         Scanner sc = new Scanner(System.in);
@@ -594,9 +626,8 @@ public class Jeu implements Parametres, Serializable {
         return false;
     }
 
-    
     /**
-     *Méthode pour sérialiser une partie non finie que le joueur l'a abandonnée
+     * Méthode pour sérialiser une partie non finie que le joueur l'a abandonnée
      * en tapant 'x'
      */
     public void serialiser() {
@@ -620,11 +651,13 @@ public class Jeu implements Parametres, Serializable {
         }
     }
 
-    
     /**
-     *Methode qui déserialise une partie précédente (dernier état du jeu avant de quiter)
+     * Methode qui déserialise une partie précédente (dernier état du jeu avant
+     * de quiter)
+     *
      * @return Jeu l'état des 3 grilles dans la partie précédente
-     **/
+     *
+     */
     public Jeu deserialiser() {
         ObjectInputStream ois = null;
         try {
@@ -647,53 +680,54 @@ public class Jeu implements Parametres, Serializable {
         }
         return null;
     }
-    
+
     /**
-     * méthode qui enregistre l'état actuel de la partie 
+     * méthode qui enregistre l'état actuel de la partie
      */
-    public LinkedList<Jeu> enregistrement() {          
-        etatsPrecedents.addFirst(this.clone()); 
+    public LinkedList<Jeu> enregistrement() {
+        etatsPrecedents.addFirst(this.clone());
         return etatsPrecedents;
     }
-    
+
     /**
-     * Méthode qui valide l'enregistrement du coup
-     * L'enregistrement est valide si des cases ont bien été déplacées
-     * La méthode supprime le 6ème état enregistré dès que la liste est supérieure à 5 
+     * Méthode qui valide l'enregistrement du coup L'enregistrement est valide
+     * si des cases ont bien été déplacées La méthode supprime le 6ème état
+     * enregistré dès que la liste est supérieure à 5
      */
-    public void validerEnregistrement() { 
+    public void validerEnregistrement() {
         if (etatsPrecedents.size() > 5) { //on n'a besoin que de 5 états en arrière
             etatsPrecedents.remove(5); //on supprime le 6ème
         }
-        
+
         /*
         for (int i = 0; i < etatsPrecedents.size(); i++) {
             System.out.println("Index " +i);
             System.out.println(etatsPrecedents.get(i));
         }*/
     }
-    
+
     /**
-     * Méthode qui annule un enregistrement qui n'a pas été validé = le joueur a choisi une direction mais aucune case n'a été déplacée
+     * Méthode qui annule un enregistrement qui n'a pas été validé = le joueur a
+     * choisi une direction mais aucune case n'a été déplacée
      */
     public void annulerEnregistrement() {
         etatsPrecedents.remove(0);
     }
-    
+
     /**
      * Méthode qui retourne en arrière, à utiliser une seule fois dans la partie
      * La méthode gère jusqu'à 5 retours consécutifs
      */
-    public void undo (){ 
+    public void undo() {
         Scanner sc = new Scanner(System.in);
         String s = "oui";
-        
+
         //tant qu'on veut encore retourner en arrière et qu'on n'a pas encore utilisé les 5 retours
         while (s.equals("oui") && etatsPrecedents.size() > 0) {
             retour();
 
             int size = etatsPrecedents.size();
-            
+
             if (size > 0) {
                 System.out.println(size + " retour(s) encore possible(s)");
 
@@ -709,20 +743,21 @@ public class Jeu implements Parametres, Serializable {
             } else {
                 System.out.println("Vous ne pouvez plus revenir en arrière !");
             }
-        } 
+        }
     }
-    
+
     /**
-     * Méthode qui effectue le retour en arrière : restauration de l'état précédent et suppression de son enregistrement
+     * Méthode qui effectue le retour en arrière : restauration de l'état
+     * précédent et suppression de son enregistrement
      */
-    public void retour(){
+    public void retour() {
         /*
         System.out.println("AVANT RETOUR");
         System.out.println(this);*/
-        
+
         //retour au coup d'avant
-        this.setgrilles(etatsPrecedents.get(0).getGrilles()); 
-        this.setScoreFinal(etatsPrecedents.get(0).getScoreFinal()); 
+        this.setgrilles(etatsPrecedents.get(0).getGrilles());
+        this.setScoreFinal(etatsPrecedents.get(0).getScoreFinal());
         this.setExistePartiePrecedente(etatsPrecedents.get(0).getExistePartiePrecedente());  //à tester
         etatsPrecedents.remove(0);
 
@@ -731,22 +766,22 @@ public class Jeu implements Parametres, Serializable {
         System.out.println("APRÈS RETOUR");
         System.out.println(this);*/
     }
-    
+
     //Méthode qui clone un jeu
     public Jeu clone() {
         return new Jeu(this);
     }
-    
+
     //Méthode qui réinitialise le nombre de déplacements pour chaque case du jeu
-    public void reinitNbDepl(){
-        for (int k=0;k<TAILLE;k++){
-            for (int i=0;i<TAILLE;i++){
-                for (int j=0;j<TAILLE;j++){
+    public void reinitNbDepl() {
+        for (int k = 0; k < TAILLE; k++) {
+            for (int i = 0; i < TAILLE; i++) {
+                for (int j = 0; j < TAILLE; j++) {
                     grilles.get(k).getGrille().get(i).get(j).setNbDeplac(0);
                     grilles.get(k).getGrille().get(i).get(j).setGrilleApDepl(grilles.get(k).getGrille().get(i).get(j).getGrille().getType());
+                    grilles.get(k).getGrille().get(i).get(j).setValAv(0);
                 }
             }
         }
     }
 }
-

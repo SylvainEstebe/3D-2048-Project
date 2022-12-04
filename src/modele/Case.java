@@ -3,6 +3,15 @@ package modele;
 import variables.Parametres;
 import java.io.Serializable;
 import java.util.ArrayList;
+import static variables.Parametres.BAS;
+import static variables.Parametres.DESCG;
+import static variables.Parametres.DROITE;
+import static variables.Parametres.GAUCHE;
+import static variables.Parametres.GRILLEB;
+import static variables.Parametres.GRILLEH;
+import static variables.Parametres.HAUT;
+import static variables.Parametres.MONTERG;
+import static variables.Parametres.TAILLE;
 
 
 /**
@@ -16,7 +25,7 @@ public class Case implements Parametres, Serializable {
     /**
      * Coordonnées et valeur de la case
      */
-    private int x, y, valeur; 
+    private int x, y, valeur,valAv; 
     /**
      * Grille à laquelle est associée la case
      */
@@ -63,6 +72,13 @@ public class Case implements Parametres, Serializable {
      */
     public int getGrilleApDepl(){
         return grilleApDepl;
+    }
+    
+    public int getValAv(){
+        return valAv;
+    }
+    public void setValAv(int i){
+        valAv=i;
     }
 
     /**
@@ -243,5 +259,7 @@ public class Case implements Parametres, Serializable {
         return "Case(" + this.x + "," + this.y + "," + this.valeur + ")";
     }
 }
+
+
 
 
