@@ -295,7 +295,7 @@ public class Jeu implements Parametres, Serializable {
      * @return un booleen qui indique si on a déplacé une case ou non
      */
     private boolean deplacementUneCaseMD(int direction2, ArrayList<Case> deplaceMonterEtDesc, int localisationCases) {
-        boolean deplacement = false,fusionFaite=false;
+        boolean deplacement = false, fusionFaite = false;
         int caseVoisine;
         //System.out.println("Val importante"+deplaceMonterEtDesc.get(localisationCases).getValeur());
         deplaceMonterEtDesc.get(localisationCases).setValAv(deplaceMonterEtDesc.get(localisationCases).getValeur());
@@ -320,7 +320,7 @@ public class Jeu implements Parametres, Serializable {
                 } else {
                     caseVoisine++;
                     localisationCases++;
-                }                
+                }
             }
 
             if (caseVoisine >= 0 && caseVoisine < TAILLE) {
@@ -331,10 +331,9 @@ public class Jeu implements Parametres, Serializable {
                     if (b) {
                         deplacement = true;
                     }
-                    if(direction2==MONTERG){
+                    if (direction2 == MONTERG) {
                         localisationCases--;
-                    }
-                    else{
+                    } else {
                         localisationCases++;
                     }
                 }
@@ -411,9 +410,10 @@ public class Jeu implements Parametres, Serializable {
         return true;
     }
 
-    public int getDirectionMouvAleo(){
-    return directionMouvAleo;
+    public int getDirectionMouvAleo() {
+        return directionMouvAleo;
     }
+
     /**
      * Méthode qui vérifie si les déplacements MONTERG et DESCG sont possible ou
      * pas dans une partie
@@ -784,4 +784,17 @@ public class Jeu implements Parametres, Serializable {
             }
         }
     }
+
+    /* // Méthode qui retourne la listes des cases vides pour les 3 grilles
+    public ArrayList<Case> listeCaseVideMultiGrille() {
+
+        ArrayList<Case> listeCaseVideMulti = new ArrayList<>();
+        for (int k = 0; k < grilles.size(); k++) {
+            listeCaseVideMulti.addAll(grilles.get(k).listeCaseVide());
+
+        }
+
+        return listeCaseVideMulti;
+    }
+     */
 }

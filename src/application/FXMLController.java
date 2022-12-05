@@ -497,7 +497,10 @@ public class FXMLController implements Initializable, Parametres {
         Stage stat = new Stage();
         TableView<Personne> table = new TableView<Personne>();
         final ObservableList<Personne> data = listePerso;
-        Scene scene = new Scene(new Group());
+        Scene scene = new Scene(new Group(), 500, 500);
+        stat.setMinHeight(200);
+        stat.setMinWidth(500);
+
         stat.setTitle("Statistique de ");
 
         final Label classement = new Label("Classement");
