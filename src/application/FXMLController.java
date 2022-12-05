@@ -583,6 +583,7 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private void mouvJoueur(KeyEvent event) {
         if(threadDepl==null || threadDepl.size()==0){
+            
             deplacementBDD = deplacementBDD + 1;
             if (dyslexique.isDisable()) {
                 instructionJeu.setVisible(true);
