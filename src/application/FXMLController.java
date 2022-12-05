@@ -26,6 +26,8 @@ import javafx.scene.layout.Pane;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -580,61 +582,62 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     private void mouvJoueur(KeyEvent event) {
-        deplacementBDD = deplacementBDD + 1;
-        if (dyslexique.isDisable()) {
-            instructionJeu.setVisible(true);
-            help.setVisible(false);
-        } else {
-            instructionJeu.setVisible(false);
-            help.setVisible(true);
-        }
-        String direction = event.getText();
-        int dirThread = 0;
-        boolean b = false;
-
-        //Déplacement des cases selon la touche clavier
-        if (direction.equals("q")) {
-            b = jeuAppli.deplacerCases3G(GAUCHE);
-            dirThread = GAUCHE;
-        } else if (direction.equals("d")) {
-            b = jeuAppli.deplacerCases3G(DROITE);
-            dirThread = DROITE;
-        } else if (direction.equals("z")) {
-            b = jeuAppli.deplacerCases3G(HAUT);
-            dirThread = HAUT;
-        } else if (direction.equals("s")) {
-            b = jeuAppli.deplacerCases3G(BAS);
-            dirThread = BAS;
-        } else if (direction.equals("f")) {
-            b = jeuAppli.deplacerCases3G(DESCG);
-            dirThread = DESCG;
-        } else if (direction.equals("r")) {
-            b = jeuAppli.deplacerCases3G(MONTERG);
-            dirThread = MONTERG;
-        } else {
-            System.out.println("Attention, vous n'avez pas appuyé sur une touche valide!");
-
-        }
-        deplacementThread(dirThread, b);
-
-        this.majScoreApp();
-        if (jeuAppli.finJeu()) {
-            if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
-                this.victoireAppli();
+        if(threadDepl==null || threadDepl.size()==0){
+            deplacementBDD = deplacementBDD + 1;
+            if (dyslexique.isDisable()) {
+                instructionJeu.setVisible(true);
+                help.setVisible(false);
             } else {
-                this.jeuPerduAppli();
+                instructionJeu.setVisible(false);
+                help.setVisible(true);
+            }
+            String direction = event.getText();
+            int dirThread = 0;
+            boolean b = false;
+
+            //Déplacement des cases selon la touche clavier
+            if (direction.equals("q")) {
+                b = jeuAppli.deplacerCases3G(GAUCHE);
+                dirThread = GAUCHE;
+            } else if (direction.equals("d")) {
+                b = jeuAppli.deplacerCases3G(DROITE);
+                dirThread = DROITE;
+            } else if (direction.equals("z")) {
+                b = jeuAppli.deplacerCases3G(HAUT);
+                dirThread = HAUT;
+            } else if (direction.equals("s")) {
+                b = jeuAppli.deplacerCases3G(BAS);
+                dirThread = BAS;
+            } else if (direction.equals("f")) {
+                b = jeuAppli.deplacerCases3G(DESCG);
+                dirThread = DESCG;
+            } else if (direction.equals("r")) {
+                b = jeuAppli.deplacerCases3G(MONTERG);
+                dirThread = MONTERG;
+            } else {
+                System.out.println("Attention, vous n'avez pas appuyé sur une touche valide!");
+
+            }
+            deplacementThread(dirThread, b);
+
+            this.majScoreApp();
+            if (jeuAppli.finJeu()) {
+                if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
+                    this.victoireAppli();
+                } else {
+                    this.jeuPerduAppli();
+                }
+            }
+            if (b) {
+                etatsPrecedents = new LinkedList<Jeu>();
+                etatsPrecedents = jeuAppli.enregistrement();
+            }
+            if (etatsPrecedents.size() >= 1 && !retourUtilise) {
+                retour.setDisable(false);
+            } else {
+                retour.setDisable(true);
             }
         }
-        if (b) {
-            etatsPrecedents = new LinkedList<Jeu>();
-            etatsPrecedents = jeuAppli.enregistrement();
-        }
-        if (etatsPrecedents.size() >= 1 && !retourUtilise) {
-            retour.setDisable(false);
-        } else {
-            retour.setDisable(true);
-        }
-
     }
 
     public void victoireAppli() {
