@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package application;
 
 import javafx.application.Platform;
@@ -14,18 +9,29 @@ import modele.Jeu;
 import static variables.Parametres.TAILLE;
 
 /**
- *
+ * Classe qui permet de faire la mise à jour de l'interface après un déplacement
+ * dynamique 
  * @author Mouna
  */
 public class MajJeu extends Task<Void> {
 
+    /**
+     * Contrôleur relié à l'interface
+     */
     private FXMLController controleur;
 
+    /**
+     * Constructeur de la classe
+     * @param c le contrôleur relié à l'interface
+     */
     public MajJeu(FXMLController c) {
         this.controleur = c;
     }
 
     @Override
+    /**
+     * Méthode qui met à jour l'interface
+     */
     protected Void call() throws Exception {
         Platform.runLater(new Runnable() {
             @Override
@@ -53,12 +59,10 @@ public class MajJeu extends Task<Void> {
                         }
                     }
                 }
-                controleur.getDeplThread().clear();
-                
+                controleur.getDeplThread().clear();  
             }
         }
         );
         return null;
-
     }
 }
