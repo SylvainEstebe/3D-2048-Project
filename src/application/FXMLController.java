@@ -1,5 +1,6 @@
 package application;
 
+import ia.IA2;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
@@ -31,7 +32,6 @@ import javafx.concurrent.Task;
 import javafx.scene.Group;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -43,7 +43,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.Case;
-import modele.ConnexionBDD;
 import modele.Jeu;
 import modele.Personne;
 import static modele.Personne.recupPersonne;
@@ -60,7 +59,8 @@ import static variables.Parametres.MONTERG;
 import static variables.Parametres.TAILLE;
 
 /**
- * FXML Controller class
+ * Contrôleur de l'interface, gère tous les évènements qui se déroulent
+ * sur l'interface
  *
  * @author sylvainestebe
  */
@@ -112,13 +112,30 @@ public class FXMLController implements Initializable, Parametres {
     private MenuItem newPartie;
     @FXML
     private MenuItem quitter;
+    /**
+     * Ensemble des panes qui correspondent aux cases
+     */
     private ArrayList<Pane> eltsGrilles = null;
 
+    /**
+     * Le jeu relié à l'interface
+     */
     private Jeu jeuAppli = null;
-    // private int compteurCoups = 0;
+    /**
+     * Le nombre de retours possibles sur l'interface
+     */
     private int nbRetour = 0;
+    /**
+     * Booléen qui indique si tous les retours ont été utilisés
+     */
     private boolean retourUtilise = false;
+    /**
+     * Grilles de l'interface
+     */
     private ArrayList<GridPane> tabGrillesApp;
+    /**
+     * Ensemble des états précédents du jeu
+     */
     private LinkedList<Jeu> etatsPrecedents = null;
 
     @FXML
@@ -138,8 +155,6 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private ImageView bas;
     @FXML
-    private ImageView gauhe;
-    @FXML
     private ImageView droite;
     @FXML
     private ImageView descendre;
@@ -151,21 +166,39 @@ public class FXMLController implements Initializable, Parametres {
     long chronos;
     long temps;
     @FXML
+    /**
+     * Fond de la grille
+     */
     private Pane fond;
-    private final int minYCase = 15, minXCaseGH = 14, longCase = 100, longGrille = 300, minXCaseGM = 353, minXCaseGB = 692;
+    /**
+     * Coordonnées qui servent à déterminer les coordonnées des cases/panes et 
+     * à générer leurs déplacements
+     */
+    private final int minYCase = 15, minXCaseGH = 14, longCase = 100, minXCaseGM = 353, minXCaseGB = 692;
     private int xCase = 0, yCase = 0, compteurTask = 0, nbTask = 0;
-    private boolean threadDead = false;
+    
+    
     @FXML
     private Pane fondGrille;
+    /**
+     * Ensemble des threads qui déplacent dynamniquement les grilles
+     */
     private ArrayList<Thread> threadDepl = null;
+    /**
+     * Ensemble des tasks qui permettent de déplacer dynamiquement les cases
+     */
     private ArrayList<Task> deplacementCases = new ArrayList<Task>();
+    
+   
+    @FXML
+    private ImageView gauche;
 
     /**
-     * Initializes the controller class.
+     * Permet d'initialiser le contrôleur
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // verification de l'existance d'une partie précedente 
+        // verification de l'existence d'une partie précedente 
         boolean existe = false;
         ObjectInputStream ois = null;
         try {
@@ -188,19 +221,20 @@ public class FXMLController implements Initializable, Parametres {
 
             }
         }
-
     }
 
     @FXML
+    /**
+     * Permet de commencer une nouvelle partie 
+     */
     public void nouvellePartie(ActionEvent event) {
         deplacementBDD = 0;
         chronos = java.lang.System.currentTimeMillis();
-
         jeuAppli = new Jeu();
         jeuAppli.lancementJeuAppli();
         sauvegardePartie.setDisable(false);
         this.majGrillesApp();
-        //System.out.println(jeuAppli.toString());
+        
         mouvOrdi.setDisable(false);
         nbRetour = 0;
         retourUtilise = false;
@@ -208,10 +242,12 @@ public class FXMLController implements Initializable, Parametres {
         case8.setVisible(false);
         case2.setVisible(false);
         case32.setVisible(false);
-
     }
 
     @FXML
+    /**
+     * Permet de charger une partie déjà existante et sauvegardée
+     */
     private void chargerPartie(ActionEvent event) {
         chargePartie.setDisable(true);
         jeuAppli.deserialiser();
@@ -228,6 +264,9 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
+    /**
+     * Permet de sauvegarder une partie en cours
+     */
     private void sauvegarderPartie(ActionEvent event) {
         //Lorsqu'on sauvegarde, le bouton de chargement devient actif
         jeuAppli.serialiser();
@@ -235,6 +274,9 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
+    /**
+     * Permet de revenir à un état précédent du jeu
+     */
     private void retour(MouseEvent event) {
         if (!etatsPrecedents.isEmpty()) {
             retourUtilise = true;
@@ -253,9 +295,7 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     /**
-     * Méthode pour afficher les 3 grilles du jeu IDEE : faire un affichage au
-     * début où on initialise le tab, puis ensuite on change juste les couleurs
-     * des panes et les valeurs des labels dans majGrillesApp
+     * Méthode qui permet de mettre à jour l'état du jeu sur l'interface 
      */
     private void majGrillesApp() {
 
@@ -271,14 +311,17 @@ public class FXMLController implements Initializable, Parametres {
             for (int i = 0; i < TAILLE; i++) {
                 for (int j = 0; j < TAILLE; j++) {
                     Case caseModele = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
+                    //On n'affiche la case que si elle est non nulle
                     if (caseModele.getValeur() != 0) {
                         Label caseJeu = new Label("" + caseModele.getValeur());
                         caseJeu.getStyleClass().add("caseJeu");
                         Pane caseJeuCouleur = new Pane();
                         caseJeuCouleur.getChildren().add(caseJeu);
+                        //On change la couleur de la case
                         caseJeuCouleur.getStyleClass().add("couleurCase");
                         eltsGrilles.add(caseJeuCouleur);
                         this.couleursCases(caseJeuCouleur, caseModele.getValeur());
+                        //On met la case au bon endroit
                         this.positionPane(caseJeuCouleur, caseModele, caseJeu, k);
                         fondGrille.getChildren().add(caseJeuCouleur);
                     }
@@ -287,6 +330,13 @@ public class FXMLController implements Initializable, Parametres {
         }
     }
 
+    /**
+     * Méthode qui permet de placer un pane/case au bon endroit dans la grille
+     * @param caseJeuCouleur le pane dont on veut modifier la position
+     * @param caseModele la case reliée au pane
+     * @param caseJeu le label de la case
+     * @param k permet de placer le pane dans la bonne grille
+     */
     public void positionPane(Pane caseJeuCouleur, Case caseModele, Label caseJeu, int k) {
         if (caseModele.getGrille().getType() == GRILLEH) {
             xCase = minXCaseGH + caseModele.getY() * longCase;
@@ -307,6 +357,12 @@ public class FXMLController implements Initializable, Parametres {
         tabGrillesApp.get(k).setHalignment(caseJeu, HPos.CENTER);
     }
 
+    /**
+     * Permet de changer les couleurs des cases en fonction du type de jeu qu'on
+     * choisit
+     * @param caseJeuCouleur le pane dont on veut changer la couleur
+     * @param valeur la valeur de la case qui détermine sa couleur
+     */
     public void couleursCases(Pane caseJeuCouleur, int valeur) {
         if (classique.isDisable()) {
             //Gestion des couleurs des cases
@@ -390,6 +446,9 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
+    /**
+     * Permet de faire l'affichage daltonien
+     */
     private void affichageDaltonien(ActionEvent event) {
         rootPane.getStylesheets().clear();
         rootPane.getStylesheets().add("css/daltonien.css");
@@ -403,6 +462,9 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
+    /**
+     * Permet de faire l'affichage classique
+     */
     private void affichageClassique(ActionEvent event) {
         rootPane.getStylesheets().clear();
         rootPane.getStylesheets().add("css/classique.css");
@@ -417,6 +479,9 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
+    /**
+     * Permet de faire l'affichage dyslexique
+     */
     private void affichageDyslexique(ActionEvent event) {
 
         rootPane.getStylesheets().clear();
@@ -434,7 +499,7 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     /**
      * Méthode qui affiches des aides concernant les commandes du jeu sous forme
-     * d'alert *
+     * d'alert 
      *
      */
     private void aidePopUp(MouseEvent event) {
@@ -480,8 +545,52 @@ public class FXMLController implements Initializable, Parametres {
      */
     @FXML
     private void ia(ActionEvent event) {
+//        boolean ia_stoppe=false;
+//        IA2 ai_algo2=new IA2(jeuAppli);
+//        int direction;
+//        ThreadAffichIAAppli ia_thread=new ThreadAffichIAAppli(stopIA);
+//        
+//        //Fonctionnement de l'IA tant que le jeu n'est pas fini ou la case
+//        ia_thread.start();
         stopIA.setDisable(false);
-    }
+//        while(!jeuAppli.finJeu() && !ia_stoppe){  
+//            System.out.println("WO WO WO");
+//            direction=ai_algo2.choixMouvIA2();
+//            jeuAppli.enregistrement();
+//            boolean b2 = jeuAppli.deplacerCases3G(direction);
+//            ThreadAffich threadaffich=new ThreadAffich(direction, b2, this);
+//            threadaffich.start();
+//            while(threadaffich.isAlive()){
+//                //System.out.println("OHU");
+//            }
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            
+//            jeuAppli.choixNbCasesAjout(b2);
+//
+//            if (b2) {
+//                jeuAppli.validerEnregistrement();
+//            } else {
+//                jeuAppli.annulerEnregistrement();
+//            }
+//            this.majScoreApp();
+//            jeuAppli.resetFusion();
+//            if (!ia_thread.isAlive()){
+//                ia_stoppe=true;
+//            }
+//             
+//        }
+//        if (jeuAppli.finJeu()) {
+//            if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
+//                this.victoireAppli();
+//            } else {
+//                this.jeuPerduAppli();
+//            }
+//        }
+   }
 
     @FXML
     /**
@@ -538,6 +647,9 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
+    /**
+     * Méthode qui permet de quitter le jeu correctement
+     */
     private void quitter(ActionEvent event) {
 
         Stage abandonner = new Stage();
@@ -576,70 +688,84 @@ public class FXMLController implements Initializable, Parametres {
         oui.setOnAction(actionEvent -> System.exit(0));
     }
 
+    /**
+     * Méthode qui met à jour le score
+     */
     public void majScoreApp() {
         score.setText("" + jeuAppli.getScoreFinal());
         score.setVisible(true);
     }
 
     @FXML
+    /**
+     * Méthode qui permet de réaliser un déplacement en fonction 
+     * des ordres du joueur
+     */
     private void mouvJoueur(KeyEvent event) {
-        deplacementBDD = deplacementBDD + 1;
-        if (dyslexique.isDisable()) {
-            instructionJeu.setVisible(true);
-            help.setVisible(false);
-        } else {
-            instructionJeu.setVisible(false);
-            help.setVisible(true);
-        }
-        String direction = event.getText();
-        int dirThread = 0;
-        boolean b = false;
-
-        //Déplacement des cases selon la touche clavier
-        if (direction.equals("q")) {
-            b = jeuAppli.deplacerCases3G(GAUCHE);
-            dirThread = GAUCHE;
-        } else if (direction.equals("d")) {
-            b = jeuAppli.deplacerCases3G(DROITE);
-            dirThread = DROITE;
-        } else if (direction.equals("z")) {
-            b = jeuAppli.deplacerCases3G(HAUT);
-            dirThread = HAUT;
-        } else if (direction.equals("s")) {
-            b = jeuAppli.deplacerCases3G(BAS);
-            dirThread = BAS;
-        } else if (direction.equals("f")) {
-            b = jeuAppli.deplacerCases3G(DESCG);
-            dirThread = DESCG;
-        } else if (direction.equals("r")) {
-            b = jeuAppli.deplacerCases3G(MONTERG);
-            dirThread = MONTERG;
-        } else {
-            System.out.println("Attention, vous n'avez pas appuyé sur une touche valide!");
-
-        }
-        deplacementThread(dirThread, b);
-
-        this.majScoreApp();
-        if (jeuAppli.finJeu()) {
-            if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
-                this.victoireAppli();
+        if(threadDepl==null || threadDepl.size()==0){
+            deplacementBDD = deplacementBDD + 1;
+            if (dyslexique.isDisable()) {
+                instructionJeu.setVisible(true);
+                help.setVisible(false);
             } else {
-                this.jeuPerduAppli();
+                instructionJeu.setVisible(false);
+                help.setVisible(true);
+            }
+            String direction = event.getText();
+            int dirThread = 0;
+            boolean b = false;
+
+            //Déplacement des cases selon la touche clavier
+            if (direction.equals("q")) {
+                b = jeuAppli.deplacerCases3G(GAUCHE);
+                dirThread = GAUCHE;
+            } else if (direction.equals("d")) {
+                b = jeuAppli.deplacerCases3G(DROITE);
+                dirThread = DROITE;
+            } else if (direction.equals("z")) {
+                b = jeuAppli.deplacerCases3G(HAUT);
+                dirThread = HAUT;
+            } else if (direction.equals("s")) {
+                b = jeuAppli.deplacerCases3G(BAS);
+                dirThread = BAS;
+            } else if (direction.equals("f")) {
+                b = jeuAppli.deplacerCases3G(DESCG);
+                dirThread = DESCG;
+            } else if (direction.equals("r")) {
+                b = jeuAppli.deplacerCases3G(MONTERG);
+                dirThread = MONTERG;
+            } else {
+                System.out.println("Attention, vous n'avez pas appuyé sur une touche valide!");
+
+            }
+            deplacementThread(dirThread, b);
+            
+            this.majScoreApp();
+            if (jeuAppli.finJeu()) {
+                if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
+                    this.victoireAppli();
+                } else {
+                    this.jeuPerduAppli();
+                }
+            }
+            if (b) {
+                etatsPrecedents = new LinkedList<Jeu>();
+                etatsPrecedents = jeuAppli.enregistrement();
+            }
+            if (etatsPrecedents.size() >= 1 && !retourUtilise) {
+                retour.setDisable(false);
+            } else {
+                retour.setDisable(true);
             }
         }
-        if (b) {
-            etatsPrecedents = new LinkedList<Jeu>();
-            etatsPrecedents = jeuAppli.enregistrement();
-        }
-        if (etatsPrecedents.size() >= 1 && !retourUtilise) {
-            retour.setDisable(false);
-        } else {
-            retour.setDisable(true);
-        }
-
     }
+    
+    
+    
 
+    /**
+     * Affichage de la victoire dans l'application
+     */
     public void victoireAppli() {
         Stage fenetre_aide = new Stage();
         fenetre_aide.setTitle("VICTOIRE");
@@ -665,6 +791,9 @@ public class FXMLController implements Initializable, Parametres {
         fenetre_aide.show();
     }
 
+    /**
+     * Affichage de la défaite dans l'application
+     */
     public void jeuPerduAppli() {
         Stage fenetre_aide = new Stage();
         fenetre_aide.setTitle("DEFAITE");
@@ -733,13 +862,16 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     @FXML
+    /**
+     * Méthode qui réalise le mouvement aléatoire de l'ordi dans l'application
+     */
     private void mouvOrdiApp(MouseEvent event) {
         if (jeuAppli != null) {
             boolean b2 = jeuAppli.mouvementAlea();
             int direction = jeuAppli.getDirectionMouvAleo();
             this.deplacementThread(direction, b2);
             this.majScoreApp();
-            // this.majGrillesApp();
+            
             if (jeuAppli.finJeu()) {
                 if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
                     this.victoireAppli();
@@ -751,6 +883,11 @@ public class FXMLController implements Initializable, Parametres {
 
     }
 
+    /**
+     * Méthode qui permet le déplacement dynamique des cases dans le jeu
+     * @param direction la direction dans laquelle les cases doivent être déplacées
+     * @param b booléen qui indique s'il est possible de déplacer les cases
+     */
     public void deplacementThread(int direction, boolean b) {
         deplacementCases = new ArrayList<Task>();
         threadDepl = new ArrayList<Thread>();
@@ -764,6 +901,7 @@ public class FXMLController implements Initializable, Parametres {
                         Case caseBouge = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
                         if (caseBouge.getValAv() != 0) {
                             int depl = caseBouge.getNbDeplac();
+                            //System.out.println("Grille"+ caseBouge.getGrilleApDepl()+"Valeur " +caseBouge.getValAv()+" xCase "+ caseBouge.getX()+"yCase"+caseBouge.getY()+"depl "+depl + "grille "+caseBouge.getGrille().getType());
                             int deplObj = 0;
                             switch (direction) {
                                 case HAUT ->
@@ -842,6 +980,7 @@ public class FXMLController implements Initializable, Parametres {
                             }
                             xCase = (int) eltsGrilles.get(compteur).getLayoutX();
                             yCase = (int) eltsGrilles.get(compteur).getLayoutY();
+                            
                             //System.out.println(deplObj+" xCase"+caseBouge.getX()+"yCase"+caseBouge.getY());
                             Pane caseABouge = eltsGrilles.get(compteur);
                             DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this);
@@ -854,6 +993,7 @@ public class FXMLController implements Initializable, Parametres {
             CountDownLatch startSignal = new CountDownLatch(1);
             CountDownLatch doneSignal = new CountDownLatch(deplacementCases.size());
             for (int i = 0; i < deplacementCases.size(); i++) {
+               
                 DeplacementTask d = (DeplacementTask) deplacementCases.get(i);
                 d.setDebut(startSignal);
                 d.setFin(doneSignal);
@@ -861,43 +1001,128 @@ public class FXMLController implements Initializable, Parametres {
                 threadDepl.add(th);
                 th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
                 th.start();
+                
             }
+            
             jeuAppli.choixNbCasesAjout(b);
             startSignal.countDown();
 
         }
     }
 
+    /**
+     * Récupérer le jeu en lien avec l'application
+     * @return le jeu 
+     */
     public Jeu getJeuAppli() {
         return this.jeuAppli;
     }
 
+    /**
+     * Permet de récupérer le fond des grilles
+     * @return un pane qui est le fond des grilles
+     */
     public Pane getFondGrille() {
         return this.fondGrille;
     }
 
+    /**
+     * Récupérer les cases du jeu sous forme de pane
+     * @return le tebleau des cases sous forme de pane
+     */
     public ArrayList<Pane> getEltsGrilles() {
         return this.eltsGrilles;
     }
-
+    
+    /**
+     * Modifier le tableau des cases sous forme de pane
+     * @param l le nouveau tableau de panes
+     */
     public void setEltsGrilles(ArrayList<Pane> l) {
         this.eltsGrilles = l;
     }
 
+    /**
+     * Changer le fond des grilles
+     * @param p le nouveau fond
+     */
     public void setFonfGrille(Pane p) {
         fondGrille = p;
     }
 
+    /**
+     * Réinitialiser le fond des grilles
+     */
     public void resetFondGrille() {
         fondGrille.getChildren().clear();
     }
 
+    /**
+     * Réinitialiser le tableau des cases sous forme de pane
+     */
     public void resetEltsGrilles() {
         eltsGrilles.clear();
     }
 
+    /**
+     * Permet de récupérer le tableau de threads responsables du déplacement des grilles
+     * @return le tableau de threads
+     */
     public ArrayList<Thread> getDeplThread() {
         return threadDepl;
     }
 
+
 }
+
+
+//class ThreadAffichIAAppli extends Thread implements Parametres{
+//    
+//    Button stopIA;
+//    
+//    /**
+//     * Constructeur vide
+//     */
+//    public ThreadAffichIAAppli(Button stopIA){
+//        this.stopIA=stopIA;
+//    }
+//
+//    /**
+//     * Méthode qui permet de faire fonctionner l'IA en console 
+//     * tant que la touche s n'est pas enfoncée
+//     */
+//    @Override
+//    public void run() {
+//        while(!stopIA.isPressed()){
+//           
+//        }
+//    }  
+//}
+
+
+//class ThreadAffich extends Thread implements Parametres{
+//    
+//    private int direction=0;
+//    private boolean b2;
+//    FXMLController controller;
+//    
+//    /**
+//     * Constructeur vide
+//     */
+//    public ThreadAffich(int direction, boolean b2, FXMLController controlleur){
+//        this.direction=direction;
+//        this.b2=b2;
+//        controller=controlleur;
+//    }
+//
+//    /**
+//     * Méthode qui permet de faire fonctionner l'IA en console 
+//     * tant que la touche s n'est pas enfoncée
+//     */
+//    @Override
+//    public void run() {
+//        controller.deplacementThread(direction, b2);
+//        
+//        System.out.println("C EST BON");
+//    }  
+//}
