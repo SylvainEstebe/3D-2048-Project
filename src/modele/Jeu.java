@@ -339,9 +339,6 @@ public class Jeu implements Parametres, Serializable {
                 }
             }
         }
-//        System.out.println("Avant "+deplaceMonterEtDesc.get(gardeLocCase).getGrille().getType());
-//        System.out.println("Après"+ deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
-//        System.out.println("Localisation case"+(localisationCases-gardeLocCase));
         deplaceMonterEtDesc.get(gardeLocCase).setGrilleApDepl(deplaceMonterEtDesc.get(localisationCases).getGrille().getType());
         return deplacement;
     }
@@ -615,7 +612,7 @@ public class Jeu implements Parametres, Serializable {
             if (s.equals("oui")) {
                 this.deserialiser();
                 return true;
-            } else if (s.equals("non")) {
+            } else if (s.equals("non")){
                 return false;
             } else {
                 System.out.println("vous devez saisir oui pour reprendre la partie précédente, sinon non");
@@ -751,20 +748,11 @@ public class Jeu implements Parametres, Serializable {
      * précédent et suppression de son enregistrement
      */
     public void retour() {
-        /*
-        System.out.println("AVANT RETOUR");
-        System.out.println(this);*/
-
         //retour au coup d'avant
         this.setgrilles(etatsPrecedents.get(0).getGrilles());
         this.setScoreFinal(etatsPrecedents.get(0).getScoreFinal());
         this.setExistePartiePrecedente(etatsPrecedents.get(0).getExistePartiePrecedente());  //à tester
         etatsPrecedents.remove(0);
-
-        /*
-        //affichage de l'état précédent que le joueur a demandé 
-        System.out.println("APRÈS RETOUR");
-        System.out.println(this);*/
     }
 
     //Méthode qui clone un jeu
@@ -784,17 +772,25 @@ public class Jeu implements Parametres, Serializable {
             }
         }
     }
+    // Méthode qui retourne la listes des cases vides pour les 3 grilles
 
-    /* // Méthode qui retourne la listes des cases vides pour les 3 grilles
     public ArrayList<Case> listeCaseVideMultiGrille() {
 
         ArrayList<Case> listeCaseVideMulti = new ArrayList<>();
         for (int k = 0; k < grilles.size(); k++) {
-            listeCaseVideMulti.addAll(grilles.get(k).listeCaseVide());
+            listeCaseVideMulti.addAll(grilles.get(k).getListeCaseVide());
 
         }
 
         return listeCaseVideMulti;
     }
-     */
+// une méthode dcalcule le score de toutes les cases de 
+
+    public int scoreCasesJeu() {
+        int score = 0;
+        for (int i = 0; i < grilles.size(); i++) {
+            score += grilles.get(i).scoreCasesDuGrilles();
+        }
+        return score;
+    }
 }

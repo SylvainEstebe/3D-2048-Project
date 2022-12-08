@@ -59,8 +59,8 @@ import static variables.Parametres.MONTERG;
 import static variables.Parametres.TAILLE;
 
 /**
- * Contrôleur de l'interface, gère tous les évènements qui se déroulent
- * sur l'interface
+ * Contrôleur de l'interface, gère tous les évènements qui se déroulent sur
+ * l'interface
  *
  * @author sylvainestebe
  */
@@ -171,13 +171,12 @@ public class FXMLController implements Initializable, Parametres {
      */
     private Pane fond;
     /**
-     * Coordonnées qui servent à déterminer les coordonnées des cases/panes et 
-     * à générer leurs déplacements
+     * Coordonnées qui servent à déterminer les coordonnées des cases/panes et à
+     * générer leurs déplacements
      */
     private final int minYCase = 15, minXCaseGH = 14, longCase = 100, minXCaseGM = 353, minXCaseGB = 692;
     private int xCase = 0, yCase = 0, compteurTask = 0, nbTask = 0;
-    
-    
+
     @FXML
     private Pane fondGrille;
     /**
@@ -188,8 +187,7 @@ public class FXMLController implements Initializable, Parametres {
      * Ensemble des tasks qui permettent de déplacer dynamiquement les cases
      */
     private ArrayList<Task> deplacementCases = new ArrayList<Task>();
-    
-   
+
     @FXML
     private ImageView gauche;
 
@@ -225,7 +223,7 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     /**
-     * Permet de commencer une nouvelle partie 
+     * Permet de commencer une nouvelle partie
      */
     public void nouvellePartie(ActionEvent event) {
         deplacementBDD = 0;
@@ -234,7 +232,7 @@ public class FXMLController implements Initializable, Parametres {
         jeuAppli.lancementJeuAppli();
         sauvegardePartie.setDisable(false);
         this.majGrillesApp();
-        
+
         mouvOrdi.setDisable(false);
         nbRetour = 0;
         retourUtilise = false;
@@ -295,7 +293,7 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     /**
-     * Méthode qui permet de mettre à jour l'état du jeu sur l'interface 
+     * Méthode qui permet de mettre à jour l'état du jeu sur l'interface
      */
     private void majGrillesApp() {
 
@@ -332,6 +330,7 @@ public class FXMLController implements Initializable, Parametres {
 
     /**
      * Méthode qui permet de placer un pane/case au bon endroit dans la grille
+     *
      * @param caseJeuCouleur le pane dont on veut modifier la position
      * @param caseModele la case reliée au pane
      * @param caseJeu le label de la case
@@ -360,6 +359,7 @@ public class FXMLController implements Initializable, Parametres {
     /**
      * Permet de changer les couleurs des cases en fonction du type de jeu qu'on
      * choisit
+     *
      * @param caseJeuCouleur le pane dont on veut changer la couleur
      * @param valeur la valeur de la case qui détermine sa couleur
      */
@@ -499,7 +499,7 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     /**
      * Méthode qui affiches des aides concernant les commandes du jeu sous forme
-     * d'alert 
+     * d'alert
      *
      */
     private void aidePopUp(MouseEvent event) {
@@ -590,7 +590,7 @@ public class FXMLController implements Initializable, Parametres {
 //                this.jeuPerduAppli();
 //            }
 //        }
-   }
+    }
 
     @FXML
     /**
@@ -601,7 +601,6 @@ public class FXMLController implements Initializable, Parametres {
     private void afficheStat(ActionEvent event) {
         ObservableList<Personne> listePerso = FXCollections.observableArrayList();
         listePerso = recupPersonne();
-
         // Création du tableau
         Stage stat = new Stage();
         TableView<Personne> table = new TableView<Personne>();
@@ -611,7 +610,8 @@ public class FXMLController implements Initializable, Parametres {
         stat.setMinWidth(500);
 
         stat.setTitle("Statistique de ");
-
+        stat.setMinHeight(500);
+        stat.setMinWidth(300);
         final Label classement = new Label("Classement");
         classement.setFont(new Font("Arial", 20));
         table.setEditable(true);
@@ -698,11 +698,11 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     /**
-     * Méthode qui permet de réaliser un déplacement en fonction 
-     * des ordres du joueur
+     * Méthode qui permet de réaliser un déplacement en fonction des ordres du
+     * joueur
      */
     private void mouvJoueur(KeyEvent event) {
-        if(threadDepl==null || threadDepl.size()==0){
+        if (threadDepl == null || threadDepl.size() == 0) {
             deplacementBDD = deplacementBDD + 1;
             if (dyslexique.isDisable()) {
                 instructionJeu.setVisible(true);
@@ -739,7 +739,7 @@ public class FXMLController implements Initializable, Parametres {
 
             }
             deplacementThread(dirThread, b);
-            
+
             this.majScoreApp();
             if (jeuAppli.finJeu()) {
                 if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
@@ -759,9 +759,6 @@ public class FXMLController implements Initializable, Parametres {
             }
         }
     }
-    
-    
-    
 
     /**
      * Affichage de la victoire dans l'application
@@ -871,7 +868,7 @@ public class FXMLController implements Initializable, Parametres {
             int direction = jeuAppli.getDirectionMouvAleo();
             this.deplacementThread(direction, b2);
             this.majScoreApp();
-            
+
             if (jeuAppli.finJeu()) {
                 if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
                     this.victoireAppli();
@@ -885,7 +882,9 @@ public class FXMLController implements Initializable, Parametres {
 
     /**
      * Méthode qui permet le déplacement dynamique des cases dans le jeu
-     * @param direction la direction dans laquelle les cases doivent être déplacées
+     *
+     * @param direction la direction dans laquelle les cases doivent être
+     * déplacées
      * @param b booléen qui indique s'il est possible de déplacer les cases
      */
     public void deplacementThread(int direction, boolean b) {
@@ -980,7 +979,7 @@ public class FXMLController implements Initializable, Parametres {
                             }
                             xCase = (int) eltsGrilles.get(compteur).getLayoutX();
                             yCase = (int) eltsGrilles.get(compteur).getLayoutY();
-                            
+
                             //System.out.println(deplObj+" xCase"+caseBouge.getX()+"yCase"+caseBouge.getY());
                             Pane caseABouge = eltsGrilles.get(compteur);
                             DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this);
@@ -993,7 +992,7 @@ public class FXMLController implements Initializable, Parametres {
             CountDownLatch startSignal = new CountDownLatch(1);
             CountDownLatch doneSignal = new CountDownLatch(deplacementCases.size());
             for (int i = 0; i < deplacementCases.size(); i++) {
-               
+
                 DeplacementTask d = (DeplacementTask) deplacementCases.get(i);
                 d.setDebut(startSignal);
                 d.setFin(doneSignal);
@@ -1001,9 +1000,9 @@ public class FXMLController implements Initializable, Parametres {
                 threadDepl.add(th);
                 th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
                 th.start();
-                
+
             }
-            
+
             jeuAppli.choixNbCasesAjout(b);
             startSignal.countDown();
 
@@ -1012,7 +1011,8 @@ public class FXMLController implements Initializable, Parametres {
 
     /**
      * Récupérer le jeu en lien avec l'application
-     * @return le jeu 
+     *
+     * @return le jeu
      */
     public Jeu getJeuAppli() {
         return this.jeuAppli;
@@ -1020,6 +1020,7 @@ public class FXMLController implements Initializable, Parametres {
 
     /**
      * Permet de récupérer le fond des grilles
+     *
      * @return un pane qui est le fond des grilles
      */
     public Pane getFondGrille() {
@@ -1028,14 +1029,16 @@ public class FXMLController implements Initializable, Parametres {
 
     /**
      * Récupérer les cases du jeu sous forme de pane
+     *
      * @return le tebleau des cases sous forme de pane
      */
     public ArrayList<Pane> getEltsGrilles() {
         return this.eltsGrilles;
     }
-    
+
     /**
      * Modifier le tableau des cases sous forme de pane
+     *
      * @param l le nouveau tableau de panes
      */
     public void setEltsGrilles(ArrayList<Pane> l) {
@@ -1044,6 +1047,7 @@ public class FXMLController implements Initializable, Parametres {
 
     /**
      * Changer le fond des grilles
+     *
      * @param p le nouveau fond
      */
     public void setFonfGrille(Pane p) {
@@ -1065,16 +1069,16 @@ public class FXMLController implements Initializable, Parametres {
     }
 
     /**
-     * Permet de récupérer le tableau de threads responsables du déplacement des grilles
+     * Permet de récupérer le tableau de threads responsables du déplacement des
+     * grilles
+     *
      * @return le tableau de threads
      */
     public ArrayList<Thread> getDeplThread() {
         return threadDepl;
     }
 
-
 }
-
 
 //class ThreadAffichIAAppli extends Thread implements Parametres{
 //    
@@ -1098,8 +1102,6 @@ public class FXMLController implements Initializable, Parametres {
 //        }
 //    }  
 //}
-
-
 //class ThreadAffich extends Thread implements Parametres{
 //    
 //    private int direction=0;

@@ -422,30 +422,29 @@ public class Grille implements Parametres, Serializable {
         return new Grille(this, j);
     }
 
-    
-       /**
-     * Méthode qui retourne toutes les cases vides d'une grille
-     *
-     * 
-     * @return listeVide Liste de case vide
-    
-    
-    public ArrayList<Case> listeCaseVide() {
-
-        ArrayList<Case> listeVide = new ArrayList<>();
-
+    public ArrayList<Case> getListeCaseVide() {
+        ArrayList<Case> listeCasesVides = new ArrayList<>();
         // Parcours d'une grille
         for (int i = 0; i < TAILLE; i++) {
             for (int j = 0; j < TAILLE; j++) {
                 grille.get(i);
                 if (grille.get(i).get(j).getValeur() == 0) {
-                    listeVide.add(grille.get(i).get(j));
+                    listeCasesVides.add(grille.get(i).get(j));
                 }
             }
         }
-       // int taille = ((TAILLE*TAILLE)- listeVide.size());
-        return listeVide;
+        return listeCasesVides;
     }
-    
-     */
+//Methode qui calcule le score moyen de toutes les cases d'une grille
+    public int scoreCasesDuGrilles() {
+        int score = 0;
+        for (int i = 0; i < TAILLE; i++) {
+            for (int j = 0; j < TAILLE; j++) {
+                if (grille.get(i).get(j).getValeur() != 0) {
+                    score += grille.get(i).get(j).scoreCase();
+                }
+            }
+        }
+        return score;
+    }
 }

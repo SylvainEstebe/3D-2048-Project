@@ -2,6 +2,7 @@ package modele;
 
 import variables.Parametres;
 import java.io.Serializable;
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 import static variables.Parametres.BAS;
 import static variables.Parametres.DESCG;
@@ -13,19 +14,19 @@ import static variables.Parametres.HAUT;
 import static variables.Parametres.MONTERG;
 import static variables.Parametres.TAILLE;
 
-
 /**
- * Classe qui s'occupe de la formation d'une case et de ses modifications dans une grille
+ * Classe qui s'occupe de la formation d'une case et de ses modifications dans
+ * une grille
+ *
  * @author Alexanne WORM
- * 
+ *
  */
-
 public class Case implements Parametres, Serializable {
 
     /**
      * Coordonnées et valeur de la case
      */
-    private int x, y, valeur,valAv; 
+    private int x, y, valeur, valAv;
     /**
      * Grille à laquelle est associée la case
      */
@@ -41,10 +42,11 @@ public class Case implements Parametres, Serializable {
     /**
      * Indique le nombre de déplacement qu'a réalisé la case lors d'un coup
      */
-    private int nbDeplacements=0;
-    
+    private int nbDeplacements = 0;
+
     /**
      * Constructeur de case
+     *
      * @param abs l'abscisse de la case
      * @param ord l'ordonnée de la case
      * @param v la valeur de la case
@@ -54,69 +56,75 @@ public class Case implements Parametres, Serializable {
         this.x = abs;
         this.y = ord;
         this.valeur = v;
-        grille=g;
+        grille = g;
         this.fusionnee = false;
     }
-    
+
     /**
      * Modifie le type de la grille où la case s'est déplacée après un coup
+     *
      * @param grilleap le type de la nouvelle grille
      */
-    public void setGrilleApDepl(int grilleap){
-        this.grilleApDepl=grilleap;
+    public void setGrilleApDepl(int grilleap) {
+        this.grilleApDepl = grilleap;
     }
-    
+
     /**
      * Donne le type de la grille où est la case après un coup
-     * @return 
+     *
+     * @return
      */
-    public int getGrilleApDepl(){
+    public int getGrilleApDepl() {
         return grilleApDepl;
     }
-    
-    public int getValAv(){
+
+    public int getValAv() {
         return valAv;
     }
-    public void setValAv(int i){
-        valAv=i;
+
+    public void setValAv(int i) {
+        valAv = i;
     }
 
     /**
      * Méthode qui modifie la grille à laquelle est associée la case
+     *
      * @param g la nouvelle grille
      */
     public void setGrille(Grille g) {
         this.grille = g;
     }
-    
-   
-    
+
     /**
-    * Méthode qui permet d'obtenir la grille dans laquelle se trouve la case 
-    * @return la grille 
-    */
+     * Méthode qui permet d'obtenir la grille dans laquelle se trouve la case
+     *
+     * @return la grille
+     */
     public Grille getGrille() {
         return this.grille;
     }
-    
+
     /**
      * Donne le nombre de déplacements effectué par la case lors d'un coup
+     *
      * @return le nombre de déplacements
      */
-    public int getNbDeplac(){
+    public int getNbDeplac() {
         return nbDeplacements;
     }
-    
+
     /**
      * Modifie le nombre de déplacements effectué par la case lors d'un coup
+     *
      * @param dep le nouveau nombre de déplacements
      */
-    public void setNbDeplac(int dep){
-        nbDeplacements=dep;
+    public void setNbDeplac(int dep) {
+        nbDeplacements = dep;
     }
 
     /**
      * Méthode qui permet d'obtenir l'abscisse de la case
+     *
      * @return x l'abscisse
      */
     public int getX() {
@@ -125,6 +133,7 @@ public class Case implements Parametres, Serializable {
 
     /**
      * Méthode qui permet d'obtenir l'ordonnée de la case
+     *
      * @return y l'ordonnée
      */
     public int getY() {
@@ -133,6 +142,7 @@ public class Case implements Parametres, Serializable {
 
     /**
      * Méthode qui permet de modifier l'abscisse de la case
+     *
      * @param x la nouvelle abscisse
      */
     public void setX(int x) {
@@ -141,39 +151,44 @@ public class Case implements Parametres, Serializable {
 
     /**
      * Méthode qui permet de modifier l'ordonnée de la case
+     *
      * @param y la nouvelle ordonnée
      */
     public void setY(int y) {
         this.y = y;
     }
-    
+
     /**
      * Méthode qui permet de modifier la valeur de la case
+     *
      * @param valeur la nouvelle valeur
      */
     public void setValeur(int valeur) {
         this.valeur = valeur;
-       
+
     }
-    
+
     /**
      * Méthode qui permet de récupérer la valeur de la case
+     *
      * @return la valeur de la case
      */
     public int getValeur() {
         return this.valeur;
     }
-    
+
     /**
      * Méthode qui permet de modifier l'ordonnée de la case
+     *
      * @param f le nouveau booléen fusionnee
      */
     public void setFusionnee(boolean f) {
         this.fusionnee = f;
     }
-    
-     /**
+
+    /**
      * Méthode qui permet d'obtenir le booléen fusionnee
+     *
      * @return fusionnee le booléen qui indique si la case a déjà été fusionnée
      */
     public boolean isFusionnee() {
@@ -182,6 +197,7 @@ public class Case implements Parametres, Serializable {
 
     /**
      * Méthode qui permet de vérifier si deux cases ont la même valeur
+     *
      * @param c la case qu'on compare avec celle-ci
      * @return un booléen indiquant si les cases ont la même valeur
      */
@@ -194,72 +210,93 @@ public class Case implements Parametres, Serializable {
     }
 
     /**
-     * Méthode qui permet d'obtenir le voisin direct de la case dans
-     * une certaine direction
+     * Méthode qui permet d'obtenir le voisin direct de la case dans une
+     * certaine direction
+     *
      * @param direction (gauche,droite,haut,bas monterg, descg)
      * @return la case voisine
      */
     public Case getVoisinDirect(int direction) {
         switch (direction) {
             case GAUCHE -> {
-                if(y>0){
-                    return grille.getGrille().get(x).get(y-1);
+                if (y > 0) {
+                    return grille.getGrille().get(x).get(y - 1);
                 }
                 return null;
             }
             case DROITE -> {
-                if(y<TAILLE-1){
-                    return grille.getGrille().get(x).get(y+1);
+                if (y < TAILLE - 1) {
+                    return grille.getGrille().get(x).get(y + 1);
                 }
                 return null;
             }
             case HAUT -> {
-                if(x>0){
-                    return grille.getGrille().get(x-1).get(y);
+                if (x > 0) {
+                    return grille.getGrille().get(x - 1).get(y);
                 }
                 return null;
             }
             case BAS -> {
-                if(x<TAILLE-1){
-                    return grille.getGrille().get(x+1).get(y);
+                if (x < TAILLE - 1) {
+                    return grille.getGrille().get(x + 1).get(y);
                 }
                 return null;
             }
             case MONTERG -> {
                 ArrayList<Grille> grilles = grille.getJeu().getGrilles();
                 int index = grilles.indexOf(this.grille); //index de la grille à laquelle appartient la case
-                if (grille.getType() != GRILLEH) { 
-                    return grilles.get(index -1).getGrille().get(x).get(y);
+                if (grille.getType() != GRILLEH) {
+                    return grilles.get(index - 1).getGrille().get(x).get(y);
                 }
                 return null;
-            }   
+            }
             case DESCG -> {
                 ArrayList<Grille> grilles = grille.getJeu().getGrilles();
                 int index = grilles.indexOf(this.grille); //index de la grille à laquelle appartient la case
-                if (grille.getType() != GRILLEB) { 
-                    return grilles.get(index +1).getGrille().get(x).get(y);
+                if (grille.getType() != GRILLEB) {
+                    return grilles.get(index + 1).getGrille().get(x).get(y);
                 }
                 return null;
-            } 
-            
+            }
+
             default -> {
             }
         }
         return null;
     }
 
-    
-   
     /**
      * Méthode qui permet d'afficher la case
+     *
      * @Override
      * @return Un string représentant la case dans la console
      */
     public String toString() {
         return "Case(" + this.x + "," + this.y + "," + this.valeur + ")";
     }
+
+    //une méthode qui compte le score d'une case par rapport à ses voisins 
+    //plus le score est petit,  plus il y a une chance de fusion  
+    public int scoreCase() {
+        int score = 0;
+        int compteur = 0;
+        if (this.getVoisinDirect(DROITE).getValeur() != 0) {
+            score += abs(this.getValeur() - this.getVoisinDirect(DROITE).getValeur());
+            compteur++;
+        }
+        if (this.getVoisinDirect(HAUT).getValeur() != 0) {
+            score += abs(this.getValeur() - this.getVoisinDirect(HAUT).getValeur());
+            compteur++;
+        }
+        if (this.getVoisinDirect(GAUCHE).getValeur() != 0) {
+            score += abs(this.getValeur() - this.getVoisinDirect(GAUCHE).getValeur());
+            compteur++;
+        }
+        if (this.getVoisinDirect(BAS).getValeur() != 0) {
+            score += abs(this.getValeur() - this.getVoisinDirect(BAS).getValeur());
+            compteur++;
+        }
+        return (int) score / compteur;
+    }
+
 }
-
-
-
-
