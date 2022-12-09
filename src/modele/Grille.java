@@ -422,7 +422,7 @@ public class Grille implements Parametres, Serializable {
         return new Grille(this, j);
     }
 
-    public ArrayList<Case> getListeCaseVide() {
+      public ArrayList<Case> getListeCaseVide() {
         ArrayList<Case> listeCasesVides = new ArrayList<>();
         // Parcours d'une grille
         for (int i = 0; i < TAILLE; i++) {
@@ -442,9 +442,11 @@ public class Grille implements Parametres, Serializable {
             for (int j = 0; j < TAILLE; j++) {
                 if (grille.get(i).get(j).getValeur() != 0) {
                     score += grille.get(i).get(j).scoreCase();
+                    //System.out.println("hhh");
                 }
             }
         }
         return score;
     }
+
 }

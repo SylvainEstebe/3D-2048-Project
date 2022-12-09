@@ -5,7 +5,21 @@
  */
 package ia;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import modele.Case;
 import modele.Jeu;
+import static variables.Parametres.BAS;
+import static variables.Parametres.DESCG;
+import static variables.Parametres.DROITE;
+import static variables.Parametres.GAUCHE;
+import static variables.Parametres.HAUT;
+import static variables.Parametres.MONTERG;
+import static variables.Parametres.TAILLE;
 
 /**
  * Classe qui instancie l'IA qui respecte le 1er algorithme
@@ -28,111 +42,148 @@ public class IA1 {
     }
 
     public void IA1() {
-    }
-
-    /*  public static void IA1() throws CloneNotSupportedException {
         int wins = 0;
-        int total = 10;
+        int total = 1;
         System.out.println("Running " + total + " games to estimate the accuracy:");
-
+        this.jeu.ajoutCases();
+        this.jeu.ajoutCases();
+        this.jeu.mouvementAlea();
+        this.jeu.ajoutCases();
+        this.jeu.mouvementAlea();
+        this.jeu.ajoutCases();
+        this.jeu.mouvementAlea();
+        this.jeu.ajoutCases();
+        this.jeu.majScore();
         for (int i = 0; i < total; ++i) {
-            int hintDepth = 7;
-            Board theGame = new Board();
-            Direction hint = AIsolver.findBestMove(theGame, hintDepth);
-            ActionStatus result = ActionStatus.CONTINUE;
-            while (result == ActionStatus.CONTINUE || result == ActionStatus.INVALID_MOVE) {
-                result = theGame.action(hint);
-                if (result == ActionStatus.CONTINUE || result == ActionStatus.INVALID_MOVE) {
-                    hint = AIsolver.findBestMove(theGame, hintDepth);
-                }
-            }
+            try {
+                int hintDepth = 2;
+                System.out.println(jeu);
+                int hint = this.findBestMove(this.jeu, hintDepth);
+                System.out.println(hint);
+                this.jeu.deplacerCases3G(hint);
+                this.jeu.ajoutCases();
+                this.jeu.majScore();
+                //System.out.println(jeu);
+                //Case nouvelleCase=this.meilleurCase(jeu,hintDepth );
+                // System.out.println(nouvelleCase.toString());
+                // jeu.ajoutCase(nouvelleCase);
 
-            if (result == ActionStatus.WIN) {
-                ++wins;
-                System.out.println("Game " + (i + 1) + " - won");
-            } else {
-                System.out.println("Game " + (i + 1) + " - lost");
+                /* ActionStatus result = ActionStatus.CONTINUE;
+                while (result == ActionStatus.CONTINUE || result == ActionStatus.INVALID_MOVE) {
+                    result = theGame.action(hint);
+                    if (result == ActionStatus.CONTINUE || result == ActionStatus.INVALID_MOVE) {
+                        hint = AIsolver.findBestMove(theGame, hintDepth);
+                    }
+                }
+                
+                if (result == ActionStatus.WIN) {
+                    ++wins;
+                    System.out.println("Game " + (i + 1) + " - won");
+                } else {
+                    System.out.println("Game " + (i + 1) + " - lost");
+                }*/
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(IA1.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
         System.out.println(wins + " wins out of " + total + " games.");
-    }*/ 
-   /* public static Direction findBestMove(Board theBoard, int depth) throws CloneNotSupportedException {
-        //Map<String, Object> result = minimax(theBoard, depth, Player.USER);
-        
-      //  Map<String, Object> result = alphabeta(theBoard, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.USER);
-        
-        return (Direction)result.get("Direction");
     }
-    
-    
-      private static Map<String, Object> minimax(Board theBoard, int depth, Player player) throws CloneNotSupportedException {
-        Map<String, Object> result = new HashMap<>();
-        
-        Direction bestDirection = null;
-        int bestScore;
-        
-        if(depth==0 || theBoard.isGameTerminated()) {
-            bestScore=heuristicScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(),calculateClusteringScore(theBoard.getBoardArray()));
-        }
-        else {
-            if(player == Player.USER) {
-                bestScore = Integer.MIN_VALUE;
 
-                for(Direction direction : Direction.values()) {
-                    Board newBoard = (Board) theBoard.clone();
+    //Methode pour le joueur "Max"  cherche le meilleur déplacement
+    public int findBestMove(Jeu jeu, int profondeur) throws CloneNotSupportedException {
+        Map<String, Object> result = this.minimax(jeu, profondeur, joueur1);
+        return (int) result.get("Direction");
+    }
+//Méthode pour le joueur "Min"  cherche le 
 
-                    int points=newBoard.move(direction);
-                    
-                    if(points==0 && newBoard.isEqual(theBoard.getBoardArray(), newBoard.getBoardArray())) {
-                    	continue;
+    public Case meilleurCase(Jeu jeu, int profondeur) throws CloneNotSupportedException {
+        Map<String, Object> result = this.minimax(jeu, profondeur, joueur2);
+        return (Case) result.get("Case");
+    }
+
+    private Map<String, Object> minimax(Jeu jeu, int profondeur, String joueur) throws CloneNotSupportedException {
+        Map<String, Object> resultat = new HashMap<>();
+        ArrayList<Integer> directions = new ArrayList<>();
+        directions.add(HAUT);
+        directions.add(BAS);
+        directions.add(GAUCHE);
+        directions.add(DROITE);
+        directions.add(DESCG);
+        directions.add(MONTERG);
+        int meilleurScore;
+        int meilleurDirection = 0;
+        Case meilleurCase = null;
+        if (profondeur == 0 || jeu.finJeu()) {
+            meilleurScore = this.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreCasesJeu());
+        } else {
+            if (joueur.equals(joueur1)) {
+                meilleurScore = Integer.MIN_VALUE;
+                for (int i = 0; i < directions.size(); i++) {
+                    Jeu nouveauJeu = jeu.clone();
+                    meilleurDirection = directions.get(i);
+                    boolean b = nouveauJeu.deplacerCases3G(directions.get(i));
+                    if (b == false && nouveauJeu.equals(jeu)) {
+                        System.out.println("déplacement impossible");
+                        continue;
                     }
-
-                    Map<String, Object> currentResult = minimax(newBoard, depth-1, Player.COMPUTER);
-                    int currentScore=((Number)currentResult.get("Score")).intValue();
-                    if(currentScore>bestScore) { //maximize score
-                        bestScore=currentScore;
-                        bestDirection=direction;
+                    nouveauJeu.majScore();
+ 
+                   meilleurScore = this.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreCasesJeu());
+                    Map<String, Object> currentResult = minimax(nouveauJeu, (profondeur - 1), joueur);
+                    int scoreActuelle = ((Number) currentResult.get("Score")).intValue();
+                     System.out.println("score actuelle" + scoreActuelle);
+                    System.out.println("meilleur score" + meilleurScore);
+                    if (scoreActuelle > meilleurScore) { //maximize score
+                        System.out.println("hhhh");
+                        meilleurScore = scoreActuelle;
+                        meilleurDirection = ((Number) currentResult.get("Direction")).intValue();
+                    }
+                }
+            } else {
+                System.out.println("Min");
+                meilleurDirection = 0;
+                meilleurScore = Integer.MAX_VALUE;
+                Jeu nouveauJeu = jeu.clone();
+                ArrayList<Case> casesVides = nouveauJeu.listeCaseVideMultiGrille();
+                if (casesVides.isEmpty()) {
+                    meilleurScore = 0;
+                }
+                for (int i = 0; i < casesVides.size(); i++) {
+                    //On détermine si on prend 2 ou 4 pour la case
+                    int valeurCase = 0;
+                    Random rand = new Random();
+                    int nombreAlea = rand.nextInt(9 - 0 + 1);
+                    if (nombreAlea < 6.6) {
+                        valeurCase = 2;
+                    } else {
+                        valeurCase = 4;
+                    }
+                    meilleurCase = casesVides.get(i);
+                    meilleurCase.setValeur(valeurCase);
+                    Map<String, Object> currentResult = minimax(nouveauJeu, profondeur - 1, joueur);
+                    int currentScore = ((Number) currentResult.get("Score")).intValue();
+                    if (currentScore < meilleurScore) { //minimize best score
+                        meilleurScore = currentScore;
+                        meilleurCase = casesVides.get(i);
+                        meilleurCase.setValeur(valeurCase);
                     }
                 }
             }
-            else {
-                bestScore = Integer.MAX_VALUE;
-
-                List<Integer> moves = theBoard.getEmptyCellIds();
-                if(moves.isEmpty()) {
-                    bestScore=0;
-                }
-                int[] possibleValues = {2, 4};
-
-                int i,j;
-                int[][] boardArray;
-                for(Integer cellId : moves) {
-                    i = cellId/Board.BOARD_SIZE;
-                    j = cellId%Board.BOARD_SIZE;
-
-                    for(int value : possibleValues) {
-                        Board newBoard = (Board) theBoard.clone();
-                        newBoard.setEmptyCell(i, j, value);
-
-                        Map<String, Object> currentResult = minimax(newBoard, depth-1, Player.USER);
-                        int currentScore=((Number)currentResult.get("Score")).intValue();
-                        if(currentScore<bestScore) { //minimize best score
-                            bestScore=currentScore;
-                        }
-                    }
-                }
-            }
         }
-        
-        result.put("Score", bestScore);
-        result.put("Direction", bestDirection);
-        
-        return result;
-    }*/
+        //System.out.println(meilleurDirection);
+        resultat.put("Case", meilleurCase);
+        resultat.put("Score", meilleurScore);
+        resultat.put("Direction", meilleurDirection);
+        return resultat;
+    }
 
     private static int scoreHeuristique(int scoreGeneral, int nbCasesVides, int scoreCases) {
+        //  System.out.println(scoreGeneral);
+        ///  System.out.println(nbCasesVides);
+        //System.out.println(scoreCases);
         int score = (int) (scoreGeneral + Math.log(scoreGeneral) * nbCasesVides - scoreCases);
+        // System.out.println(Math.max(score, Math.min(scoreGeneral, 1)));
         return Math.max(score, Math.min(scoreGeneral, 1));
     }
 

@@ -1,5 +1,6 @@
 package modele;
 
+import ia.IA1;
 import variables.Parametres;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -103,7 +104,7 @@ public class Main implements Parametres {
         
         
         
-        boolean existe = false; //variable si il existe une patie précédente non finie = true sinon =false
+      /*  boolean existe = false; //variable si il existe une patie précédente non finie = true sinon =false
         ObjectInputStream ois = null;
         try {
             //verifier s'il existe un fichier: une partie précédente
@@ -136,8 +137,13 @@ public class Main implements Parametres {
             } catch (final ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
+      
+      Jeu jeu= new Jeu();
+      IA1 ia= new IA1(jeu);
+      ia.IA1();
 
     }
+      
 
 }

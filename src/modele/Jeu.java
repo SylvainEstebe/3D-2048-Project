@@ -357,7 +357,6 @@ public class Jeu implements Parametres, Serializable {
 
         Random ra = new Random();
         int index = ra.nextInt(grilles.size());
-
         while (!grilles.get(index).nouvelleCase()) {
             places[index] = false;
             if (!(places[0] || places[1] || places[2])) {
@@ -612,7 +611,7 @@ public class Jeu implements Parametres, Serializable {
             if (s.equals("oui")) {
                 this.deserialiser();
                 return true;
-            } else if (s.equals("non")){
+            } else if (s.equals("non")) {
                 return false;
             } else {
                 System.out.println("vous devez saisir oui pour reprendre la partie précédente, sinon non");
@@ -775,11 +774,9 @@ public class Jeu implements Parametres, Serializable {
     // Méthode qui retourne la listes des cases vides pour les 3 grilles
 
     public ArrayList<Case> listeCaseVideMultiGrille() {
-
         ArrayList<Case> listeCaseVideMulti = new ArrayList<>();
-        for (int k = 0; k < grilles.size(); k++) {
+        for (int k = 0; k < TAILLE; k++) {
             listeCaseVideMulti.addAll(grilles.get(k).getListeCaseVide());
-
         }
 
         return listeCaseVideMulti;
@@ -792,5 +789,20 @@ public class Jeu implements Parametres, Serializable {
             score += grilles.get(i).scoreCasesDuGrilles();
         }
         return score;
+    }
+
+    public void ajoutCase(Case c) {
+        int type = c.getGrille().getType();
+        int index;
+
+        if (type == GRILLEH) {
+            index = 0;
+        } else if (type == GRILLEM) {
+            index = 1;
+        } else {
+            index = 2;
+        }
+
+        this.getGrilles().get(index).getGrille().get(c.getX()).get(c.getY()).setValeur(c.getValeur());
     }
 }
