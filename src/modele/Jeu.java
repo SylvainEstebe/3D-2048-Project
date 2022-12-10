@@ -781,15 +781,6 @@ public class Jeu implements Parametres, Serializable {
 
         return listeCaseVideMulti;
     }
-// une méthode dcalcule le score de toutes les cases de 
-
-    public int scoreCasesJeu() {
-        int score = 0;
-        for (int i = 0; i < grilles.size(); i++) {
-            score += grilles.get(i).scoreCasesDuGrilles();
-        }
-        return score;
-    }
 
     public void ajoutCase(Case c) {
         int type = c.getGrille().getType();
@@ -804,5 +795,51 @@ public class Jeu implements Parametres, Serializable {
         }
 
         this.getGrilles().get(index).getGrille().get(c.getX()).get(c.getY()).setValeur(c.getValeur());
+    }
+
+    public int scoreDispersion() {
+        int dispersionScore = 0;
+
+        int[] voisins = {-1, 0, 1};
+        for (int p = 0; p < TAILLE; ++p) {
+            for (int i = 0; i < TAILLE; ++i) {
+                for (int j = 0; j < TAILLE; ++j) {
+                    Case c = grilles.get(p).getGrille().get(i).get(j);
+                    if (c.getValeur() == 0) {
+                        continue; //ignore empty cells
+                    }
+                    int nbvoisins = 0;
+                    int somme = 0;
+                    for (int k : voisins) {
+                        int x = c.getX() + k;
+                        if (x < 0 || x >= TAILLE) {
+                            continue;
+                        }
+                        for (int l : voisins) {
+                            int y = c.getY() + l;
+                            if (y < 0 || y >= TAILLE) {
+                                continue;
+                            }
+                            for (int b : voisins) {
+                                int z = p + b;
+                                if (z < 0 || z >= TAILLE) {
+                                    continue;
+                                }
+
+                                if (c.getValeur() > 0) {
+                                    nbvoisins++;
+                                    somme += Math.abs(c.getValeur() - grilles.get(p).getGrille().get(x).get(y).getValeur());
+                                }
+
+                            }
+                        }
+                    }
+                    dispersionScore += somme / nbvoisins;
+                }
+            }
+        }
+
+        return dispersionScore;
+
     }
 }

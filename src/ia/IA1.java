@@ -31,6 +31,7 @@ public class IA1 {
     String joueur1 = "Max";
     String joueur2 = "Min";
     Jeu jeu;
+    //int meilleurDirection = 0;
 
     /**
      * Constructeur de l'IA
@@ -43,45 +44,25 @@ public class IA1 {
 
     public void IA1() {
         int wins = 0;
-        int total = 1;
+        int total = 20;
         System.out.println("Running " + total + " games to estimate the accuracy:");
         this.jeu.ajoutCases();
         this.jeu.ajoutCases();
-        this.jeu.mouvementAlea();
-        this.jeu.ajoutCases();
-        this.jeu.mouvementAlea();
-        this.jeu.ajoutCases();
-        this.jeu.mouvementAlea();
-        this.jeu.ajoutCases();
-        this.jeu.majScore();
         for (int i = 0; i < total; ++i) {
             try {
-                int hintDepth = 2;
+                int hintDepth = 5;
+                System.out.println("Avant deplacement : ");
                 System.out.println(jeu);
                 int hint = this.findBestMove(this.jeu, hintDepth);
                 System.out.println(hint);
                 this.jeu.deplacerCases3G(hint);
-                this.jeu.ajoutCases();
                 this.jeu.majScore();
-                //System.out.println(jeu);
-                //Case nouvelleCase=this.meilleurCase(jeu,hintDepth );
-                // System.out.println(nouvelleCase.toString());
-                // jeu.ajoutCase(nouvelleCase);
+                System.out.println("ajout d'une case");
+                Case nouvelleCase = this.meilleurCase(jeu, hintDepth);
+                System.out.println(nouvelleCase.toString());
+                jeu.ajoutCase(nouvelleCase);
+                System.out.println(jeu);
 
-                /* ActionStatus result = ActionStatus.CONTINUE;
-                while (result == ActionStatus.CONTINUE || result == ActionStatus.INVALID_MOVE) {
-                    result = theGame.action(hint);
-                    if (result == ActionStatus.CONTINUE || result == ActionStatus.INVALID_MOVE) {
-                        hint = AIsolver.findBestMove(theGame, hintDepth);
-                    }
-                }
-                
-                if (result == ActionStatus.WIN) {
-                    ++wins;
-                    System.out.println("Game " + (i + 1) + " - won");
-                } else {
-                    System.out.println("Game " + (i + 1) + " - lost");
-                }*/
             } catch (CloneNotSupportedException ex) {
                 Logger.getLogger(IA1.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -112,37 +93,28 @@ public class IA1 {
         directions.add(DESCG);
         directions.add(MONTERG);
         int meilleurScore;
-        int meilleurDirection = 0;
+        int meilleurDirection = -10;
         Case meilleurCase = null;
         if (profondeur == 0 || jeu.finJeu()) {
-            meilleurScore = this.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreCasesJeu());
+            meilleurScore = this.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreDispersion());
         } else {
             if (joueur.equals(joueur1)) {
                 meilleurScore = Integer.MIN_VALUE;
                 for (int i = 0; i < directions.size(); i++) {
                     Jeu nouveauJeu = jeu.clone();
-                    meilleurDirection = directions.get(i);
                     boolean b = nouveauJeu.deplacerCases3G(directions.get(i));
                     if (b == false && nouveauJeu.equals(jeu)) {
-                        System.out.println("déplacement impossible");
                         continue;
                     }
-                    nouveauJeu.majScore();
- 
-                   meilleurScore = this.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreCasesJeu());
+                    this.jeu.majScore();
                     Map<String, Object> currentResult = minimax(nouveauJeu, (profondeur - 1), joueur);
                     int scoreActuelle = ((Number) currentResult.get("Score")).intValue();
-                     System.out.println("score actuelle" + scoreActuelle);
-                    System.out.println("meilleur score" + meilleurScore);
                     if (scoreActuelle > meilleurScore) { //maximize score
-                        System.out.println("hhhh");
                         meilleurScore = scoreActuelle;
-                        meilleurDirection = ((Number) currentResult.get("Direction")).intValue();
+                        meilleurDirection = directions.get(i);
                     }
                 }
             } else {
-                System.out.println("Min");
-                meilleurDirection = 0;
                 meilleurScore = Integer.MAX_VALUE;
                 Jeu nouveauJeu = jeu.clone();
                 ArrayList<Case> casesVides = nouveauJeu.listeCaseVideMultiGrille();
@@ -159,8 +131,7 @@ public class IA1 {
                     } else {
                         valeurCase = 4;
                     }
-                    meilleurCase = casesVides.get(i);
-                    meilleurCase.setValeur(valeurCase);
+                    this.jeu.majScore();
                     Map<String, Object> currentResult = minimax(nouveauJeu, profondeur - 1, joueur);
                     int currentScore = ((Number) currentResult.get("Score")).intValue();
                     if (currentScore < meilleurScore) { //minimize best score
@@ -171,7 +142,7 @@ public class IA1 {
                 }
             }
         }
-        //System.out.println(meilleurDirection);
+
         resultat.put("Case", meilleurCase);
         resultat.put("Score", meilleurScore);
         resultat.put("Direction", meilleurDirection);
@@ -179,11 +150,7 @@ public class IA1 {
     }
 
     private static int scoreHeuristique(int scoreGeneral, int nbCasesVides, int scoreCases) {
-        //  System.out.println(scoreGeneral);
-        ///  System.out.println(nbCasesVides);
-        //System.out.println(scoreCases);
         int score = (int) (scoreGeneral + Math.log(scoreGeneral) * nbCasesVides - scoreCases);
-        // System.out.println(Math.max(score, Math.min(scoreGeneral, 1)));
         return Math.max(score, Math.min(scoreGeneral, 1));
     }
 

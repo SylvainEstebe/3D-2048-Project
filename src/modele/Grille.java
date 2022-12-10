@@ -422,7 +422,7 @@ public class Grille implements Parametres, Serializable {
         return new Grille(this, j);
     }
 
-      public ArrayList<Case> getListeCaseVide() {
+    public ArrayList<Case> getListeCaseVide() {
         ArrayList<Case> listeCasesVides = new ArrayList<>();
         // Parcours d'une grille
         for (int i = 0; i < TAILLE; i++) {
@@ -434,19 +434,6 @@ public class Grille implements Parametres, Serializable {
             }
         }
         return listeCasesVides;
-    }
-//Methode qui calcule le score moyen de toutes les cases d'une grille
-    public int scoreCasesDuGrilles() {
-        int score = 0;
-        for (int i = 0; i < TAILLE; i++) {
-            for (int j = 0; j < TAILLE; j++) {
-                if (grille.get(i).get(j).getValeur() != 0) {
-                    score += grille.get(i).get(j).scoreCase();
-                    //System.out.println("hhh");
-                }
-            }
-        }
-        return score;
     }
 
 }
