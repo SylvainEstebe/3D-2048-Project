@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import modele.Case;
 import modele.Jeu;
+import modele.ThreadAffichIACons;
 import static variables.Parametres.BAS;
 import static variables.Parametres.DESCG;
 import static variables.Parametres.DROITE;
@@ -28,9 +29,10 @@ import static variables.Parametres.TAILLE;
  */
 public class IA1 {
 
-    String joueur1 = "Max";
-    String joueur2 = "Min";
-    Jeu jeu;
+    private String joueur1 = "Max";
+    private String joueur2 = "Min";
+    private boolean arreter = false;
+    private Jeu jeu;
     //int meilleurDirection = 0;
 
     /**
@@ -42,36 +44,46 @@ public class IA1 {
         jeu = j;
     }
 
-    public void IA1() {
-        int wins = 0;
-        int total = 20;
-        System.out.println("Running " + total + " games to estimate the accuracy:");
-        this.jeu.ajoutCases();
-        this.jeu.ajoutCases();
-        for (int i = 0; i < total; ++i) {
-            try {
+    public void jeuIA1() {
+        //Thread qui permet l'affichage de l'IA en console
+        ThreadAffichIACons arreterIa = new ThreadAffichIACons();
+        arreterIa.start();
+        int i = 0;
+        int total = 50;
+        System.out.println("L'IA va jouer " + total + " tours");
+        System.out.println(jeu);
+        try {
+            while (!jeu.finJeu() && !arreter && i < total) {
                 int hintDepth = 5;
-                System.out.println("Avant deplacement : ");
-                System.out.println(jeu);
                 int hint = this.findBestMove(this.jeu, hintDepth);
-                System.out.println(hint);
                 this.jeu.deplacerCases3G(hint);
                 this.jeu.majScore();
-                System.out.println("ajout d'une case");
+                System.out.println("Max effectue un déplacement");
+                System.out.println(jeu.toString());
                 Case nouvelleCase = this.meilleurCase(jeu, hintDepth);
-                System.out.println(nouvelleCase.toString());
                 jeu.ajoutCase(nouvelleCase);
-                System.out.println(jeu);
+                System.out.println("Min ajoute une case");
+                System.out.println(jeu.toString());
 
-            } catch (CloneNotSupportedException ex) {
-                Logger.getLogger(IA1.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("\n Tapez 's' puis Entree pour stopper l'IA");
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Jeu.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (!arreterIa.isAlive()) {
+                    arreter = true;
+                }
+                i++;
             }
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(IA1.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        System.out.println(wins + " wins out of " + total + " games.");
     }
-
     //Methode pour le joueur "Max"  cherche le meilleur déplacement
+
     public int findBestMove(Jeu jeu, int profondeur) throws CloneNotSupportedException {
         Map<String, Object> result = this.minimax(jeu, profondeur, joueur1);
         return (int) result.get("Direction");
@@ -96,7 +108,7 @@ public class IA1 {
         int meilleurDirection = -10;
         Case meilleurCase = null;
         if (profondeur == 0 || jeu.finJeu()) {
-            meilleurScore = this.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreDispersion());
+            meilleurScore = IA1.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreDispersion());
         } else {
             if (joueur.equals(joueur1)) {
                 meilleurScore = Integer.MIN_VALUE;

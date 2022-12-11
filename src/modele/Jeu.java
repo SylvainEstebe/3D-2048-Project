@@ -1,5 +1,6 @@
 package modele;
 
+import ia.IA1;
 import ia.IA2;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -50,10 +51,11 @@ public class Jeu implements Parametres, Serializable, Runnable {
     private LinkedList<Jeu> etatsPrecedents = new LinkedList<>();
 
     private int directionMouvAleo = 0;
-    
+
     private Client client;
     /**
-     * Option pour indiquer qu'il s'agit d'un jeu multijoueurs (false par défaut)
+     * Option pour indiquer qu'il s'agit d'un jeu multijoueurs (false par
+     * défaut)
      */
     private boolean multi = false;
     /**
@@ -63,7 +65,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
 
     /**
      * Constructeur qui initialise le jeu
-     * 
+     *
      * @param c Client du jeu
      * @param m Statut multijoueur du jeu
      */
@@ -78,14 +80,14 @@ public class Jeu implements Parametres, Serializable, Runnable {
         grilles.add(g1);
         grilles.add(g2);
         existePartiePrecedente = false;
-        
+
         // Présence du client pour une partie multijoueurs
         if (c != null && m) {
             this.client = c;
             this.multi = m;
         }
     }
-    
+
     /**
      * Surcharge du constructeur pour une partie solo
      */
@@ -164,19 +166,19 @@ public class Jeu implements Parametres, Serializable, Runnable {
     public void setExistePartiePrecedente(boolean e) {
         this.existePartiePrecedente = e;
     }
-    
+
     /**
      * Setter pour le statut multijoueurs du jeu
-     * 
+     *
      * @param m Statut multijoueurs
      */
     public void setMulti(boolean m) {
         this.multi = m;
     }
-    
+
     /**
      * Setter pour le statut compétitif du jeu
-     * 
+     *
      * @param c Statut compétitif
      */
     public void setCompetitif(boolean c) {
@@ -256,7 +258,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
 
     /**
      * Méthode qui donne la valeur maximale atteinte du jeu
-     * 
+     *
      * @return Valeur maximale du jeu
      */
     public int getValeurMaxJeu() {
@@ -268,11 +270,11 @@ public class Jeu implements Parametres, Serializable, Runnable {
         }
         return max;
     }
-    
+
     /**
      * Getter des états précédents
-     * 
-     * @return Etats précédents 
+     *
+     * @return Etats précédents
      */
     public LinkedList<Jeu> getEtatsPrecedents() {
         return this.etatsPrecedents;
@@ -551,6 +553,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
     @Override
     public void run() {
         Scanner sc1 = new Scanner(System.in);
+        Scanner sc2 = new Scanner(System.in);
         Random ra = new Random();
         boolean retour = false; //faux car le retour n'a pas encore été utilisé
 
@@ -571,20 +574,39 @@ public class Jeu implements Parametres, Serializable, Runnable {
             System.out.println("Si vous voulez nous laisser choisir pour vous, tapez '?' ");
             System.out.println("Pour quitter le jeu taper 'x'");
             System.out.println("Taper ii pour laisser l'IA jouer à votre place.");
+            System.out.println("Taper (e) pour enregistrer votre partie.");
             if (!retour && etatsPrecedents.size() > 0) { //on ne peut pas retourner en arrière si on l'a déjà fait ou si on n'a pas encore joué
                 System.out.println("Retourner en arrière ? Tapez b : vous pouvez retourner jusqu'à 5 coups en arrière. Attention ! Vous ne pouvez utiliser le retour en arrière qu'une fois par partie !");
             }
 
             String s = sc1.next();
             s = s.toLowerCase();
-            //Action de l'IA 2
+            //Action de l'IA 
             if (s.equals("ii")) {
-                IA2 ia2 = new IA2(this);
-                ia2.jeuIA2();
+                System.out.println("Taper le numéro d'algo que vous voulez :");
+                System.out.println("1. Algo minmax");
+                System.out.println("2. Algo Monte Carlo");
+                String ia = sc2.next();
+                if (ia.equals("1")) {
+                    IA1 ia1 = new IA1(this);
+                    ia1.jeuIA1();
+                } else if (ia.equals("2")) {
+                    IA2 ia2 = new IA2(this);
+                    ia2.jeuIA2();
+                } else {
+                    System.out.println("Attention, saisie incorrecte!");
+                    System.out.println("Il faut taper 1 pour l'algo minmax ");
+                    System.out.println("Il faut taper 2 pour l'algo Monte Carlo ");
+                }
             }
             //Quitter le jeu
             if (s.equals("x")) {
                 this.quitter();
+            }
+            //Sauvegarder un partie
+            if (s.equals("e")) {
+                this.serialiser();
+                System.out.println("Votre partie a été bien enregistrer! ");
             }
             //Annulation de coups
             if (s.equals("b") && !retour && etatsPrecedents.size() > 0) {
@@ -636,17 +658,23 @@ public class Jeu implements Parametres, Serializable, Runnable {
                 this.majScore();
                 this.resetFusion();
                 System.out.println(this);
-                
-                if (multi && competitif) this.client.getConnexion().envoyerScore(this.scoreFinal, this.getValeurMaxJeu());
+
+                if (multi && competitif) {
+                    this.client.getConnexion().envoyerScore(this.scoreFinal, this.getValeurMaxJeu());
+                }
             }
         }
         //Fin du jeu, affichage de l'état du jeu
         if (this.getValeurMaxJeu() >= OBJECTIF) {
             this.victoire();
-            if (multi && competitif) this.client.getConnexion().envoyerVictoireVersus();
+            if (multi && competitif) {
+                this.client.getConnexion().envoyerVictoireVersus();
+            }
         } else {
             this.jeuPerdu();
-            if (multi && competitif) this.client.getConnexion().envoyerDefaiteVersus();
+            if (multi && competitif) {
+                this.client.getConnexion().envoyerDefaiteVersus();
+            }
         }
     }
 

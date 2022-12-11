@@ -134,8 +134,7 @@ public class Main implements Parametres {
             if (save.isFile() && save.canRead()) {
                 try {
                     // Lecture de la sauvegarde
-                    final FileInputStream fichierIn = new FileInputStream(save);
-                    
+                    final FileInputStream fichierIn = new FileInputStream(save); 
                     ObjectInputStream ois;
                     try {
                         // Déserialisation
@@ -158,13 +157,8 @@ public class Main implements Parametres {
                 }
             } else { // Lancement d'une nouvelle partie en l'absence d'une sauvegarde
                 Jeu j = new Jeu();
-
                 new Thread(j).start();
             }
         }
-      
-        // Jeu jeu= new Jeu();
-        // IA1 ia= new IA1(jeu);
-        // ia.IA1();
     }
 }
