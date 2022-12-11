@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import modele.Jeu;
+
 /**
  * Client d'un serveur de jeu
  *
@@ -18,6 +20,8 @@ import java.util.logging.Logger;
 public class Client implements Runnable {
     private final String ADDRESSE;
     private final int PORT;
+    private Jeu jeu;
+    private boolean estServeur;
     private Socket socket;
     private Connexion connexion;
     
@@ -26,10 +30,12 @@ public class Client implements Runnable {
      * 
      * @param a Adresse du serveur auquel se connecter
      * @param p Port du serveur auquel se connecter
+     * @param estS Client hôte ou non
      */
-    public Client(String a, int p) {
+    public Client(String a, int p, boolean estS) {
         this.ADDRESSE = a;
         this.PORT = p;
+        this.estServeur = estS;
     }
 
     @Override
@@ -58,6 +64,33 @@ public class Client implements Runnable {
      */
     protected void closeClient() throws IOException {
         this.socket.close();
+    }
+    
+    /**
+     * Setter pour le jeu du client
+     * 
+     * @param j Jeu 
+     */
+    public void setJeu(Jeu j) {
+        this.jeu = j;
+    }
+    
+    /**
+     * Getter pour le jeu du client
+     * 
+     * @return Jeu 
+     */
+    protected Jeu getJeu() {
+        return this.jeu;
+    }
+    
+    /**
+     * Getter pour le statut hôte du client
+     * 
+     * @return Statut hôte du client 
+     */
+    protected boolean estServeur() {
+        return this.estServeur;
     }
     
     /**

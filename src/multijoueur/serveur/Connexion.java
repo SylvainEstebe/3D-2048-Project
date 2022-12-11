@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+
 import multijoueur.Routes;
 
 /**
@@ -24,10 +25,19 @@ public class Connexion implements Runnable {
     private BufferedReader in;
     private PrintWriter out;
     
+    // Données de base
     private String pseudo;
+    private boolean pret = false;
+    
+    // Données de parties compétitives
+    private int score = 0;
+    private int valeurMax = 0;
+    private boolean victoire = false;
+    private int classement = 0;
+    private boolean defaite = false;
 
     /**
-     * Consructeur
+     * Constructeur
      * 
      * @param s Socket de la connexion entre le client et le serveur
      * @param srv Serveur
@@ -57,14 +67,23 @@ public class Connexion implements Runnable {
                 if (ligne == null) break;
                 
                 if (ligne.startsWith(Routes.CHAT)) { // Message
-                    int premierEspace = ligne.indexOf(" ");
-                    this.envoyerATous(ligne.substring(premierEspace + 1));
+                    this.envoyerATous(this.escapeRequest(ligne));
                 } else if (ligne.startsWith(Routes.VERIF_PSEUDO)) { // Vérification disponibilité pseudo
-                    int premierEspace = ligne.indexOf(" ");
-                    this.pseudoDispo(ligne.substring(premierEspace + 1));
+                    this.pseudoDispo(this.escapeRequest(ligne));
                 } else if (ligne.startsWith(Routes.ENREG_PSEUDO)) { // Enregistrement pseudo
-                    int premierEspace = ligne.indexOf(" ");
-                    this.enregistrerJoueur(ligne.substring(premierEspace + 1));
+                    this.enregistrerJoueur(this.escapeRequest(ligne));
+                } else if (ligne.equals(Routes.PRET_A_COMMENCER)) { // Joueur prêt
+                    this.setJoueurPret(true);
+                } else if (ligne.equals(Routes.JOUEURS_PRETS)) { // Vérifications que tous les joueurs sont prêts
+                    this.joueursPrets();
+                } else if (ligne.equals(Routes.COMMENCER_PARTIE)) { // Lancement de la partie
+                    this.commencerPartie();
+                } else if (ligne.startsWith(Routes.ENVOYER_SCORE)) { // Envoi du score
+                    this.scoreEnvoye(this.escapeRequest(ligne));
+                } else if (ligne.equals(Routes.VICTOIRE_VERSUS)) { // Victoire en compétitif
+                    this.victoire();
+                } else if (ligne.equals(Routes.DEFAITE_VERSUS)) { // Défaite en compétitif
+                    this.defaite();
                 } else {
                     this.out.println(ligne);
                 }
@@ -110,12 +129,90 @@ public class Connexion implements Runnable {
     
     /**
      * Enregistre le pseudo du joueur associe a cette connexion
-     * @param p 
+     * 
+     * @param p Pseudo 
      */
     private void enregistrerJoueur(String p) {
         this.pseudo = p;
         
         this.out.println(p + " enregistré");
+    }
+    
+    /**
+     * Setter pour le statut prêt du joueur
+     * 
+     * @param p Statut prêt
+     */
+    private void setJoueurPret(boolean p) {
+        this.pret = p;
+    }
+    
+    /**
+     * Vérifie que tous les joueurs sont prêts
+     */
+    private void joueursPrets() {
+        this.pret = true;
+        
+        boolean prets = true;
+        
+        for (Connexion client : this.serveur.getClients()) {
+            if (prets && !client.pret) prets = false;
+        }
+        
+        this.out.println(Routes.JOUEURS_PRETS + " " + prets);
+    }
+    
+    /**
+     * Lance une partie multijoueur après confirmation 
+     */
+    private void commencerPartie() {
+        for (Connexion client : this.serveur.getClients()) {
+            client.out.println(Routes.COMMENCER_PARTIE + " " + this.serveur.estCompetitif());
+        }
+    }
+    
+    /**
+     * Enregistre le score envoyé par le client et transmet l'information aux autres joueurs
+     * 
+     * @param data Données envoyées par le client 
+     */
+    private void scoreEnvoye(String data) {
+        int splitter = data.indexOf("|");
+        this.score = Integer.parseInt(data.substring(0, splitter));
+        this.valeurMax = Integer.parseInt(data.substring(splitter + 1));
+        this.envoyerATous(Routes.ENVOYER_SCORE + " " + this.pseudo + "#" + this.score + "|" + this.valeurMax);
+    }
+    
+    /**
+     * Enregistre la victoire, détermine le classement et transmet l'information aux autres joueurs et donne le classement au joueur concerné
+     */
+    private void victoire() {
+        this.victoire = true;
+        
+        // Calcul du classement
+        for (Connexion client : this.serveur.getClients()) {
+            if (client.victoire) this.classement++;
+        }
+        
+        this.envoyerATous(Routes.VICTOIRE_VERSUS_AUTRE + " " + this.pseudo + "#" + this.classement);
+        this.out.println(Routes.VICTOIRE_VERSUS + " " + this.classement);
+    }
+    
+    /**
+     * Enregistre la défaite, détermine le classement et transmet l'information aux autres joueurs et donne le classement au joueur concerné
+     */
+    private void defaite() {
+        this.defaite = true;
+        
+        this.classement = this.serveur.getClients().size() + 1;
+        
+        // Calcul du classement
+        for (Connexion client : this.serveur.getClients()) {
+            if (client.defaite) this.classement--;
+        }
+        
+        this.envoyerATous(Routes.DEFAITE_VERSUS_AUTRE + " " + this.pseudo + "#" + this.classement);
+        this.out.println(Routes.DEFAITE_VERSUS + " " + this.classement);
     }
     
     /**
@@ -128,12 +225,41 @@ public class Connexion implements Runnable {
     }
     
     /**
+     * Getter du score du client
+     * 
+     * @return Score 
+     */
+    public int getScore() {
+        return this.score;
+    }
+    
+    /**
+     * Getter de la valeur max du client
+     * 
+     * @return Valeur max 
+     */
+    public int getValeurMax() {
+        return this.valeurMax;
+    }
+    
+    /**
      * Vérifie l'égalite avec une autre connexion (vérification de l'égalité entre les sockets)
      * 
      * @param c Autre connexion
      * @return true si égaux, false sinon
      */
-    public boolean equals (Connexion c) {
+    public boolean equals(Connexion c) {
         return this.socket.equals(c.socket);
+    }
+    
+    /**
+     * Supprime l'entête de la requête
+     * 
+     * @param request Requête
+     * @return Données de la requête sans l'entête
+     */
+    private String escapeRequest(String request) {
+        int premierEspace = request.indexOf(" ");
+        return request.substring(premierEspace + 1);
     }
 }

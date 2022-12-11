@@ -47,7 +47,7 @@ public class Serveur implements Runnable {
         try {
             System.out.println("[SERVEUR] Lancement du serveur");
             this.serveur = new ServerSocket(this.PORT, this.LIMIT);
-            System.out.println("[SERVEUR] Serveur lancé a l'adresse " + this.getHost() + ":" + this.PORT);
+            System.out.println("[SERVEUR] Serveur lancé à l'adresse " + this.getHost() + ":" + this.PORT);
             
             // Boucle d'attente d'une nouvelle connexion
             while (true) {

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
+import multijoueur.client.Client;
 import variables.Parametres;
 import static variables.Parametres.BAS;
 import static variables.Parametres.DESCG;
@@ -29,7 +30,7 @@ import static variables.Parametres.TAILLE;
  *
  * @author Manon
  */
-public class Jeu implements Parametres, Serializable {
+public class Jeu implements Parametres, Serializable, Runnable {
 
     /**
      * Tableau des grilles du jeu
@@ -49,11 +50,24 @@ public class Jeu implements Parametres, Serializable {
     private LinkedList<Jeu> etatsPrecedents = new LinkedList<>();
 
     private int directionMouvAleo = 0;
+    
+    private Client client;
+    /**
+     * Option pour indiquer qu'il s'agit d'un jeu multijoueurs (false par défaut)
+     */
+    private boolean multi = false;
+    /**
+     * Option pour indique qu'il s'agit d'un jeu compétitif (false par défaut)
+     */
+    private boolean competitif = false;
 
     /**
      * Constructeur qui initialise le jeu
+     * 
+     * @param c Client du jeu
+     * @param m Statut multijoueur du jeu
      */
-    public Jeu() {
+    public Jeu(Client c, boolean m) {
         Grille g, g1, g2;
         //Initialiser les 3 grilles 
         g = new Grille(this, GRILLEH);
@@ -64,7 +78,19 @@ public class Jeu implements Parametres, Serializable {
         grilles.add(g1);
         grilles.add(g2);
         existePartiePrecedente = false;
-
+        
+        // Présence du client pour une partie multijoueurs
+        if (c != null && m) {
+            this.client = c;
+            this.multi = m;
+        }
+    }
+    
+    /**
+     * Surcharge du constructeur pour une partie solo
+     */
+    public Jeu() {
+        this(null, false);
     }
 
     /**
@@ -78,6 +104,8 @@ public class Jeu implements Parametres, Serializable {
         this.grilles.add(j.grilles.get(2).clone(this));
         this.scoreFinal = j.scoreFinal;
         this.existePartiePrecedente = j.existePartiePrecedente;
+        this.client = j.client;
+        this.multi = j.multi;
     }
 
     /**
@@ -123,7 +151,7 @@ public class Jeu implements Parametres, Serializable {
      *
      * @param nouvellesgrilles la nouvelle version des 3 grilles
      */
-    public void setgrilles(ArrayList<Grille> nouvellesgrilles) {
+    public void setGrilles(ArrayList<Grille> nouvellesgrilles) {
         grilles = nouvellesgrilles;
     }
 
@@ -136,13 +164,31 @@ public class Jeu implements Parametres, Serializable {
     public void setExistePartiePrecedente(boolean e) {
         this.existePartiePrecedente = e;
     }
+    
+    /**
+     * Setter pour le statut multijoueurs du jeu
+     * 
+     * @param m Statut multijoueurs
+     */
+    public void setMulti(boolean m) {
+        this.multi = m;
+    }
+    
+    /**
+     * Setter pour le statut compétitif du jeu
+     * 
+     * @param c Statut compétitif
+     */
+    public void setCompetitif(boolean c) {
+        this.competitif = c;
+    }
 
     /**
      * Methode qui permet d'afficher les grilles côte-à-côte
      *
-     * @Override
      * @return String les 3 grilles du jeu et le score
      */
+    @Override
     public String toString() {
         String result = "\n\n";
         String result_interm = "";
@@ -210,6 +256,8 @@ public class Jeu implements Parametres, Serializable {
 
     /**
      * Méthode qui donne la valeur maximale atteinte du jeu
+     * 
+     * @return Valeur maximale du jeu
      */
     public int getValeurMaxJeu() {
         int max = 0;
@@ -219,6 +267,15 @@ public class Jeu implements Parametres, Serializable {
             }
         }
         return max;
+    }
+    
+    /**
+     * Getter des états précédents
+     * 
+     * @return Etats précédents 
+     */
+    public LinkedList<Jeu> getEtatsPrecedents() {
+        return this.etatsPrecedents;
     }
 
     /**
@@ -418,7 +475,6 @@ public class Jeu implements Parametres, Serializable {
      * possible ou non
      */
     public boolean deplacementFini3G() {
-
         for (int j = 0; j < TAILLE; j++) {
             for (int k = 0; k < TAILLE; k++) {
                 for (int i = 0; i < grilles.size(); i++) {
@@ -457,11 +513,7 @@ public class Jeu implements Parametres, Serializable {
      * @return booleen qui retourne true la partie est terminée sinon false
      */
     public boolean finJeu() {
-        if (grilles.get(0).deplacementFiniG() && grilles.get(1).deplacementFiniG() && grilles.get(2).deplacementFiniG() && this.deplacementFini3G()) {
-            return true;
-        } else {
-            return false;
-        }
+        return grilles.get(0).deplacementFiniG() && grilles.get(1).deplacementFiniG() && grilles.get(2).deplacementFiniG() && this.deplacementFini3G();
     }
 
     /**
@@ -472,7 +524,6 @@ public class Jeu implements Parametres, Serializable {
         //le jeu commence avec 2 cases
         this.ajoutCases();
         this.ajoutCases();
-
     }
 
     /**
@@ -490,7 +541,6 @@ public class Jeu implements Parametres, Serializable {
             }
         }
         this.majScore();
-
     }
 
     /**
@@ -498,7 +548,8 @@ public class Jeu implements Parametres, Serializable {
      * une direction saisie par le joueur + synchronisation du score + aide:
      * l'ordinateur joue un coup à la place du joueur s'il veut Fin du jeu
      */
-    public void lancementJeuConsole() {
+    @Override
+    public void run() {
         Scanner sc1 = new Scanner(System.in);
         Random ra = new Random();
         boolean retour = false; //faux car le retour n'a pas encore été utilisé
@@ -513,7 +564,7 @@ public class Jeu implements Parametres, Serializable {
             System.out.println(this);
         }
         //Tant que le jeu n'est pas fini
-        while (!this.finJeu()) {
+        while (!this.finJeu() && this.getValeurMaxJeu() < OBJECTIF) {
             reinitNbDepl();
             //Affichage des différentes fonctionnalités
             System.out.println("Déplacer vers la Droite (d), Gauche (q), Haut (z), ou Bas (s), niveau supérieur (r) niveau inférieur (f) ?");
@@ -568,8 +619,10 @@ public class Jeu implements Parametres, Serializable {
                         GAUCHE;
                     case "z", "haut" ->
                         HAUT;
-                    default ->
+                    case "s", "bas" ->
                         BAS;
+                    default ->
+                        0;
                 };
 
                 enregistrement();
@@ -583,16 +636,18 @@ public class Jeu implements Parametres, Serializable {
                 this.majScore();
                 this.resetFusion();
                 System.out.println(this);
+                
+                if (multi && competitif) this.client.getConnexion().envoyerScore(this.scoreFinal, this.getValeurMaxJeu());
             }
-
         }
         //Fin du jeu, affichage de l'état du jeu
         if (this.getValeurMaxJeu() >= OBJECTIF) {
             this.victoire();
+            if (multi && competitif) this.client.getConnexion().envoyerVictoireVersus();
         } else {
             this.jeuPerdu();
+            if (multi && competitif) this.client.getConnexion().envoyerDefaiteVersus();
         }
-
     }
 
     /**
@@ -680,9 +735,8 @@ public class Jeu implements Parametres, Serializable {
     /**
      * méthode qui enregistre l'état actuel de la partie
      */
-    public LinkedList<Jeu> enregistrement() {
+    public void enregistrement() {
         etatsPrecedents.addFirst(this.clone());
-        return etatsPrecedents;
     }
 
     /**
@@ -694,12 +748,6 @@ public class Jeu implements Parametres, Serializable {
         if (etatsPrecedents.size() > 5) { //on n'a besoin que de 5 états en arrière
             etatsPrecedents.remove(5); //on supprime le 6ème
         }
-
-        /*
-        for (int i = 0; i < etatsPrecedents.size(); i++) {
-            System.out.println("Index " +i);
-            System.out.println(etatsPrecedents.get(i));
-        }*/
     }
 
     /**
@@ -748,13 +796,14 @@ public class Jeu implements Parametres, Serializable {
      */
     public void retour() {
         //retour au coup d'avant
-        this.setgrilles(etatsPrecedents.get(0).getGrilles());
+        this.setGrilles(etatsPrecedents.get(0).getGrilles());
         this.setScoreFinal(etatsPrecedents.get(0).getScoreFinal());
         this.setExistePartiePrecedente(etatsPrecedents.get(0).getExistePartiePrecedente());  //à tester
         etatsPrecedents.remove(0);
     }
 
     //Méthode qui clone un jeu
+    @Override
     public Jeu clone() {
         return new Jeu(this);
     }
