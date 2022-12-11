@@ -23,7 +23,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import java.util.LinkedList;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import javafx.collections.FXCollections;
@@ -133,10 +132,6 @@ public class FXMLController implements Initializable, Parametres {
      * Grilles de l'interface
      */
     private ArrayList<GridPane> tabGrillesApp;
-    /**
-     * Ensemble des états précédents du jeu
-     */
-    private LinkedList<Jeu> etatsPrecedents = null;
 
     @FXML
     private Label score;
@@ -276,15 +271,13 @@ public class FXMLController implements Initializable, Parametres {
      * Permet de revenir à un état précédent du jeu
      */
     private void retour(MouseEvent event) {
-        if (!etatsPrecedents.isEmpty()) {
+        if (!jeuAppli.getEtatsPrecedents().isEmpty()) {
             retourUtilise = true;
-            etatsPrecedents.removeFirst();
-            jeuAppli = etatsPrecedents.getFirst();
+            jeuAppli.retour();
             this.majGrillesApp();
             this.majScoreApp();
-            etatsPrecedents.removeFirst();
             nbRetour++;
-            if (nbRetour == 5) {
+            if (nbRetour == 5 || jeuAppli.getEtatsPrecedents().isEmpty()) {
                 retour.setDisable(true);
             }
         } else {
@@ -711,51 +704,52 @@ public class FXMLController implements Initializable, Parametres {
                 instructionJeu.setVisible(false);
                 help.setVisible(true);
             }
-            String direction = event.getText();
-            int dirThread = 0;
-            boolean b = false;
-
-            //Déplacement des cases selon la touche clavier
-            if (direction.equals("q")) {
-                b = jeuAppli.deplacerCases3G(GAUCHE);
-                dirThread = GAUCHE;
-            } else if (direction.equals("d")) {
-                b = jeuAppli.deplacerCases3G(DROITE);
-                dirThread = DROITE;
-            } else if (direction.equals("z")) {
-                b = jeuAppli.deplacerCases3G(HAUT);
-                dirThread = HAUT;
-            } else if (direction.equals("s")) {
-                b = jeuAppli.deplacerCases3G(BAS);
-                dirThread = BAS;
-            } else if (direction.equals("f")) {
-                b = jeuAppli.deplacerCases3G(DESCG);
-                dirThread = DESCG;
-            } else if (direction.equals("r")) {
-                b = jeuAppli.deplacerCases3G(MONTERG);
-                dirThread = MONTERG;
-            } else {
-                System.out.println("Attention, vous n'avez pas appuyé sur une touche valide!");
-
-            }
-            deplacementThread(dirThread, b);
-
-            this.majScoreApp();
-            if (jeuAppli.finJeu()) {
-                if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
-                    this.victoireAppli();
+            String directionInput = event.getText();
+            
+            int direction;
+            direction = switch (directionInput) {
+                case "f" ->
+                    DESCG;
+                case "r" ->
+                    MONTERG;
+                case "d" ->
+                    DROITE;
+                case "q" ->
+                    GAUCHE;
+                case "z" ->
+                    HAUT;
+                case "s" ->
+                    BAS;
+                default ->
+                    0;
+            };
+            
+            if (direction != 0) {
+                jeuAppli.enregistrement();
+                
+                boolean b = jeuAppli.deplacerCases3G(direction);
+                deplacementThread(direction, b);
+                
+                if (b) {
+                    jeuAppli.validerEnregistrement();
                 } else {
-                    this.jeuPerduAppli();
+                    jeuAppli.annulerEnregistrement();
                 }
-            }
-            if (b) {
-                etatsPrecedents = new LinkedList<Jeu>();
-                etatsPrecedents = jeuAppli.enregistrement();
-            }
-            if (etatsPrecedents.size() >= 1 && !retourUtilise) {
-                retour.setDisable(false);
-            } else {
-                retour.setDisable(true);
+                
+                this.majScoreApp();
+                if (jeuAppli.finJeu()) {
+                    if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
+                        this.victoireAppli();
+                    } else {
+                        this.jeuPerduAppli();
+                    }
+                }
+                
+                if (jeuAppli.getEtatsPrecedents().size() >= 1 && !retourUtilise) {
+                    retour.setDisable(false);
+                } else {
+                    retour.setDisable(true);
+                }
             }
         }
     }
@@ -1007,6 +1001,11 @@ public class FXMLController implements Initializable, Parametres {
             startSignal.countDown();
 
         }
+    }
+    
+    @FXML
+    private void multi(ActionEvent event) {
+        
     }
 
     /**
