@@ -1,5 +1,6 @@
 package application;
 
+import ia.IA1;
 import ia.IA2;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,6 +27,8 @@ import javafx.scene.layout.Pane;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -161,13 +164,9 @@ public class FXMLController implements Initializable, Parametres {
     private Label chrono;
     long chronos;
     long temps;
-    
-    
+
     private Timer timer;
-    
-    
-    
-    
+
     @FXML
     /**
      * Fond de la grille
@@ -541,8 +540,6 @@ public class FXMLController implements Initializable, Parametres {
 
     }
 
-
-
     @FXML
     /**
      * Méthode affiche une fenêtre du classement des joueurs
@@ -608,12 +605,11 @@ public class FXMLController implements Initializable, Parametres {
         BorderPane root = new BorderPane();
         root.getStyleClass().add("pane");
         Label message;
-        if(jeuAppli.finJeu()){
-            message = new Label ("\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?");
-        }
-        else{
+        if (jeuAppli.finJeu()) {
+            message = new Label("\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?");
+        } else {
             message = new Label("\t\t\t\t la partie n'est pas finie!"
-                + "\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?");
+                    + "\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?");
         }
         root.getStyleClass().add("message");
         root.setTop(message);
@@ -669,7 +665,7 @@ public class FXMLController implements Initializable, Parametres {
                 help.setVisible(true);
             }
             String directionInput = event.getText();
-            
+
             int direction;
             direction = switch (directionInput) {
                 case "f" ->
@@ -687,19 +683,19 @@ public class FXMLController implements Initializable, Parametres {
                 default ->
                     0;
             };
-            
+
             if (direction != 0) {
                 jeuAppli.enregistrement();
-                
+
                 boolean b = jeuAppli.deplacerCases3G(direction);
-                deplacementThread(direction, b);
-                
+                deplacementThread(direction, b, false);
+
                 if (b) {
                     jeuAppli.validerEnregistrement();
                 } else {
                     jeuAppli.annulerEnregistrement();
                 }
-                
+
                 //this.majScoreApp();
                 if (jeuAppli.finJeu()) {
                     if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
@@ -708,7 +704,7 @@ public class FXMLController implements Initializable, Parametres {
                         this.jeuPerduAppli();
                     }
                 }
-                
+
                 if (jeuAppli.getEtatsPrecedents().size() >= 1 && !retourUtilise) {
                     retour.setDisable(false);
                 } else {
@@ -824,7 +820,7 @@ public class FXMLController implements Initializable, Parametres {
         if (jeuAppli != null) {
             boolean b2 = jeuAppli.mouvementAlea();
             int direction = jeuAppli.getDirectionMouvAleo();
-            this.deplacementThread(direction, b2);
+            this.deplacementThread(direction, b2, false);
             this.majScoreApp();
 
             if (jeuAppli.finJeu()) {
@@ -845,7 +841,7 @@ public class FXMLController implements Initializable, Parametres {
      * déplacées
      * @param b booléen qui indique s'il est possible de déplacer les cases
      */
-    public void deplacementThread(int direction, boolean b) {
+    public void deplacementThread(int direction, boolean b, boolean ia) {
         deplacementCases = new ArrayList<Task>();
         threadDepl = new ArrayList<Thread>();
         deplacementCases.clear();
@@ -858,7 +854,6 @@ public class FXMLController implements Initializable, Parametres {
                         Case caseBouge = jeuAppli.getGrilles().get(k).getGrille().get(i).get(j);
                         if (caseBouge.getValAv() != 0) {
                             int depl = caseBouge.getNbDeplac();
-                            //System.out.println("Grille"+ caseBouge.getGrilleApDepl()+"Valeur " +caseBouge.getValAv()+" xCase "+ caseBouge.getX()+"yCase"+caseBouge.getY()+"depl "+depl + "grille "+caseBouge.getGrille().getType());
                             int deplObj = 0;
                             switch (direction) {
                                 case HAUT ->
@@ -937,8 +932,6 @@ public class FXMLController implements Initializable, Parametres {
                             }
                             xCase = (int) eltsGrilles.get(compteur).getLayoutX();
                             yCase = (int) eltsGrilles.get(compteur).getLayoutY();
-
-                            //System.out.println(deplObj+" xCase"+caseBouge.getX()+"yCase"+caseBouge.getY());
                             Pane caseABouge = eltsGrilles.get(compteur);
                             DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this);
                             deplacementCases.add(d);
@@ -950,7 +943,6 @@ public class FXMLController implements Initializable, Parametres {
             CountDownLatch startSignal = new CountDownLatch(1);
             CountDownLatch doneSignal = new CountDownLatch(deplacementCases.size());
             for (int i = 0; i < deplacementCases.size(); i++) {
-
                 DeplacementTask d = (DeplacementTask) deplacementCases.get(i);
                 d.setDebut(startSignal);
                 d.setFin(doneSignal);
@@ -960,16 +952,17 @@ public class FXMLController implements Initializable, Parametres {
                 th.start();
 
             }
-
-            jeuAppli.choixNbCasesAjout(b);
+            if (!ia) {
+                jeuAppli.choixNbCasesAjout(b);
+            } 
             startSignal.countDown();
 
         }
     }
-    
+
     @FXML
     private void multi(ActionEvent event) {
-        
+
     }
 
     /**
@@ -1041,20 +1034,15 @@ public class FXMLController implements Initializable, Parametres {
         return threadDepl;
     }
 
-    @FXML
-    private void ia1(ActionEvent event) {
-    }
-
-    
     /**
-     * 
+     *
      * Méthode qui lorsqu'on sélectionne une des ia dans le menu permet le
      * déclenchement d'un des algorithmes d'IA avec un affichage dynamique.
      *
      */
     @FXML
-    private void ia2(ActionEvent event) {
-        if(eltsGrilles==null){
+    private void ia1(ActionEvent event) {
+        if (eltsGrilles == null) {
             deplacementBDD = 0;
             chronos = java.lang.System.currentTimeMillis();
             jeuAppli = new Jeu();
@@ -1076,21 +1064,47 @@ public class FXMLController implements Initializable, Parametres {
         this.i3.setDisable(true);
         this.i2.setDisable(true);
         this.stat.setDisable(true);
-        timer=new Timer();
-        timer.schedule(new IAThreadApp (this,2),1000 ,1500);   
+        timer = new Timer();
+        timer.schedule(new IAThreadApp(this, 1), 1000, 15000);
+    }
 
+    @FXML
+    private void ia2(ActionEvent event) {
+        if (eltsGrilles == null) {
+            deplacementBDD = 0;
+            chronos = java.lang.System.currentTimeMillis();
+            jeuAppli = new Jeu();
+            jeuAppli.lancementJeuAppli();
+            sauvegardePartie.setDisable(true);
+            this.majGrillesApp();
+            nbRetour = 0;
+            retourUtilise = false;
+            tuile.setVisible(false);
+            case8.setVisible(false);
+            case2.setVisible(false);
+            case32.setVisible(false);
+        }
+        retour.setDisable(true);
+        stopIA.setDisable(false);
+        mouvOrdi.setDisable(true);
+        this.multijoueur.setDisable(true);
+        this.ia1.setDisable(true);
+        this.i3.setDisable(true);
+        this.i2.setDisable(true);
+        this.stat.setDisable(true);
+        timer = new Timer();
+        timer.schedule(new IAThreadApp(this, 2), 1000, 1500);
     }
 
     @FXML
     private void ia3(ActionEvent event) {
     }
-    
-    
+
     @FXML
     private void stopperIA(ActionEvent event) {
         timer.cancel();
         stopIA.setDisable(true);
-        if(!retourUtilise && nbRetour!=0){
+        if (!retourUtilise && nbRetour != 0) {
             retour.setDisable(false);
         }
         mouvOrdi.setDisable(false);
@@ -1101,4 +1115,3 @@ public class FXMLController implements Initializable, Parametres {
     }
 
 }
-

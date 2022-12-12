@@ -130,7 +130,6 @@ public class IA2 implements Parametres {
 
         int direction;
         //Fonctionnement de l'IA tant que le jeu n'est pas fini ou la case
-        //s non enfoncée
         while (!jeu.finJeu() && !est_stoppe) {
             direction = choixMouvIA2();
             jeu.enregistrement();
@@ -138,7 +137,6 @@ public class IA2 implements Parametres {
             jeu.choixNbCasesAjout(b2);
             System.out.println(jeu.toString());
             System.out.println("Tapez 'a' puis Entree pour stopper l'IA");
-
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException ex) {

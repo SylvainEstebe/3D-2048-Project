@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="808.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
+<AnchorPane id="AnchorPane" fx:id="rootPane" onKeyPressed="#mouvJoueur" prefHeight="808.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLController">
    <children>
       <AnchorPane layoutX="3.0" layoutY="14.0" prefHeight="811.0" prefWidth="1018.0" AnchorPane.bottomAnchor="-17.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0">
          <children>
@@ -66,6 +66,17 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
+                                 <children>
+                                    <Pane fx:id="case32" prefHeight="92.0" prefWidth="100.0" styleClass="case32" GridPane.columnIndex="2">
+                                       <children>
+                                          <Label layoutX="21.0" layoutY="15.0" prefHeight="60.0" prefWidth="59.0" text="32" textAlignment="JUSTIFY" textFill="WHITE">
+                                             <font>
+                                                <Font size="48.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                 </children>
                               </GridPane>
                               <GridPane fx:id="grilleM" gridLinesVisible="true" layoutX="353.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
                                  <columnConstraints>
@@ -78,6 +89,17 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
+                                 <children>
+                                    <Pane fx:id="tuile" prefHeight="92.0" prefWidth="100.0" styleClass="case4">
+                                       <children>
+                                          <Label fx:id="valTuile" layoutX="35.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="4" textAlignment="CENTER" textFill="#776e65">
+                                             <font>
+                                                <Font size="48.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                 </children>
                               </GridPane>
                               <GridPane fx:id="grilleB" gridLinesVisible="true" layoutX="692.0" layoutY="15.0" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: rgba(238, 228, 218, 0.35)rgba(238, 228, 218, 0.35); -fx-border-radius: 10px; -fx-background-radius: 10px;" styleClass="gridPane">
                                 <columnConstraints>
@@ -90,6 +112,26 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
+                                 <children>
+                                    <Pane fx:id="case2" prefHeight="92.0" prefWidth="60.0" styleClass="case2" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label layoutX="36.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="2" textAlignment="CENTER" textFill="#776e65">
+                                             <font>
+                                                <Font size="48.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                    <Pane fx:id="case8" prefHeight="92.0" prefWidth="100.0" styleClass="case8" GridPane.columnIndex="2">
+                                       <children>
+                                          <Label layoutX="36.0" layoutY="20.0" prefHeight="27.0" prefWidth="13.0" text="8" textAlignment="CENTER" textFill="WHITE">
+                                             <font>
+                                                <Font size="48.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                 </children>
                               </GridPane>
                            </children>
                         </Pane>
@@ -127,7 +169,7 @@
                            </font>
                         </Label>
                         <Button fx:id="boutonBDD" layoutX="428.0" layoutY="132.0" mnemonicParsing="false" onMouseClicked="#enregistrementBDD" text="BASE DE DONNÉE" />
-                        <Pane fx:id="instructionJeu" layoutY="521.0" prefHeight="196.0" prefWidth="1018.0" visible="false">
+                        <Pane fx:id="instructionJeu" layoutX="7.0" layoutY="526.0" prefHeight="196.0" prefWidth="1018.0" visible="false">
                            <children>
                               <ImageView fx:id="haut" fitHeight="59.0" fitWidth="61.0" layoutX="270.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -139,22 +181,17 @@
                                     <Image url="@../img/s.png" />
                                  </image>
                               </ImageView>
-                              <ImageView fx:id="droite" fitHeight="75.0" fitWidth="59.0" layoutX="200.0" layoutY="68.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="gauche" fitHeight="65.0" fitWidth="58.0" layoutX="340.0" layoutY="70.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../img/q.png" />
+                                    <Image url="@../img/d.png" />
                                  </image>
                               </ImageView>
-                              <ImageView fx:id="gauche" fitHeight="65.0" fitWidth="58.0" layoutX="348.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../img/g.png" />
-                                 </image>
-                              </ImageView>
-                              <ImageView fx:id="descendre" fitHeight="65.0" fitWidth="90.0" layoutX="413.0" layoutY="109.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="descendre" fitHeight="60.0" fitWidth="58.0" layoutX="429.0" layoutY="106.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../img/f.png" />
                                  </image>
                               </ImageView>
-                              <ImageView fx:id="monter" fitHeight="65.0" fitWidth="90.0" layoutX="413.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="monter" fitHeight="74.0" fitWidth="57.0" layoutX="430.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../img/R.png" />
                                  </image>
@@ -184,14 +221,19 @@
                                     <Image url="@../img/fb.png" />
                                  </image>
                               </ImageView>
-                              <ImageView fitHeight="68.0" fitWidth="30.0" layoutX="489.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="68.0" fitWidth="30.0" layoutX="490.0" layoutY="43.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../img/fh.png" />
                                  </image>
                               </ImageView>
-                              <ImageView fitHeight="71.0" fitWidth="37.0" layoutX="486.0" layoutY="128.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="71.0" fitWidth="37.0" layoutX="487.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../img/fb.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="gauche1" fitHeight="65.0" fitWidth="58.0" layoutX="201.0" layoutY="69.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/q.png" />
                                  </image>
                               </ImageView>
                            </children>

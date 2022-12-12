@@ -876,8 +876,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
 
     public int scoreDispersion() {
         int dispersionScore = 0;
-
-        int[] voisins = {-1, 0, 1};
+        int[] voisins = {-2,-1, 0, 1,2 };
         for (int p = 0; p < TAILLE; ++p) {
             for (int i = 0; i < TAILLE; ++i) {
                 for (int j = 0; j < TAILLE; ++j) {
@@ -889,7 +888,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
                     int somme = 0;
                     for (int k : voisins) {
                         int x = c.getX() + k;
-                        if (x < 0 || x >= TAILLE) {
+                        if (x < 0 || x >=TAILLE) {
                             continue;
                         }
                         for (int l : voisins) {
@@ -902,7 +901,6 @@ public class Jeu implements Parametres, Serializable, Runnable {
                                 if (z < 0 || z >= TAILLE) {
                                     continue;
                                 }
-
                                 if (c.getValeur() > 0) {
                                     nbvoisins++;
                                     somme += Math.abs(c.getValeur() - grilles.get(p).getGrille().get(x).get(y).getValeur());

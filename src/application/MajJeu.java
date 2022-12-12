@@ -10,7 +10,8 @@ import static variables.Parametres.TAILLE;
 
 /**
  * Classe qui permet de faire la mise à jour de l'interface après un déplacement
- * dynamique 
+ * dynamique
+ *
  * @author Mouna
  */
 public class MajJeu extends Task<Void> {
@@ -22,6 +23,7 @@ public class MajJeu extends Task<Void> {
 
     /**
      * Constructeur de la classe
+     *
      * @param c le contrôleur relié à l'interface
      */
     public MajJeu(FXMLController c) {
@@ -59,7 +61,7 @@ public class MajJeu extends Task<Void> {
                         }
                     }
                 }
-                controleur.getDeplThread().clear();  
+                controleur.getDeplThread().clear();
                 controleur.majScoreApp();
             }
         }
