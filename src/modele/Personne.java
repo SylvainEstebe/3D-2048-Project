@@ -120,7 +120,7 @@ public class Personne {
         ObservableList<Personne> listePerso = FXCollections.observableArrayList();
 
         // Requête pour la base de donnée
-        String queryScore = "SELECT pseudo, score, temps, nombreDéplacement FROM Joueur ORDER BY score ASC";
+        String queryScore = "SELECT pseudo, score, temps, nombreDéplacement FROM Joueur ORDER BY score DESC";
         // Récupération d'une liste de string avec toute les informations
         ArrayList<String> pseudo = c.getTuples(queryScore);
 
