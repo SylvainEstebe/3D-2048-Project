@@ -1076,7 +1076,6 @@ public class FXMLController implements Initializable, Parametres {
         this.i3.setDisable(true);
         this.i2.setDisable(true);
         this.stat.setDisable(true);
-        this.classique.setDisable(false);
         timer=new Timer();
         timer.schedule(new IAThreadApp (this,2),1000 ,1500);   
 
@@ -1095,6 +1094,10 @@ public class FXMLController implements Initializable, Parametres {
             retour.setDisable(false);
         }
         mouvOrdi.setDisable(false);
+        this.ia1.setDisable(false);
+        this.i3.setDisable(false);
+        this.i2.setDisable(false);
+        this.stat.setDisable(false);
     }
 
 }

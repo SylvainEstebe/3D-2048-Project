@@ -137,7 +137,7 @@ public class IA2 implements Parametres {
             boolean b2 = jeu.deplacerCases3G(direction);
             jeu.choixNbCasesAjout(b2);
             System.out.println(jeu.toString());
-            System.out.println("Tapez 's' puis Entree pour stopper l'IA");
+            System.out.println("Tapez 'a' puis Entree pour stopper l'IA");
 
             try {
                 Thread.sleep(2000);

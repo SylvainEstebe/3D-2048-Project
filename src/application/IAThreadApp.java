@@ -22,6 +22,7 @@ public class IAThreadApp extends TimerTask {
     public void run(){
         int direction;
         if(algo==2){
+            
             IA2 ai_algo2=new IA2(controleur.getJeuAppli());
             direction=ai_algo2.choixMouvIA2();
         }
