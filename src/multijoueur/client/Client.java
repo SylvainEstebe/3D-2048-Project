@@ -7,8 +7,6 @@ package multijoueur.client;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import modele.Jeu;
 
@@ -20,6 +18,8 @@ import modele.Jeu;
 public class Client implements Runnable {
     private final String ADDRESSE;
     private final int PORT;
+    private boolean erreur = false;
+    private boolean debug = false;
     private Jeu jeu;
     private boolean estServeur;
     private Socket socket;
@@ -44,16 +44,18 @@ public class Client implements Runnable {
      */
     public void run() {
         try {
-            System.out.println("[CLIENT] Connexion au serveur " + this.ADDRESSE + ":" + this.PORT);
+            if (this.debug) System.out.println("[CLIENT] Connexion au serveur " + this.ADDRESSE + ":" + this.PORT);
             this.socket = new Socket(this.ADDRESSE, this.PORT);
-            System.out.println("[CLIENT] Connecté au serveur");
+            if (this.debug) System.out.println("[CLIENT] Connecté au serveur");
             
             this.connexion = new Connexion(this.socket, this);
+            this.connexion.setDebug(this.debug);
             
             // Lancement de l'écoute
             new Thread(this.connexion).start();
         } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            if (this.debug) System.out.println("[CLIENT] Connexion au serveur impossible");
+            this.erreur = true;
         }
     }
     
@@ -64,6 +66,15 @@ public class Client implements Runnable {
      */
     protected void closeClient() throws IOException {
         this.socket.close();
+    }
+    
+    /**
+     * Setter pour le débuggage (affichage de réponses recues)
+     * 
+     * @param d 
+     */
+    public void setDebug(boolean d) {
+        this.debug = d;
     }
     
     /**
@@ -94,11 +105,29 @@ public class Client implements Runnable {
     }
     
     /**
+     * Getter du socket
+     * 
+     * @return Socket 
+     */
+    public Socket getSocket() {
+        return this.socket;
+    }
+    
+    /**
      * Getter de la connexion
      * 
      * @return Connexion 
      */
     public Connexion getConnexion() {
         return this.connexion;
+    }
+    
+    /**
+     * Getter de erreur
+     * 
+     * @return Erreur 
+     */
+    public boolean aUneErreur() {
+        return this.erreur;
     }
 }

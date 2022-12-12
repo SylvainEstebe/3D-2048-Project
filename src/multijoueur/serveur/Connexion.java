@@ -24,6 +24,7 @@ public class Connexion implements Runnable {
     private Serveur serveur;
     private BufferedReader in;
     private PrintWriter out;
+    private boolean debug = false;
     
     // Données de base
     private String pseudo;
@@ -61,31 +62,42 @@ public class Connexion implements Runnable {
     public void run() {
         try {
             while (true) {
-                String ligne = this.in.readLine();
-                System.out.println("[SERVEUR] Recu : " + ligne);
+                String requete = this.in.readLine();
+                if (this.debug) System.out.println("[SERVEUR] Recu : " + (requete.length() > 32 ? requete.substring(0, 32) : requete));
                 
-                if (ligne == null) break;
+                if (requete == null) break;
                 
-                if (ligne.startsWith(Routes.CHAT)) { // Message
-                    this.envoyerATous(this.escapeRequest(ligne));
-                } else if (ligne.startsWith(Routes.VERIF_PSEUDO)) { // Vérification disponibilité pseudo
-                    this.pseudoDispo(this.escapeRequest(ligne));
-                } else if (ligne.startsWith(Routes.ENREG_PSEUDO)) { // Enregistrement pseudo
-                    this.enregistrerJoueur(this.escapeRequest(ligne));
-                } else if (ligne.equals(Routes.PRET_A_COMMENCER)) { // Joueur prêt
+                /* Routes de base */
+                if (requete.startsWith(Routes.CHAT)) { // Message
+                    this.envoyerATous(this.escapeRequest(requete));
+                } else if (requete.startsWith(Routes.VERIF_PSEUDO)) { // Vérification disponibilité pseudo
+                    this.pseudoDispo(this.escapeRequest(requete));
+                } else if (requete.startsWith(Routes.ENREG_PSEUDO)) { // Enregistrement pseudo
+                    this.enregistrerJoueur(this.escapeRequest(requete));
+                } else if (requete.equals(Routes.PRET_A_COMMENCER)) { // Joueur prêt
                     this.setJoueurPret(true);
-                } else if (ligne.equals(Routes.JOUEURS_PRETS)) { // Vérifications que tous les joueurs sont prêts
+                } else if (requete.equals(Routes.JOUEURS_PRETS)) { // Vérifications que tous les joueurs sont prêts
                     this.joueursPrets();
-                } else if (ligne.equals(Routes.COMMENCER_PARTIE)) { // Lancement de la partie
+                } else if (requete.equals(Routes.COMMENCER_PARTIE)) { // Lancement de la partie
                     this.commencerPartie();
-                } else if (ligne.startsWith(Routes.ENVOYER_SCORE)) { // Envoi du score
-                    this.scoreEnvoye(this.escapeRequest(ligne));
-                } else if (ligne.equals(Routes.VICTOIRE_VERSUS)) { // Victoire en compétitif
-                    this.victoire();
-                } else if (ligne.equals(Routes.DEFAITE_VERSUS)) { // Défaite en compétitif
-                    this.defaite();
-                } else {
-                    this.out.println(ligne);
+                } else 
+                
+                /* Routes de parties compétitives */
+                if (requete.startsWith(Routes.ENVOYER_SCORE)) { // Envoi du score
+                    this.scoreEnvoye(this.escapeRequest(requete));
+                } else if (requete.equals(Routes.VICTOIRE_VERSUS)) { // Victoire en compétitif
+                    this.victoireVersus();
+                } else if (requete.equals(Routes.DEFAITE_VERSUS)) { // Défaite en compétitif
+                    this.defaiteVersus();
+                } else
+                
+                /* Routes de parties coopératives */
+                if (requete.startsWith(Routes.ENVOYER_JEU)) { // Envoi du jeu après un tour terminé
+                    this.envoyerJeu(requete);
+                } else if (requete.equals(Routes.VICTOIRE_COOP)) { // Victoire en ccop
+                    this.victoireCoop();
+                } else if (requete.equals(Routes.DEFAITE_COOP)) { // Défaire en coop
+                    this.defaiteCoop();
                 }
             }
         } catch (IOException e) {
@@ -128,7 +140,7 @@ public class Connexion implements Runnable {
     }
     
     /**
-     * Enregistre le pseudo du joueur associe a cette connexion
+     * Enregistre le pseudo du joueur associé à cette connexion
      * 
      * @param p Pseudo 
      */
@@ -159,6 +171,8 @@ public class Connexion implements Runnable {
             if (prets && !client.pret) prets = false;
         }
         
+        if (this.serveur.getClients().size() < 2) prets = false;
+        
         this.out.println(Routes.JOUEURS_PRETS + " " + prets);
     }
     
@@ -168,6 +182,14 @@ public class Connexion implements Runnable {
     private void commencerPartie() {
         for (Connexion client : this.serveur.getClients()) {
             client.out.println(Routes.COMMENCER_PARTIE + " " + this.serveur.estCompetitif());
+        }
+        
+        // Notification du prochain joueur s'il s'agit d'une partie coopérative
+        if (!this.serveur.estCompetitif()) {
+            Connexion nextClient = this.serveur.getNextClient();
+            for (Connexion client : this.serveur.getClients()) {
+                client.out.println(Routes.AU_TOUR_DE + " " + nextClient.pseudo);
+            }
         }
     }
     
@@ -184,9 +206,9 @@ public class Connexion implements Runnable {
     }
     
     /**
-     * Enregistre la victoire, détermine le classement et transmet l'information aux autres joueurs et donne le classement au joueur concerné
+     * Enregistre la victoire, détermine le classement, transmet l'information aux autres joueurs et donne le classement au joueur concerné
      */
-    private void victoire() {
+    private void victoireVersus() {
         this.victoire = true;
         
         // Calcul du classement
@@ -199,9 +221,9 @@ public class Connexion implements Runnable {
     }
     
     /**
-     * Enregistre la défaite, détermine le classement et transmet l'information aux autres joueurs et donne le classement au joueur concerné
+     * Enregistre la défaite, détermine le classement, transmet l'information aux autres joueurs et donne le classement au joueur concerné
      */
-    private void defaite() {
+    private void defaiteVersus() {
         this.defaite = true;
         
         this.classement = this.serveur.getClients().size() + 1;
@@ -213,6 +235,50 @@ public class Connexion implements Runnable {
         
         this.envoyerATous(Routes.DEFAITE_VERSUS_AUTRE + " " + this.pseudo + "#" + this.classement);
         this.out.println(Routes.DEFAITE_VERSUS + " " + this.classement);
+    }
+    
+    /**
+     * Envoie le jeu aux autres joueurs et annonce le joueur suivant
+     * 
+     * @param requete Requête envoyée par le client
+     */
+    private void envoyerJeu(String requete) {
+        this.envoyerATous(requete);
+        Connexion nextClient = this.serveur.getNextClient();
+        for (Connexion client : this.serveur.getClients()) {
+            client.out.println(Routes.AU_TOUR_DE + " " + nextClient.pseudo);
+        }
+    }
+    
+    /**
+     * Enregistre la victoire et transmet l'information aux autres joueurs
+     */
+    private void victoireCoop() {
+        for (Connexion client : this.serveur.getClients()) {
+            client.victoire = true;
+        }
+        
+        this.envoyerATous(Routes.VICTOIRE_COOP + " " + this.pseudo);
+    }
+    
+    /**
+     * Enregistre la défaite et transmet l'information aux autres joueurs
+     */
+    private void defaiteCoop() {
+        for (Connexion client : this.serveur.getClients()) {
+            client.defaite = true;
+        }
+        
+        this.envoyerATous(Routes.VICTOIRE_COOP + " " + this.pseudo);
+    }
+    
+    /**
+     * Setter pour le débuggage (affichage de requêtes recus)
+     * 
+     * @param d 
+     */
+    public void setDebug(boolean d) {
+        this.debug = d;
     }
     
     /**

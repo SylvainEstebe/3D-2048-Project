@@ -22,9 +22,11 @@ import java.util.logging.Logger;
 public class Serveur implements Runnable {
     private final int PORT;
     private final int LIMIT;
+    private boolean debug = false;
     private ServerSocket serveur = null;
     private ArrayList<Connexion> clients;
     private boolean competitif = false;
+    private int next = -1;
     
     /**
      * Constructeur
@@ -45,18 +47,19 @@ public class Serveur implements Runnable {
      */
     public void run() {
         try {
-            System.out.println("[SERVEUR] Lancement du serveur");
+            if (this.debug) System.out.println("[SERVEUR] Lancement du serveur");
             this.serveur = new ServerSocket(this.PORT, this.LIMIT);
-            System.out.println("[SERVEUR] Serveur lancé à l'adresse " + this.getHost() + ":" + this.PORT);
+            if (this.debug) System.out.println("[SERVEUR] Serveur lancé à l'adresse " + this.getHost() + ":" + this.PORT);
             
             // Boucle d'attente d'une nouvelle connexion
             while (true) {
-                System.out.println("[SERVEUR] En attente de connexion");
+                if (this.debug) System.out.println("[SERVEUR] En attente de connexion");
                 Socket socket = serveur.accept();
                 
                 // Connexion d'un nouveau client
-                System.out.println("[SERVEUR] Client connecté");
+                if (this.debug) System.out.println("[SERVEUR] Client connecté");
                 Connexion client = new Connexion(socket, this);
+                client.setDebug(this.debug);
                 clients.add(client);
                 
                 new Thread(client).start();
@@ -93,6 +96,15 @@ public class Serveur implements Runnable {
     }
     
     /**
+     * Setter pour le débuggage (affichage de requêtes recus)
+     * 
+     * @param d 
+     */
+    public void setDebug(boolean d) {
+        this.debug = d;
+    }
+    
+    /**
      * Getter des clients connectés au serveur
      * 
      * @return Clients connectés au serveur 
@@ -117,5 +129,18 @@ public class Serveur implements Runnable {
      */
     public boolean estCompetitif() {
         return this.competitif;
+    }
+    
+    /**
+     * Détermine le prochain joueur à jouer lors d'une partie coopérative
+     * 
+     * @return Prochain joueur 
+     */
+    public Connexion getNextClient() {
+        this.next++;
+        
+        if (this.next >= this.clients.size()) this.next = 0;
+        
+        return this.clients.get(this.next);
     }
 }

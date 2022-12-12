@@ -1,7 +1,5 @@
 package modele;
 
-import ia.IA1;
-import ia.IA2;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,8 +8,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Random;
 import java.util.Scanner;
+
+import ia.IA1;
+import ia.IA2;
 import multijoueur.client.Client;
 import variables.Parametres;
 import static variables.Parametres.BAS;
@@ -45,6 +48,11 @@ public class Jeu implements Parametres, Serializable, Runnable {
      * indique s'il existe une version antérieure de ce jeu
      */
     private boolean existePartiePrecedente;
+    
+    /**
+     * Indique si le retour a déjà été utilisé ou non
+     */
+    private boolean retour = false; //faux car le retour n'a pas encore été utilisé
     /**
      * Tableau des états précédents du jeu
      */
@@ -52,7 +60,8 @@ public class Jeu implements Parametres, Serializable, Runnable {
 
     private int directionMouvAleo = 0;
 
-    private Client client;
+    private transient Client client;
+    
     /**
      * Option pour indiquer qu'il s'agit d'un jeu multijoueurs (false par
      * défaut)
@@ -62,6 +71,16 @@ public class Jeu implements Parametres, Serializable, Runnable {
      * Option pour indique qu'il s'agit d'un jeu compétitif (false par défaut)
      */
     private boolean competitif = false;
+
+    /**
+     * Détermine si la partie coop est démarrée ou non
+     */
+    private boolean coopDemarre = false;
+    
+    /**
+     * Détermine si la partie coop est finie ou non
+     */
+    private boolean coopFini = false;
 
     /**
      * Constructeur qui initialise le jeu
@@ -108,6 +127,8 @@ public class Jeu implements Parametres, Serializable, Runnable {
         this.existePartiePrecedente = j.existePartiePrecedente;
         this.client = j.client;
         this.multi = j.multi;
+        this.coopDemarre = j.coopDemarre;
+        this.coopFini = j.coopFini;
     }
 
     /**
@@ -551,15 +572,28 @@ public class Jeu implements Parametres, Serializable, Runnable {
      * l'ordinateur joue un coup à la place du joueur s'il veut Fin du jeu
      */
     @Override
-    public void run() {
+    public synchronized void run() {
         Scanner sc1 = new Scanner(System.in);
-        Scanner sc2 = new Scanner(System.in);
-        Random ra = new Random();
-        boolean retour = false; //faux car le retour n'a pas encore été utilisé
 
         if (this.existePartiePrecedente) {// si le joueur choisit de terminer une partie précédente
             System.out.println(this);
-        } else { // si le joueur commence une nouvelle partie
+        } else if (this.multi && !this.competitif) { // si le joueur commence une partie coopérative
+            // Attente que le client du jeu soit notifié pour pousuivre l'exécution (tour par tour)
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Jeu.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            // Démarrage pour le premier joueur à joueur
+            if (!this.coopDemarre) {
+                this.coopDemarre = true;
+                this.ajoutCases();
+                this.ajoutCases();
+                System.out.println("Début du jeu");
+                System.out.println(this);
+            }
+        } else { // si le joueur commence une nouvelle partie solo ou compétitive
             //le jeu commence avec 2 cases
             this.ajoutCases();
             this.ajoutCases();
@@ -575,7 +609,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
             System.out.println("Pour quitter le jeu taper 'x'");
             System.out.println("Taper ii pour laisser l'IA jouer à votre place.");
             System.out.println("Taper (e) pour enregistrer votre partie.");
-            if (!retour && etatsPrecedents.size() > 0) { //on ne peut pas retourner en arrière si on l'a déjà fait ou si on n'a pas encore joué
+            if (!this.retour && etatsPrecedents.size() > 0) { //on ne peut pas retourner en arrière si on l'a déjà fait ou si on n'a pas encore joué
                 System.out.println("Retourner en arrière ? Tapez b : vous pouvez retourner jusqu'à 5 coups en arrière. Attention ! Vous ne pouvez utiliser le retour en arrière qu'une fois par partie !");
             }
 
@@ -586,7 +620,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
                 System.out.println("Taper le numéro d'algo que vous voulez :");
                 System.out.println("1. Algo minmax");
                 System.out.println("2. Algo Monte Carlo");
-                String ia = sc2.next();
+                String ia = sc1.next();
                 if (ia.equals("1")) {
                     IA1 ia1 = new IA1(this);
                     ia1.jeuIA1();
@@ -609,10 +643,10 @@ public class Jeu implements Parametres, Serializable, Runnable {
                 System.out.println("Votre partie a été bien enregistrer! ");
             }
             //Annulation de coups
-            if (s.equals("b") && !retour && etatsPrecedents.size() > 0) {
+            if (s.equals("b") && !this.retour && etatsPrecedents.size() > 0) {
                 this.undo();
                 System.out.println(this);
-                retour = true;
+                this.retour = true;
             }
             //Mouvement aléatoire de l'ordinateur
             if (s.equals("?")) {
@@ -659,21 +693,58 @@ public class Jeu implements Parametres, Serializable, Runnable {
                 this.resetFusion();
                 System.out.println(this);
 
-                if (multi && competitif) {
-                    this.client.getConnexion().envoyerScore(this.scoreFinal, this.getValeurMaxJeu());
+                if (this.multi && this.competitif) this.client.getConnexion().envoyerScore(this.scoreFinal, this.getValeurMaxJeu());
+                
+                if (this.multi && b2 && !this.competitif && !this.finJeu() && this.getValeurMaxJeu() < OBJECTIF) {
+                    this.client.getConnexion().envoyerJeu();
+                    try {
+                        wait();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Jeu.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }
         //Fin du jeu, affichage de l'état du jeu
         if (this.getValeurMaxJeu() >= OBJECTIF) {
-            this.victoire();
-            if (multi && competitif) {
-                this.client.getConnexion().envoyerVictoireVersus();
+            if (!this.multi && !this.competitif) this.victoire();
+            
+            // Si mode versus, envoi de la notification de victoire
+            if (this.multi && this.competitif) this.client.getConnexion().envoyerVictoireVersus();
+            
+            // Si mode coop, envoi de la grille finale et de la notification de victoire
+            if (this.multi && !this.competitif && !this.coopFini) {
+                System.out.println("Vous avez terminé la partie !!!");
+                this.coopFini = true;
+                this.client.getConnexion().envoyerJeu();
+                this.client.getConnexion().envoyerVictoireCoop();
             }
         } else {
-            this.jeuPerdu();
-            if (multi && competitif) {
-                this.client.getConnexion().envoyerDefaiteVersus();
+            if (!this.multi && !this.competitif) this.jeuPerdu();
+            
+            // Si mode versus, envoi de la notification de défaite
+            if (this.multi && this.competitif) this.client.getConnexion().envoyerDefaiteVersus();
+            
+            // Si mode coop, envoi de la grille finale et de la notification de défaite
+            if (this.multi && !this.competitif && !this.coopFini) {
+                System.out.println("Vous avez perdu...");
+                this.client.getConnexion().envoyerJeu();
+                this.coopFini = true;
+                this.client.getConnexion().envoyerDefaiteCoop();
+            }
+        }
+        
+        if (this.multi && !this.competitif) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Jeu.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            if (this.getValeurMaxJeu() >= OBJECTIF) {
+                System.exit(0);
+            } else {
+                System.exit(1);
             }
         }
     }
@@ -682,7 +753,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
      * Methode qui demande au joueur s'il veut terminer une partie précédente ou
      * commencer une nouvelle
      *
-     * @return booléen ture: pour terminer une partie précedente et false: pour
+     * @return booléen true: pour terminer une partie précedente et false: pour
      * une nouvelle
      */
     public boolean rechargerPartie() {
@@ -828,6 +899,27 @@ public class Jeu implements Parametres, Serializable, Runnable {
         this.setScoreFinal(etatsPrecedents.get(0).getScoreFinal());
         this.setExistePartiePrecedente(etatsPrecedents.get(0).getExistePartiePrecedente());  //à tester
         etatsPrecedents.remove(0);
+        
+        // Affichage de la grille après retour en arrière
+        System.out.println(this);
+    }
+
+    /**
+     * Actualise le jeu depuis un autre lors d'une partie en coop
+     * 
+     * @param j Autre jeu 
+     */
+    public void actualiserDepuisAutreJeu(Jeu j) {
+        this.grilles = j.grilles;
+        this.scoreFinal = j.scoreFinal;
+        this.existePartiePrecedente = j.existePartiePrecedente;
+        this.retour = j.retour;
+        this.etatsPrecedents = j.etatsPrecedents;
+        this.coopDemarre = j.coopDemarre;
+        this.coopFini = j.coopFini;
+        
+        // Affichage du jeu après actualisation
+        System.out.println(this);
     }
 
     //Méthode qui clone un jeu

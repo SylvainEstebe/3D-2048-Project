@@ -1,8 +1,6 @@
 package modele;
 
-import ia.IA1;
 import java.io.File;
-import variables.Parametres;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,9 +8,11 @@ import java.io.ObjectInputStream;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import multijoueur.Routes;
 import multijoueur.client.Client;
 import multijoueur.serveur.Serveur;
+import variables.Parametres;
 
 /**
  * Classe principale 
@@ -57,6 +57,7 @@ public class Main implements Parametres {
                 estServeur = true;
                 // Lancement du serveur
                 serveur = new Serveur(3333, 4);
+                // serveur.setDebug(true);
                 new Thread(serveur).start();
                 
                 // Attente d'une seconde pour que le serveur ait le temps de se lancer (trouver autre chose de mieux)
@@ -68,6 +69,8 @@ public class Main implements Parametres {
                 
                 adresse = serveur.getHost();
                 port = serveur.getPort();
+                
+                System.out.println("Les autres joueurs doivent se connecter à l'adresse " + adresse + ":" + port);
                 
                 System.out.println("Partie compétitive ? (oui/non)");
         
@@ -84,15 +87,70 @@ public class Main implements Parametres {
                 System.out.println("Adresse du serveur :");
                 adresse = sc.nextLine();
                 
+                while (adresse == null || adresse.equals("")) {
+                    System.out.println("Veuillez saisir une adresse :");
+                    adresse = sc.nextLine();
+                }
+                
                 System.out.println("Port du serveur :");
-                port = sc.nextInt();
+                String p = sc.nextLine();
+                 
+                try { port = Integer.parseInt(p); } catch (NumberFormatException e) {}
+                
+                while (p == null || p.equals("") || port == 0) {
+                    System.out.println("Veuillez saisir un port :");
+                    
+                    p = sc.nextLine();
+                 
+                    try { port = Integer.parseInt(p); } catch (NumberFormatException e) {}
+                }
             }
             
             // Lancement du client
             Client client = new Client(adresse, port, estServeur);
+            // client.setDebug(true);
             Jeu jeu = new Jeu(client, multi);
             client.setJeu(jeu);
             new Thread(client).start();
+            
+            // Boucle pour s'assurer que la connection avec le serveur se fait (en cas de mauvaise saisie pour un client)
+            while (true) {
+                // Boucle tant que le client n'est pas connecté ou qu'une erreur est relevée
+                while (client.getSocket() == null && !client.aUneErreur()) {}
+
+                // S'il y a une erreur, demande de resaisie et nouvelle tentative de connexion
+                if (client.aUneErreur()) {
+                    System.out.println("Connexion au serveur impossible, vérifiez l'adresse et le port données");
+                    System.out.println("Adresse du serveur :");
+                    adresse = sc.nextLine();
+                    
+                    while (adresse == null || adresse.equals("")) {
+                        System.out.println("Veuillez saisir une adresse :");
+                        adresse = sc.nextLine();
+                    }
+
+                    System.out.println("Port du serveur :");
+                    String p = sc.nextLine();
+                 
+                    try { port = Integer.parseInt(p); } catch (NumberFormatException e) {}
+
+                    while (p == null || p.equals("") || port == 0) {
+                        System.out.println("Veuillez saisir un port :");
+
+                        p = sc.nextLine();
+
+                        try { port = Integer.parseInt(p); } catch (NumberFormatException e) {}
+                    }
+
+                    client = new Client(adresse, port, estServeur);
+                    // client.setDebug(true);
+                    jeu = new Jeu(client, multi);
+                    client.setJeu(jeu);
+                    new Thread(client).start();
+                } else { // Sinon,sortie de la boucle
+                    break;
+                }
+            }
             
             // Enregistrement du pseudo
             System.out.println("Votre pseudo ?");
@@ -114,7 +172,11 @@ public class Main implements Parametres {
             boolean result = client.getConnexion().lancementPartie();
             // Si le client est hôte et tant que les autres joueurs ne sont pas prêt, attente
             while (estServeur && !result) {
-                System.out.println("Veuillez patienter, tous les joueurs ne sont pas prêts");
+                if (serveur.getClients().size() < 2) {
+                    System.out.println("En attente d'un autre joueur, vous devez au moins être 2 pour jouer");
+                } else {
+                    System.out.println("Veuillez patienter, tous les joueurs ne sont pas prêts");
+                }
                 commande = sc.nextLine();
                 while (!commande.equals(Routes.COMMENCER_PARTIE)) {
                     commande = sc.nextLine();
@@ -135,6 +197,7 @@ public class Main implements Parametres {
                 try {
                     // Lecture de la sauvegarde
                     final FileInputStream fichierIn = new FileInputStream(save); 
+                    
                     ObjectInputStream ois;
                     try {
                         // Déserialisation
@@ -157,6 +220,7 @@ public class Main implements Parametres {
                 }
             } else { // Lancement d'une nouvelle partie en l'absence d'une sauvegarde
                 Jeu j = new Jeu();
+
                 new Thread(j).start();
             }
         }

@@ -12,7 +12,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import modele.Jeu;
 import multijoueur.Routes;
+import multijoueur.SerializeToString;
+import static variables.Parametres.OBJECTIF;
 
 /**
  * Connexion du serveur au client
@@ -25,6 +29,7 @@ public class Connexion implements Runnable {
     private Client client;
     private BufferedReader in;
     private PrintWriter out;
+    private boolean debug = false;
     
     private boolean pseudoDispo = false;
     private boolean joueursPrets = false;
@@ -51,18 +56,22 @@ public class Connexion implements Runnable {
         try {
             while (true) {
                 String reponse = this.in.readLine();
-                System.out.println("[CLIENT] Le serveur dit : " + reponse);
+                if (this.debug) System.out.println("[CLIENT] Le serveur dit : " + (reponse.length() > 32 ? reponse.substring(0, 32) : reponse));
                 
                 // Le serveur n'envoie plus rien
                 if (reponse == null) break;
                 
+                /* Routes de base */
                 if (reponse.startsWith(Routes.VERIF_PSEUDO)) { // Vérification du pseudo
                     this.setPseudoDispo(reponse);
                 } else if (reponse.startsWith(Routes.JOUEURS_PRETS)) { // Vérification des joueurs prêts
                     this.setJoueursPrets(reponse);
                 } else if (reponse.startsWith(Routes.COMMENCER_PARTIE)) { // Démarrage de la partie
                     this.commencerPartie(reponse);
-                } else if (reponse.startsWith(Routes.ENVOYER_SCORE)) { // Score envoyé par un autre joueur
+                } else 
+                
+                /* Routes de parties compétitives */
+                if (reponse.startsWith(Routes.ENVOYER_SCORE)) { // Score envoyé par un autre joueur
                     this.scoreRecu(this.escapeRequest(reponse));
                 } else if (reponse.startsWith(Routes.VICTOIRE_VERSUS)) { // Victoire du joueur
                     this.victoireVersus(Integer.parseInt(this.escapeRequest(reponse)));
@@ -72,6 +81,17 @@ public class Connexion implements Runnable {
                     this.defaiteVersus(Integer.parseInt(this.escapeRequest(reponse)));
                 } else if (reponse.startsWith(Routes.DEFAITE_VERSUS_AUTRE)) { // Défaite d'un autre joueur
                     this.defaiteVersusAutre(this.escapeRequest(reponse));
+                } else 
+                    
+                /* Routes de parties coopératives */    
+                if (reponse.startsWith(Routes.ENVOYER_JEU)) { // Envoi du jeu
+                    this.jeuRecu(this.escapeRequest(reponse));
+                } else if (reponse.startsWith(Routes.AU_TOUR_DE)) { // Annonce du prochain joueur à jouer
+                    this.auTourDe(this.escapeRequest(reponse));
+                } else if (reponse.startsWith(Routes.VICTOIRE_COOP)) { // Victoire en coop
+                    this.victoireCoop(this.escapeRequest(reponse));
+                } else if (reponse.startsWith(Routes.DEFAITE_COOP)) { // Défaite en coop
+                    this.defaiteCoop(this.escapeRequest(reponse));
                 }
             }
         } catch (IOException ex) {
@@ -198,7 +218,7 @@ public class Connexion implements Runnable {
     /**
      * Récupère et affiche le score envoyé par un autre joueur
      * 
-     * @param data Données envoyées par le serveur  (joueur#score|valeurMax)
+     * @param data Données envoyées par le serveur (joueur#score|valeurMax)
      */
     private void scoreRecu(String data) {
         int splitter = data.indexOf("#");
@@ -208,18 +228,18 @@ public class Connexion implements Runnable {
         int score = Integer.parseInt(data.substring(splitter + 1, splitter2));
         int valeurMax = Integer.parseInt(data.substring(splitter2 + 1));
         
-        System.out.println("Progression de " + joueur + " :\n - Score: " + score + "\n - Valeur max: " + valeurMax);
+        System.out.println("Progression de " + joueur + " => Score: " + score + " | Valeur max: " + valeurMax);
     }
     
     /**
-     * Envoie la notification de victoire au serveur
+     * Envoie la notification de victoire versus au serveur
      */
     public void envoyerVictoireVersus() {
         this.out.println(Routes.VICTOIRE_VERSUS);
     }
     
     /**
-     * Envoie la notification de défaite au serveur
+     * Envoie la notification de défaite versus au serveur
      */
     public void envoyerDefaiteVersus() {
         this.out.println(Routes.DEFAITE_VERSUS);
@@ -272,12 +292,111 @@ public class Connexion implements Runnable {
     }
     
     /**
+     * Annonce le prochain joueur à jouer et notifie son Thread de jeu
+     * 
+     * @param p Pseudo de joueur à jouer 
+     */
+    private void auTourDe(String p) {
+        Jeu jeu = this.client.getJeu();
+        // Si la partie n'est pas terminée
+        if (!jeu.finJeu() && jeu.getValeurMaxJeu() < OBJECTIF) {
+            if (this.pseudo.equals(p)) {
+                System.out.println("Au tour :::: " + jeu.finJeu() + " | " + jeu.getValeurMaxJeu());
+                System.out.println("À vous de jouer !!!");
+                synchronized (jeu) {
+                    jeu.notify();
+                }
+            } else {
+                System.out.println("Au tour de " + p + " de jouer !!!");
+            } 
+        }
+    }
+    
+    /**
+     * Envoi le jeu sérialisé au serveur
+     */
+    public void envoyerJeu() {
+        try {
+            this.out.println(Routes.ENVOYER_JEU + " " + SerializeToString.toString(this.client.getJeu()));
+        } catch (IOException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    /**
+     * Actualise le jeu à partir du jeu envoyé par un autre joueur
+     * 
+     * @param j Jeu recu par un autre joueur
+     */
+    private void jeuRecu(String j) {
+        try {
+            Jeu jeu = (Jeu) SerializeToString.fromString(j);
+            this.client.getJeu().actualiserDepuisAutreJeu(jeu);
+        } catch (IOException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    /**
+     * Envoie la notification de victoire coop au serveur
+     */
+    public void envoyerVictoireCoop() {
+        this.out.println(Routes.VICTOIRE_COOP);
+    }
+    
+    /**
+     * Envoie la notification de défaite coop au serveur
+     */
+    public void envoyerDefaiteCoop() {
+        this.out.println(Routes.DEFAITE_COOP);
+    }
+    
+    /**
+     * Victoire en coop
+     * 
+     * @param p Pseudo du joueur ayant fini la partie 
+     */
+    private void victoireCoop(String p) {
+        System.out.println("Vous avez gagné !!! " + p + " a terminé la partie");
+        
+        Jeu jeu = this.client.getJeu();
+        synchronized (jeu) {
+            jeu.notify();
+        }
+    }
+    
+    /**
+     * Défaite en coop
+     * 
+     * @param p Pseudo du joueur ayant bloqué la partie 
+     */
+    private void defaiteCoop(String p) {
+        System.out.println("Vous avez perdu... " + p + " n'a pas réussi à débloquer la partie");
+        
+        Jeu jeu = this.client.getJeu();
+        synchronized (jeu) {
+            jeu.notify();
+        }
+    }
+    
+    /**
      * Getter du pseudo
      * 
      * @return Pseudo du joueur 
      */
     public String getPseudo() {
         return this.pseudo;
+    }
+    
+    /**
+     * Setter pour le débuggage (affichage de réponses recues)
+     * 
+     * @param d 
+     */
+    public void setDebug(boolean d) {
+        this.debug = d;
     }
     
     /**
