@@ -24,6 +24,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import java.util.Optional;
+import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -160,6 +161,13 @@ public class FXMLController implements Initializable, Parametres {
     private Label chrono;
     long chronos;
     long temps;
+    
+    
+    private Timer timer;
+    
+    
+    
+    
     @FXML
     /**
      * Fond de la grille
@@ -185,6 +193,8 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     private ImageView gauche;
+    @FXML
+    private MenuItem multijoueur;
 
     /**
      * Permet d'initialiser le contrôleur
@@ -531,59 +541,7 @@ public class FXMLController implements Initializable, Parametres {
 
     }
 
-    /**
-     * Méthode qui lorsqu'on sélectionne une des ia dans le menu permet le
-     * déclenchement de l'algo assoscié Également rend visible le bouton stop IA
-     *
-     */
-    @FXML
-    private void ia(ActionEvent event) {
-//        boolean ia_stoppe=false;
-//        IA2 ai_algo2=new IA2(jeuAppli);
-//        int direction;
-//        ThreadAffichIAAppli ia_thread=new ThreadAffichIAAppli(stopIA);
-//        
-//        //Fonctionnement de l'IA tant que le jeu n'est pas fini ou la case
-//        ia_thread.start();
-        stopIA.setDisable(false);
-//        while(!jeuAppli.finJeu() && !ia_stoppe){  
-//            System.out.println("WO WO WO");
-//            direction=ai_algo2.choixMouvIA2();
-//            jeuAppli.enregistrement();
-//            boolean b2 = jeuAppli.deplacerCases3G(direction);
-//            ThreadAffich threadaffich=new ThreadAffich(direction, b2, this);
-//            threadaffich.start();
-//            while(threadaffich.isAlive()){
-//                //System.out.println("OHU");
-//            }
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            
-//            jeuAppli.choixNbCasesAjout(b2);
-//
-//            if (b2) {
-//                jeuAppli.validerEnregistrement();
-//            } else {
-//                jeuAppli.annulerEnregistrement();
-//            }
-//            this.majScoreApp();
-//            jeuAppli.resetFusion();
-//            if (!ia_thread.isAlive()){
-//                ia_stoppe=true;
-//            }
-//             
-//        }
-//        if (jeuAppli.finJeu()) {
-//            if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
-//                this.victoireAppli();
-//            } else {
-//                this.jeuPerduAppli();
-//            }
-//        }
-    }
+
 
     @FXML
     /**
@@ -649,8 +607,14 @@ public class FXMLController implements Initializable, Parametres {
         abandonner.setTitle("Voulez-vous vraiment quitter le jeu ? ");
         BorderPane root = new BorderPane();
         root.getStyleClass().add("pane");
-        Label message = new Label("\t\t\t\t la partie n'est pas finie!"
+        Label message;
+        if(jeuAppli.finJeu()){
+            message = new Label ("\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?");
+        }
+        else{
+            message = new Label("\t\t\t\t la partie n'est pas finie!"
                 + "\n  Est-ce-que vous êtes sûr de vouloir quitter le jeu  ?");
+        }
         root.getStyleClass().add("message");
         root.setTop(message);
         Pane decision = new Pane();
@@ -736,7 +700,7 @@ public class FXMLController implements Initializable, Parametres {
                     jeuAppli.annulerEnregistrement();
                 }
                 
-                this.majScoreApp();
+                //this.majScoreApp();
                 if (jeuAppli.finJeu()) {
                     if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
                         this.victoireAppli();
@@ -769,7 +733,7 @@ public class FXMLController implements Initializable, Parametres {
         scoreAff.getStyleClass().add("text_horsjeu");
         root.setCenter(victoire);
         root.setTop(scoreAff);
-        final Scene scene = new Scene(root, 100, 100);
+        final Scene scene = new Scene(root, 500, 200);
         if (classique.isDisable()) {
             scene.getStylesheets().add("css/classique.css");
         } else if (daltonien.isDisable()) {
@@ -798,7 +762,7 @@ public class FXMLController implements Initializable, Parametres {
         scoreAff.getStyleClass().add("text_horsjeu");
         root.setCenter(defaite);
         root.setTop(scoreAff);
-        final Scene scene = new Scene(root, 100, 100);
+        final Scene scene = new Scene(root, 500, 200);
         if (classique.isDisable()) {
             scene.getStylesheets().add("css/classique.css");
         } else if (daltonien.isDisable()) {
@@ -1077,53 +1041,61 @@ public class FXMLController implements Initializable, Parametres {
         return threadDepl;
     }
 
+    @FXML
+    private void ia1(ActionEvent event) {
+    }
+
+    
+    /**
+     * 
+     * Méthode qui lorsqu'on sélectionne une des ia dans le menu permet le
+     * déclenchement d'un des algorithmes d'IA avec un affichage dynamique.
+     *
+     */
+    @FXML
+    private void ia2(ActionEvent event) {
+        if(eltsGrilles==null){
+            deplacementBDD = 0;
+            chronos = java.lang.System.currentTimeMillis();
+            jeuAppli = new Jeu();
+            jeuAppli.lancementJeuAppli();
+            sauvegardePartie.setDisable(true);
+            this.majGrillesApp();
+            nbRetour = 0;
+            retourUtilise = false;
+            tuile.setVisible(false);
+            case8.setVisible(false);
+            case2.setVisible(false);
+            case32.setVisible(false);
+        }
+        retour.setDisable(true);
+        stopIA.setDisable(false);
+        mouvOrdi.setDisable(true);
+        this.multijoueur.setDisable(true);
+        this.ia1.setDisable(true);
+        this.i3.setDisable(true);
+        this.i2.setDisable(true);
+        this.stat.setDisable(true);
+        this.classique.setDisable(false);
+        timer=new Timer();
+        timer.schedule(new IAThreadApp (this,2),1000 ,1500);   
+
+    }
+
+    @FXML
+    private void ia3(ActionEvent event) {
+    }
+    
+    
+    @FXML
+    private void stopperIA(ActionEvent event) {
+        timer.cancel();
+        stopIA.setDisable(true);
+        if(!retourUtilise && nbRetour!=0){
+            retour.setDisable(false);
+        }
+        mouvOrdi.setDisable(false);
+    }
+
 }
 
-//class ThreadAffichIAAppli extends Thread implements Parametres{
-//    
-//    Button stopIA;
-//    
-//    /**
-//     * Constructeur vide
-//     */
-//    public ThreadAffichIAAppli(Button stopIA){
-//        this.stopIA=stopIA;
-//    }
-//
-//    /**
-//     * Méthode qui permet de faire fonctionner l'IA en console 
-//     * tant que la touche s n'est pas enfoncée
-//     */
-//    @Override
-//    public void run() {
-//        while(!stopIA.isPressed()){
-//           
-//        }
-//    }  
-//}
-//class ThreadAffich extends Thread implements Parametres{
-//    
-//    private int direction=0;
-//    private boolean b2;
-//    FXMLController controller;
-//    
-//    /**
-//     * Constructeur vide
-//     */
-//    public ThreadAffich(int direction, boolean b2, FXMLController controlleur){
-//        this.direction=direction;
-//        this.b2=b2;
-//        controller=controlleur;
-//    }
-//
-//    /**
-//     * Méthode qui permet de faire fonctionner l'IA en console 
-//     * tant que la touche s n'est pas enfoncée
-//     */
-//    @Override
-//    public void run() {
-//        controller.deplacementThread(direction, b2);
-//        
-//        System.out.println("C EST BON");
-//    }  
-//}

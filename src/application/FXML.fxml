@@ -41,9 +41,9 @@
                 <Menu mnemonicParsing="false" text="Mode">
                   <items>
                     <MenuItem fx:id="multijoueur" mnemonicParsing="false" onAction="#multi" text="multijoueur" />
-                        <MenuItem fx:id="ia1" mnemonicParsing="false" onAction="#ia" text="IA 1" />
-                        <MenuItem fx:id="i2" mnemonicParsing="false" onAction="#ia" text="IA 2" />
-                        <MenuItem fx:id="i3" mnemonicParsing="false" onAction="#ia" text="IA 3" />
+                        <MenuItem fx:id="ia1" mnemonicParsing="false" onAction="#ia1" text="IA 1" />
+                        <MenuItem fx:id="i2" mnemonicParsing="false" onAction="#ia2" text="IA 2" />
+                        <MenuItem fx:id="i3" mnemonicParsing="false" onAction="#ia3" text="IA 3" />
                         <MenuItem fx:id="stat" mnemonicParsing="false" onAction="#afficheStat" text="Afficher les statistiques" />
                   </items>
                 </Menu>
@@ -268,7 +268,7 @@
                               <Font name="Arial" size="18.0" />
                            </font>
                         </Button>
-                        <Button fx:id="stopIA" disable="true" layoutX="250.0" layoutY="15.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Arrêter IA" textAlignment="CENTER" textFill="#eee4da">
+                        <Button fx:id="stopIA" disable="true" layoutX="250.0" layoutY="15.0" mnemonicParsing="false" onAction="#stopperIA" prefHeight="33.0" prefWidth="171.0" styleClass="option" text="Arrêter IA" textAlignment="CENTER" textFill="#eee4da">
                            <font>
                               <Font name="Arial" size="18.0" />
                            </font>

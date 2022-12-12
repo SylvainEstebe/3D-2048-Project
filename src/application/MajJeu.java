@@ -60,6 +60,7 @@ public class MajJeu extends Task<Void> {
                     }
                 }
                 controleur.getDeplThread().clear();  
+                controleur.majScoreApp();
             }
         }
         );
