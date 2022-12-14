@@ -1,6 +1,4 @@
-
 package application;
-
 
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;
@@ -11,7 +9,9 @@ import static variables.Parametres.BAS;
 import static variables.Parametres.HAUT;
 
 /**
- * Thread qui permet de déplacer une case du jeu de manière fluide sur l'application
+ * Thread qui permet de déplacer une case du jeu de manière fluide sur
+ * l'application
+ *
  * @author Alexanne
  */
 public class DeplacementTask extends Task<Void> implements Parametres {
@@ -29,7 +29,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
      */
     private int x = 0;
     /**
-     * Ordonnée de la case à bouger 
+     * Ordonnée de la case à bouger
      */
     private int y = 0;
     /**
@@ -44,16 +44,19 @@ public class DeplacementTask extends Task<Void> implements Parametres {
      * La direction dans laquelle doit aller la case
      */
     int direction;
-    
+
     /**
      * Le contrôleur relié à la case
      */
     private FXMLController controleur;
-    
-
+    /**
+     * La mode d'affichage pour l'ia
+     */
+    boolean ia;
 
     /**
      * Constructeur du thread
+     *
      * @param x abscisse de la case
      * @param y ordonnée de la case
      * @param deplobj le déplacement objectif de la case
@@ -61,18 +64,20 @@ public class DeplacementTask extends Task<Void> implements Parametres {
      * @param d la direction dans laquelle doit aller la case
      * @param c le controleur relié à la case
      */
-    public DeplacementTask(int x, int y, int deplobj, Pane caseABougeGraph, int d, FXMLController c) {
+    public DeplacementTask(int x, int y, int deplobj, Pane caseABougeGraph, int d, FXMLController c, boolean i) {
         this.x = x;
         this.y = y;
         this.deplObj = deplobj;
         this.caseABougeGraph = caseABougeGraph;
         this.direction = d;
         this.controleur = c;
+        this.ia = i;
 
     }
 
     /**
      * Changer les paramètres du compteur de fin de thread
+     *
      * @param f le nombre de threads restant à compter à la fin
      */
     public void setFin(CountDownLatch f) {
@@ -81,6 +86,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
 
     /**
      * Changer les paramètres du compteur de début de thread
+     *
      * @param d le nombre de threads restant à compter au début
      */
     public void setDebut(CountDownLatch d) {
@@ -89,8 +95,8 @@ public class DeplacementTask extends Task<Void> implements Parametres {
 
     @Override
     /**
-     * Réalise le déplacement dynamique de la case et fait la mise à jour de 
-     * son déplacement
+     * Réalise le déplacement dynamique de la case et fait la mise à jour de son
+     * déplacement
      */
     protected Void call() throws Exception {
         int cord;
@@ -126,7 +132,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
             Thread.sleep(1);
         } // end while        
         fin.countDown();
-        fin.await();        
+        fin.await();
         Thread th = new Thread((new MajJeu(controleur)));
         th.start();
         return null;

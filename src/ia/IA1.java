@@ -101,7 +101,7 @@ public class IA1 {
         int meilleurDirection = -10;
         Case meilleurCase = null;
         if (profondeur == 0 || jeu.finJeu()) {
-            meilleurScore = IA1.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreDispersion());
+            meilleurScore = jeu.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreDispersion());
         } else {
             if (joueur.equals(joueur1)) {
                 meilleurScore = Integer.MIN_VALUE;
@@ -154,9 +154,5 @@ public class IA1 {
         return resultat;
     }
 
-    private static int scoreHeuristique(int scoreGeneral, int nbCasesVides, int scoreCases) {
-        int score = (int) (scoreGeneral + Math.log(scoreGeneral) * nbCasesVides - scoreCases);
-        return Math.max(score, Math.min(scoreGeneral, 1));
-    }
 
 }

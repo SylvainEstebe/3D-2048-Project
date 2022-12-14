@@ -933,7 +933,7 @@ public class FXMLController implements Initializable, Parametres {
                             xCase = (int) eltsGrilles.get(compteur).getLayoutX();
                             yCase = (int) eltsGrilles.get(compteur).getLayoutY();
                             Pane caseABouge = eltsGrilles.get(compteur);
-                            DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this);
+                            DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this, ia);
                             deplacementCases.add(d);
                             compteur++;
                         }
@@ -954,7 +954,17 @@ public class FXMLController implements Initializable, Parametres {
             }
             if (!ia) {
                 jeuAppli.choixNbCasesAjout(b);
-            } 
+            } /*else {
+                IA1 ia1 = new IA1(jeuAppli);
+                int profondeur = 5;
+                try {
+                    System.out.println("hhh");
+                    Case nouvelleCase = ia1.meilleurCase(jeuAppli, profondeur);
+                    jeuAppli.ajoutCase(nouvelleCase);
+                } catch (CloneNotSupportedException ex) {
+                    Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }*/
             startSignal.countDown();
 
         }
@@ -1065,7 +1075,10 @@ public class FXMLController implements Initializable, Parametres {
         this.i2.setDisable(true);
         this.stat.setDisable(true);
         timer = new Timer();
-        timer.schedule(new IAThreadApp(this, 1), 1000, 15000);
+        IAThreadApp task = new IAThreadApp(this, 1);  
+        timer.schedule(task,10, 100);
+        //timer.schedule(new IAThreadApp(this, 1), 10, 1500);
+        
     }
 
     @FXML

@@ -25,6 +25,7 @@ public class IAThreadApp extends TimerTask {
 
     @Override
     public void run() {
+
         int direction;
         boolean b2;
         switch (algo) {
@@ -38,22 +39,24 @@ public class IAThreadApp extends TimerTask {
                 IA1 ia1 = new IA1(controleur.getJeuAppli());
                 int profondeur = 5;
                 try {
-
-                    System.out.println(controleur.getJeuAppli());
                     direction = ia1.meilleurMouvement(controleur.getJeuAppli(), profondeur);
                     Case nouvelleCase = ia1.meilleurCase(controleur.getJeuAppli(), profondeur);
                     b2 = controleur.getJeuAppli().deplacerCases3G(direction);
+                    System.out.println(nouvelleCase);
+                    System.out.println(direction);
                     controleur.deplacementThread(direction, b2, true);
                     controleur.getJeuAppli().ajoutCase(nouvelleCase);
-                    break;
+
                 } catch (CloneNotSupportedException ex) {
                     Logger.getLogger(IAThreadApp.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+
             default:
                 direction = -2;
                 break;
         }
+
         if (controleur.getJeuAppli().finJeu()) {
             if (controleur.getJeuAppli().getValeurMaxJeu() >= OBJECTIF) {
                 controleur.victoireAppli();
@@ -61,6 +64,23 @@ public class IAThreadApp extends TimerTask {
                 controleur.jeuPerduAppli();
             }
         }
+    }
+
+    public long dureeIA() {
+        IA1 ia1 = new IA1(controleur.getJeuAppli());
+        int profondeur = 5;
+        int direction;
+        boolean b2;
+        long duree = java.lang.System.currentTimeMillis();
+        try {
+            direction = ia1.meilleurMouvement(controleur.getJeuAppli(), profondeur);
+            Case nouvelleCase = ia1.meilleurCase(controleur.getJeuAppli(), profondeur);
+            b2 = controleur.getJeuAppli().deplacerCases3G(direction);
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(IAThreadApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println(java.lang.System.currentTimeMillis() - duree);
+        return java.lang.System.currentTimeMillis() - duree;
     }
 
 }

@@ -1,9 +1,3 @@
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ia;
 
 import java.util.ArrayList;
@@ -15,26 +9,28 @@ import java.util.logging.Logger;
 import modele.Case;
 import modele.Jeu;
 import modele.ThreadAffichIACons;
+import variables.Parametres;
 import static variables.Parametres.BAS;
 import static variables.Parametres.DESCG;
 import static variables.Parametres.DROITE;
 import static variables.Parametres.GAUCHE;
 import static variables.Parametres.HAUT;
 import static variables.Parametres.MONTERG;
+import static variables.Parametres.OBJECTIF;
 import static variables.Parametres.TAILLE;
 
 /**
- * Classe qui instancie l'IA qui respecte le 1er algorithme
+ * Classe qui instancie l'IA et contient l'algorithme alphabeta
  *
- * @author Mouna
+ * @author Mouna, Sylvain
  */
-public class IA3{
+public class IA3 implements Parametres {
 
     private String joueur1 = "Max";
     private String joueur2 = "Min";
     private boolean arreter = false;
     private Jeu jeu;
-    //int meilleurDirection = 0;
+    private int alpha, beta;
 
     /**
      * Constructeur de l'IA
@@ -45,7 +41,11 @@ public class IA3{
         jeu = j;
     }
 
-    public void jeuIA1() {
+    /**
+     * méthode qui fait jouer l'IA *
+     *
+     */
+    public void jeuIA3() {
         //Thread qui permet l'affichage de l'IA en console
         ThreadAffichIACons arreterIa = new ThreadAffichIACons();
         arreterIa.start();
@@ -56,18 +56,18 @@ public class IA3{
         try {
             while (!jeu.finJeu() && !arreter && i < total) {
                 int profondeur = 5;
-                int direction = this.meilleurMouvement(jeu,  profondeur);
+                int direction = this.meilleurMouvement(jeu, profondeur);
                 this.jeu.deplacerCases3G(direction);
                 this.jeu.majScore();
                 System.out.println(" \n Max effectue un déplacement");
                 System.out.println(jeu.toString());
-                Case nouvelleCase = this.meilleurCase(jeu,  profondeur);
+                Case nouvelleCase = this.meilleurCase(jeu, profondeur);
                 jeu.ajoutCase(nouvelleCase);
                 System.out.println("Min ajoute une case");
                 System.out.println(jeu.toString());
                 System.out.println(" Tapez 's' puis Entree pour stopper l'IA");
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Jeu.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -79,23 +79,47 @@ public class IA3{
         } catch (CloneNotSupportedException ex) {
             Logger.getLogger(IA1.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
-    //Methode pour le joueur "Max"  cherche le meilleur déplacement
 
+    /**
+     * Méthode qui cherche le meilleur mouvement à faire (associé à max)
+     *
+     * @param jeu
+     * @param profondeur : profondeur maximale de l'arbre
+     * @return le meilleur mouvement à faire
+     */
     public int meilleurMouvement(Jeu jeu, int profondeur) throws CloneNotSupportedException {
-        Map<String, Object> result = this.minimax(jeu, profondeur, joueur1);
+        Map<String, Object> result = this.alphabeta(jeu, profondeur, Integer.MIN_VALUE, Integer.MAX_VALUE, joueur1);
         return (int) result.get("Direction");
     }
-//Méthode pour le joueur "Min"  cherche le 
 
+    /**
+     * Méthode qui cherche le meilleur mouvement à faire (associé à min)
+     *
+     * @param jeu
+     * @param profondeur : profondeur maximale de l'arbre
+     * @return la case à rajouter
+     */
     public Case meilleurCase(Jeu jeu, int profondeur) throws CloneNotSupportedException {
-        Map<String, Object> result = this.minimax(jeu, profondeur, joueur2);
+        Map<String, Object> result = this.alphabeta(jeu, profondeur, Integer.MIN_VALUE, Integer.MAX_VALUE, joueur2);
         return (Case) result.get("Case");
     }
 
-    private Map<String, Object> minimax(Jeu jeu, int profondeur, String joueur) throws CloneNotSupportedException {
-        Map<String, Object> resultat = new HashMap<>();
+    /**
+     * Algorithme min-max optimisé Cherche le meilleur mouvement en utilisant
+     * l'élagage alpha-beta.
+     *
+     * @param Jeu
+     * @param profondeur
+     * @param alpha
+     * @param beta
+     * @param joueur
+     * @return alphabeta
+     * @throws CloneNotSupportedException
+     */
+    private Map<String, Object> alphabeta(Jeu jeu, int profondeur, int alpha, int beta, String joueur) throws CloneNotSupportedException {
+
+        Map<String, Object> result = new HashMap<>();
         ArrayList<Integer> directions = new ArrayList<>();
         directions.add(HAUT);
         directions.add(BAS);
@@ -103,30 +127,43 @@ public class IA3{
         directions.add(DROITE);
         directions.add(DESCG);
         directions.add(MONTERG);
-        int meilleurScore;
+
         int meilleurDirection = -10;
+        int meilleurScore;
         Case meilleurCase = null;
-        if (profondeur == 0 || jeu.finJeu()) {
-            meilleurScore = IA3.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreDispersion());
+
+        if (jeu.finJeu()) {
+            if (jeu.getValeurMaxJeu() >= OBJECTIF) {
+                meilleurScore = Integer.MAX_VALUE; // Score le plus grand possuble
+            } else {
+                meilleurScore = Math.min(jeu.getScoreFinal(), 1); // Score le plus petit possible
+            }
+        } else if (profondeur == 0) {
+            meilleurScore = jeu.scoreHeuristique(jeu.getScoreFinal(), jeu.listeCaseVideMultiGrille().size(), jeu.scoreDispersion());
         } else {
             if (joueur.equals(joueur1)) {
-                meilleurScore = Integer.MIN_VALUE;
                 for (int i = 0; i < directions.size(); i++) {
-                    Jeu nouveauJeu = jeu.clone();
+                    Jeu nouveauJeu = (Jeu) jeu.clone();
                     boolean b = nouveauJeu.deplacerCases3G(directions.get(i));
                     if (b == false && nouveauJeu.equals(jeu)) {
                         continue;
                     }
                     this.jeu.majScore();
-                    Map<String, Object> currentResult = minimax(nouveauJeu, (profondeur - 1), joueur);
+                    Map<String, Object> currentResult = alphabeta(nouveauJeu, (profondeur - 1), alpha, beta, joueur);
+
                     int scoreActuelle = ((Number) currentResult.get("Score")).intValue();
-                    if (scoreActuelle > meilleurScore) { //maximize score
-                        meilleurScore = scoreActuelle;
+
+                    if (scoreActuelle > alpha) { //maximize score
+                        alpha = scoreActuelle;
                         meilleurDirection = directions.get(i);
                     }
+                    if (beta <= alpha) {
+                        break; //beta cutoff
+                    }
                 }
+
+                meilleurScore = alpha;
             } else {
-                meilleurScore = Integer.MAX_VALUE;
                 Jeu nouveauJeu = jeu.clone();
                 ArrayList<Case> casesVides = nouveauJeu.listeCaseVideMultiGrille();
                 if (casesVides.isEmpty()) {
@@ -143,26 +180,29 @@ public class IA3{
                         valeurCase = 4;
                     }
                     this.jeu.majScore();
-                    Map<String, Object> currentResult = minimax(nouveauJeu, profondeur - 1, joueur);
+                    Map<String, Object> currentResult = alphabeta(nouveauJeu, profondeur - 1, alpha, beta, joueur);
                     int currentScore = ((Number) currentResult.get("Score")).intValue();
-                    if (currentScore < meilleurScore) { //minimize best score
-                        meilleurScore = currentScore;
+                    if (currentScore < beta) { //minimize best score
+                        beta = currentScore;
                         meilleurCase = casesVides.get(i);
                         meilleurCase.setValeur(valeurCase);
+
+                    }
+
+                    if (beta <= alpha) {
+                        break; //alpha cutoff
                     }
                 }
             }
+
+            meilleurScore = beta;
+
         }
 
-        resultat.put("Case", meilleurCase);
-        resultat.put("Score", meilleurScore);
-        resultat.put("Direction", meilleurDirection);
-        return resultat;
-    }
-
-    private static int scoreHeuristique(int scoreGeneral, int nbCasesVides, int scoreCases) {
-        int score = (int) (scoreGeneral + Math.log(scoreGeneral) * nbCasesVides - scoreCases);
-        return Math.max(score, Math.min(scoreGeneral, 1));
+        result.put("Case", meilleurCase);
+        result.put("Score", meilleurScore);
+        result.put("Direction", meilleurDirection);
+        return result;
     }
 
 }

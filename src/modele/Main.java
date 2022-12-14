@@ -15,15 +15,14 @@ import multijoueur.serveur.Serveur;
 import variables.Parametres;
 
 /**
- * Classe principale 
- * qui lance le programme
+ * Classe principale qui lance le programme
  *
  * @author Alexanne WORM
  */
 public class Main implements Parametres {
 
     public static void main(String[] args) {
-        boolean multi = false;
+         boolean multi = false;
         boolean estServeur = false;
         
         Scanner sc = new Scanner(System.in);

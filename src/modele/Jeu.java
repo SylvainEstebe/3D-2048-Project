@@ -1,5 +1,8 @@
 package modele;
 
+import ia.IA1;
+import ia.IA2;
+import ia.IA3;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -627,10 +630,14 @@ public class Jeu implements Parametres, Serializable, Runnable {
                 } else if (ia.equals("2")) {
                     IA2 ia2 = new IA2(this);
                     ia2.jeuIA2();
+                } else if (ia.equals("3")) {
+                    IA3 ia3 = new IA3(this);
+                    ia3.jeuIA3();
                 } else {
                     System.out.println("Attention, saisie incorrecte!");
                     System.out.println("Il faut taper 1 pour l'algo minmax ");
                     System.out.println("Il faut taper 2 pour l'algo Monte Carlo ");
+                    System.out.println("Il faut taper 3 pour l'algo Alpha Beta ");
                 }
             }
             //Quitter le jeu
@@ -952,23 +959,25 @@ public class Jeu implements Parametres, Serializable, Runnable {
     }
 
     public void ajoutCase(Case c) {
-        int type = c.getGrille().getType();
-        int index;
+        if (c != null) {
+            int type = c.getGrille().getType();
+            int index;
 
-        if (type == GRILLEH) {
-            index = 0;
-        } else if (type == GRILLEM) {
-            index = 1;
-        } else {
-            index = 2;
+            if (type == GRILLEH) {
+                index = 0;
+            } else if (type == GRILLEM) {
+                index = 1;
+            } else {
+                index = 2;
+            }
+
+            this.getGrilles().get(index).getGrille().get(c.getX()).get(c.getY()).setValeur(c.getValeur());
         }
-
-        this.getGrilles().get(index).getGrille().get(c.getX()).get(c.getY()).setValeur(c.getValeur());
     }
 
     public int scoreDispersion() {
         int dispersionScore = 0;
-        int[] voisins = {-2,-1, 0, 1,2 };
+        int[] voisins = {-2, -1, 0, 1, 2};
         for (int p = 0; p < TAILLE; ++p) {
             for (int i = 0; i < TAILLE; ++i) {
                 for (int j = 0; j < TAILLE; ++j) {
@@ -980,7 +989,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
                     int somme = 0;
                     for (int k : voisins) {
                         int x = c.getX() + k;
-                        if (x < 0 || x >=TAILLE) {
+                        if (x < 0 || x >= TAILLE) {
                             continue;
                         }
                         for (int l : voisins) {
@@ -1009,4 +1018,17 @@ public class Jeu implements Parametres, Serializable, Runnable {
         return dispersionScore;
 
     }
+
+    /**
+     * Méthode qui calcule le score heuristique
+     *
+     * @param scoreGeneral : Le score actuel
+     * @param nbCasesVides : Le nombre de case vide
+     * @return scoreCases : Le score de dispersion
+     */
+    public static int scoreHeuristique(int scoreGeneral, int nbCasesVides, int scoreCases) {
+        int score = (int) (scoreGeneral + Math.log(scoreGeneral) * nbCasesVides - scoreCases);
+        return Math.max(score, Math.min(scoreGeneral, 1));
+    }
+
 }
