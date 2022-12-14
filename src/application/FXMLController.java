@@ -683,19 +683,15 @@ public class FXMLController implements Initializable, Parametres {
                 default ->
                     0;
             };
-
             if (direction != 0) {
                 jeuAppli.enregistrement();
-
                 boolean b = jeuAppli.deplacerCases3G(direction);
                 deplacementThread(direction, b, false);
-
                 if (b) {
                     jeuAppli.validerEnregistrement();
                 } else {
                     jeuAppli.annulerEnregistrement();
                 }
-
                 //this.majScoreApp();
                 if (jeuAppli.finJeu()) {
                     if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
@@ -952,19 +948,10 @@ public class FXMLController implements Initializable, Parametres {
                 th.start();
 
             }
+            //   jeuAppli.choixNbCasesAjout(b);
             if (!ia) {
                 jeuAppli.choixNbCasesAjout(b);
-            } /*else {
-                IA1 ia1 = new IA1(jeuAppli);
-                int profondeur = 5;
-                try {
-                    System.out.println("hhh");
-                    Case nouvelleCase = ia1.meilleurCase(jeuAppli, profondeur);
-                    jeuAppli.ajoutCase(nouvelleCase);
-                } catch (CloneNotSupportedException ex) {
-                    Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }*/
+            }
             startSignal.countDown();
 
         }
@@ -1075,10 +1062,9 @@ public class FXMLController implements Initializable, Parametres {
         this.i2.setDisable(true);
         this.stat.setDisable(true);
         timer = new Timer();
-        IAThreadApp task = new IAThreadApp(this, 1);  
-        timer.schedule(task,10, 100);
-        //timer.schedule(new IAThreadApp(this, 1), 10, 1500);
-        
+        IAThreadApp task = new IAThreadApp(this, 1);
+        timer.schedule(new IAThreadApp(this, 1), 1000, 2500);
+
     }
 
     @FXML
@@ -1111,6 +1097,30 @@ public class FXMLController implements Initializable, Parametres {
 
     @FXML
     private void ia3(ActionEvent event) {
+        if (eltsGrilles == null) {
+            deplacementBDD = 0;
+            chronos = java.lang.System.currentTimeMillis();
+            jeuAppli = new Jeu();
+            jeuAppli.lancementJeuAppli();
+            sauvegardePartie.setDisable(true);
+            this.majGrillesApp();
+            nbRetour = 0;
+            retourUtilise = false;
+            tuile.setVisible(false);
+            case8.setVisible(false);
+            case2.setVisible(false);
+            case32.setVisible(false);
+        }
+        retour.setDisable(true);
+        stopIA.setDisable(false);
+        mouvOrdi.setDisable(true);
+        this.multijoueur.setDisable(true);
+        this.ia1.setDisable(true);
+        this.i3.setDisable(true);
+        this.i2.setDisable(true);
+        this.stat.setDisable(true);
+        timer = new Timer();
+        timer.schedule(new IAThreadApp(this, 3), 1000, 2500);
     }
 
     @FXML

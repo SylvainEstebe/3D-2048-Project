@@ -45,17 +45,18 @@ public class IA1 {
         arreterIa.start();
         int i = 0;
         int total = 50;
+        boolean b2;
         System.out.println("L'IA va jouer " + total + " tours");
         System.out.println(jeu);
         try {
             while (!jeu.finJeu() && !arreter && i < total) {
                 int profondeur = 5;
-                int direction = this.meilleurMouvement(jeu,  profondeur);
-                this.jeu.deplacerCases3G(direction);
+                int direction = this.meilleurMouvement(jeu, profondeur);
+                b2 = this.jeu.deplacerCases3G(direction);
                 this.jeu.majScore();
                 System.out.println(" \n Max effectue un déplacement");
                 System.out.println(jeu.toString());
-                Case nouvelleCase = this.meilleurCase(jeu,  profondeur);
+                Case nouvelleCase = this.meilleurCase(jeu, profondeur);
                 jeu.ajoutCase(nouvelleCase);
                 System.out.println("Min ajoute une case");
                 System.out.println(jeu.toString());
@@ -153,6 +154,5 @@ public class IA1 {
         resultat.put("Direction", meilleurDirection);
         return resultat;
     }
-
 
 }

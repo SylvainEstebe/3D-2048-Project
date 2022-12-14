@@ -150,9 +150,7 @@ public class IA3 implements Parametres {
                     }
                     this.jeu.majScore();
                     Map<String, Object> currentResult = alphabeta(nouveauJeu, (profondeur - 1), alpha, beta, joueur);
-
                     int scoreActuelle = ((Number) currentResult.get("Score")).intValue();
-
                     if (scoreActuelle > alpha) { //maximize score
                         alpha = scoreActuelle;
                         meilleurDirection = directions.get(i);

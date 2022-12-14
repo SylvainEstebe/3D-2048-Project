@@ -623,6 +623,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
                 System.out.println("Taper le numéro d'algo que vous voulez :");
                 System.out.println("1. Algo minmax");
                 System.out.println("2. Algo Monte Carlo");
+                System.out.println("3. Algo Alpha Beta ");
                 String ia = sc1.next();
                 if (ia.equals("1")) {
                     IA1 ia1 = new IA1(this);
