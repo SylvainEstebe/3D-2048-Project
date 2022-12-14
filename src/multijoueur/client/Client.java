@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package multijoueur.client;
 
 import java.io.IOException;
@@ -62,7 +57,7 @@ public class Client implements Runnable {
     /**
      * Fermeture du client
      * 
-     * @throws IOException 
+     * @throws IOException exception possible quand le socket ne se ferme pas
      */
     protected void closeClient() throws IOException {
         this.socket.close();
@@ -71,7 +66,7 @@ public class Client implements Runnable {
     /**
      * Setter pour le débuggage (affichage de réponses recues)
      * 
-     * @param d 
+     * @param d un booléen qui permet de savoir si le débuggage a fonctionné 
      */
     public void setDebug(boolean d) {
         this.debug = d;

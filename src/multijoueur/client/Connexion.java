@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package multijoueur.client;
 
 import java.io.BufferedReader;
@@ -39,7 +34,8 @@ public class Connexion implements Runnable {
      * Constructeur
      * 
      * @param s Socket de la connexion entre le serveur et le client
-     * @throws IOException 
+     * @param c un client du serveur
+     * @throws IOException exception possible quand le socket rencontre un problème
      */
     public Connexion(Socket s, Client c) throws IOException {
         this.socket = s;
@@ -393,7 +389,7 @@ public class Connexion implements Runnable {
     /**
      * Setter pour le débuggage (affichage de réponses recues)
      * 
-     * @param d 
+     * @param d booléen qui lance le débuggage
      */
     public void setDebug(boolean d) {
         this.debug = d;

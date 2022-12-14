@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package multijoueur.serveur;
 
 import java.io.BufferedReader;
@@ -275,7 +270,7 @@ public class Connexion implements Runnable {
     /**
      * Setter pour le débuggage (affichage de requêtes recus)
      * 
-     * @param d 
+     * @param d un booléen qui permet le débuggage
      */
     public void setDebug(boolean d) {
         this.debug = d;

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package multijoueur.serveur;
 
 import java.io.IOException;
@@ -15,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Serveur de jeu
+ * Serveur de jeu pour le jeu multijoueur
  *
  * @author Manon
  */
@@ -98,7 +93,7 @@ public class Serveur implements Runnable {
     /**
      * Setter pour le débuggage (affichage de requêtes recus)
      * 
-     * @param d 
+     * @param d un booléen qui permet le débuggage
      */
     public void setDebug(boolean d) {
         this.debug = d;

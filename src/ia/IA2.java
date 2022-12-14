@@ -36,7 +36,7 @@ public class IA2 implements Parametres {
      * Méthode qui choisit le mouvement le plus optimal pour le jeu à un certain
      * état
      *
-     * @return
+     * @return un entier qui correspond au mouvement qui doit être pris par l'IA.
      */
     public int choixMouvIA2() {
         Jeu jeu_h, jeu_b, jeu_g, jeu_d, jeu_q, jeu_e = new Jeu();
@@ -136,7 +136,7 @@ public class IA2 implements Parametres {
             boolean b2 = jeu.deplacerCases3G(direction);
             jeu.choixNbCasesAjout(b2);
             System.out.println(jeu.toString());
-            System.out.println("Tapez 'a' puis Entree pour stopper l'IA");
+            System.out.println("Tapez 's' puis Entree pour stopper l'IA");
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException ex) {

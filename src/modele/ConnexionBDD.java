@@ -7,14 +7,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 /**
- *
- * @author Sylvain 
- * Class utilisée pour établir une connexion avec la base de
+ * Classe utilisée pour établir une connexion avec la base de
  * données, interroger la base et insérer de nouveaux tuples dans la base
+ * @author Sylvain 
+ * 
  */
 public class ConnexionBDD {
 
@@ -23,7 +21,7 @@ public class ConnexionBDD {
     
       /**
      * Construteur de la classe connexionBDD
-     * @param b hote de connexion
+     * @param h hote de connexion
      * @param po port de connexion
      * @param dbn nom de la base de donnée
      * @param u nom de l'utilisateur

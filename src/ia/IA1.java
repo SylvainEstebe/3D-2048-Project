@@ -15,7 +15,6 @@ import static variables.Parametres.DROITE;
 import static variables.Parametres.GAUCHE;
 import static variables.Parametres.HAUT;
 import static variables.Parametres.MONTERG;
-import static variables.Parametres.TAILLE;
 
 /**
  * Classe qui instancie l'IA qui respecte le 1er algorithme
@@ -32,7 +31,6 @@ public class IA1 {
 
     /**
      * Constructeur de l'IA
-     *
      * @param j jeu associé à l'IA
      */
     public IA1(Jeu j) {

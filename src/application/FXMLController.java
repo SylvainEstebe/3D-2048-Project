@@ -1,7 +1,6 @@
 package application;
 
-import ia.IA1;
-import ia.IA2;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
@@ -27,8 +26,6 @@ import javafx.scene.layout.Pane;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -225,10 +222,12 @@ public class FXMLController implements Initializable, Parametres {
         }
     }
 
-    @FXML
+    
     /**
      * Permet de commencer une nouvelle partie
+     * @param event qui correspond à l'event sur le bouton de la nouvelle partie
      */
+    @FXML
     public void nouvellePartie(ActionEvent event) {
         deplacementBDD = 0;
         chronos = java.lang.System.currentTimeMillis();
@@ -246,10 +245,11 @@ public class FXMLController implements Initializable, Parametres {
         case32.setVisible(false);
     }
 
-    @FXML
+    
     /**
      * Permet de charger une partie déjà existante et sauvegardée
      */
+    @FXML
     private void chargerPartie(ActionEvent event) {
         chargePartie.setDisable(true);
         jeuAppli.deserialiser();
@@ -265,20 +265,22 @@ public class FXMLController implements Initializable, Parametres {
         case32.setVisible(false);
     }
 
-    @FXML
+    
     /**
      * Permet de sauvegarder une partie en cours
      */
+    @FXML
     private void sauvegarderPartie(ActionEvent event) {
         //Lorsqu'on sauvegarde, le bouton de chargement devient actif
         jeuAppli.serialiser();
         chargePartie.setDisable(false);
     }
 
-    @FXML
+    
     /**
      * Permet de revenir à un état précédent du jeu
      */
+    @FXML
     private void retour(MouseEvent event) {
         if (!jeuAppli.getEtatsPrecedents().isEmpty()) {
             retourUtilise = true;
@@ -836,6 +838,7 @@ public class FXMLController implements Initializable, Parametres {
      * @param direction la direction dans laquelle les cases doivent être
      * déplacées
      * @param b booléen qui indique s'il est possible de déplacer les cases
+     * @param ia booléen qui permet d'ajouter des cases dans le jeu quand c'est possible
      */
     public void deplacementThread(int direction, boolean b, boolean ia) {
         deplacementCases = new ArrayList<Task>();

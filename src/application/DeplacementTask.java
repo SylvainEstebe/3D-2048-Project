@@ -54,6 +54,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
      */
     boolean ia;
 
+
     /**
      * Constructeur du thread
      *
@@ -63,6 +64,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
      * @param caseABougeGraph le pane à déplacer correspondant à la case
      * @param d la direction dans laquelle doit aller la case
      * @param c le controleur relié à la case
+     * @param i un booléen qui indique si on peut ajouter des cases pour l'IA.
      */
     public DeplacementTask(int x, int y, int deplobj, Pane caseABougeGraph, int d, FXMLController c, boolean i) {
         this.x = x;
@@ -96,7 +98,8 @@ public class DeplacementTask extends Task<Void> implements Parametres {
     @Override
     /**
      * Réalise le déplacement dynamique de la case et fait la mise à jour de son
-     * déplacement
+     * déplacement.
+     * @throws Exception exception générale.
      */
     protected Void call() throws Exception {
         int cord;

@@ -17,7 +17,6 @@ import static variables.Parametres.GAUCHE;
 import static variables.Parametres.HAUT;
 import static variables.Parametres.MONTERG;
 import static variables.Parametres.OBJECTIF;
-import static variables.Parametres.TAILLE;
 
 /**
  * Classe qui instancie l'IA et contient l'algorithme alphabeta
@@ -84,9 +83,10 @@ public class IA3 implements Parametres {
     /**
      * Méthode qui cherche le meilleur mouvement à faire (associé à max)
      *
-     * @param jeu
+     * @param jeu l'état du jeu actuel
      * @param profondeur : profondeur maximale de l'arbre
      * @return le meilleur mouvement à faire
+     * @throws CloneNotSupportedException exception possible quand clone
      */
     public int meilleurMouvement(Jeu jeu, int profondeur) throws CloneNotSupportedException {
         Map<String, Object> result = this.alphabeta(jeu, profondeur, Integer.MIN_VALUE, Integer.MAX_VALUE, joueur1);
@@ -96,9 +96,10 @@ public class IA3 implements Parametres {
     /**
      * Méthode qui cherche le meilleur mouvement à faire (associé à min)
      *
-     * @param jeu
+     * @param jeu l'état actuel du jeu
      * @param profondeur : profondeur maximale de l'arbre
      * @return la case à rajouter
+     * @throws CloneNotSupportedException exception possible quand clonage
      */
     public Case meilleurCase(Jeu jeu, int profondeur) throws CloneNotSupportedException {
         Map<String, Object> result = this.alphabeta(jeu, profondeur, Integer.MIN_VALUE, Integer.MAX_VALUE, joueur2);

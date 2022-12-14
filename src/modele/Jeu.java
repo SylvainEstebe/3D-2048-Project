@@ -1,7 +1,5 @@
 package modele;
 
-import ia.IA1;
-import ia.IA2;
 import ia.IA3;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -243,8 +241,8 @@ public class Jeu implements Parametres, Serializable, Runnable {
         return result;
     }
 
-    /* 
-    *Méthode qui incrémente les points gagnés au scoreFinal à chaque déplacement
+    /** 
+    * Méthode qui incrémente les points gagnés au scoreFinal à chaque déplacement
      */
     public void majScore() {
         scoreFinal = grilles.get(0).getScoreG() + grilles.get(1).getScoreG() + grilles.get(2).getScoreG();
@@ -426,10 +424,10 @@ public class Jeu implements Parametres, Serializable, Runnable {
         return deplacement;
     }
 
+    
     /**
      * Méthode qui permet d'ajouter une ou deux cases dans une ou 2 grilles par
      * hasard et selon les places libres dans les grilles
-     *
      * @return booleen qui indique si une case a été ajoutée ou pas
      */
     public boolean ajoutCases() {
@@ -489,6 +487,11 @@ public class Jeu implements Parametres, Serializable, Runnable {
         return true;
     }
 
+    /**
+     * Méthode qui permet de récupérer la direction que réalise l'ordinateur
+     * lors du mouvement aléatoire
+     * @return la direction  
+     */
     public int getDirectionMouvAleo() {
         return directionMouvAleo;
     }
@@ -535,7 +538,6 @@ public class Jeu implements Parametres, Serializable, Runnable {
 
     /**
      * Méthode qui vérifie que la partie est terminée
-     *
      * @return booleen qui retourne true la partie est terminée sinon false
      */
     public boolean finJeu() {
@@ -930,13 +932,20 @@ public class Jeu implements Parametres, Serializable, Runnable {
         System.out.println(this);
     }
 
-    //Méthode qui clone un jeu
+   
+    
+    /**
+     * Méthode qui permet de cloner un jeu
+     */
     @Override
     public Jeu clone() {
         return new Jeu(this);
     }
 
-    //Méthode qui réinitialise le nombre de déplacements pour chaque case du jeu
+    /**
+     * Méthode qui réinitialise le nombre de déplacements pour chaque case du jeu
+     *
+     */
     public void reinitNbDepl() {
         for (int k = 0; k < TAILLE; k++) {
             for (int i = 0; i < TAILLE; i++) {
@@ -948,8 +957,11 @@ public class Jeu implements Parametres, Serializable, Runnable {
             }
         }
     }
-    // Méthode qui retourne la listes des cases vides pour les 3 grilles
-
+    
+     /**
+      * Méthode qui retourne la listes des cases vides pour les 3 grilles
+      * @return un tableau de cases qui contient toutes les cases vides du jeu.
+      */
     public ArrayList<Case> listeCaseVideMultiGrille() {
         ArrayList<Case> listeCaseVideMulti = new ArrayList<>();
         for (int k = 0; k < TAILLE; k++) {
@@ -959,6 +971,10 @@ public class Jeu implements Parametres, Serializable, Runnable {
         return listeCaseVideMulti;
     }
 
+    /**
+     * Méthode qui permet d'ajouter une case particulière dans la grille
+     * @param c la case à ajouter
+     */
     public void ajoutCase(Case c) {
         if (c != null) {
             int type = c.getGrille().getType();
@@ -976,6 +992,10 @@ public class Jeu implements Parametres, Serializable, Runnable {
         }
     }
 
+    /**
+     * Permet gérer le score pour le jeu multijoueur
+     * @return le score dispersé
+     */
     public int scoreDispersion() {
         int dispersionScore = 0;
         int[] voisins = {-2, -1, 0, 1, 2};
@@ -1025,6 +1045,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
      *
      * @param scoreGeneral : Le score actuel
      * @param nbCasesVides : Le nombre de case vide
+     * @param scoreCases : le score de la case
      * @return scoreCases : Le score de dispersion
      */
     public static int scoreHeuristique(int scoreGeneral, int nbCasesVides, int scoreCases) {

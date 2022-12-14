@@ -106,7 +106,7 @@ public class Personne {
     /**
      * Récupère les personnes qui sont stockées dans la base de donnée
      *
-     * @return ObservableList<Personne> Une liste de personne
+     * @return  Une liste de personne
      */
     public static ObservableList<Personne> recupPersonne() {
         // Connection à la base de donnée

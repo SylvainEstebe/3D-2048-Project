@@ -2,7 +2,6 @@ package modele;
 
 import variables.Parametres;
 import java.io.Serializable;
-import static java.lang.Math.abs;
 import java.util.ArrayList;
 import static variables.Parametres.BAS;
 import static variables.Parametres.DESCG;
@@ -72,16 +71,24 @@ public class Case implements Parametres, Serializable {
     /**
      * Donne le type de la grille où est la case après un coup
      *
-     * @return
+     * @return un entier qui représente la grille dans laquelle est la case après déplacement.
      */
     public int getGrilleApDepl() {
         return grilleApDepl;
     }
 
+    /**
+     * Permet de récupérer la valeur qu'avait précédemment la case
+     * @return la valeur précédente
+     */
     public int getValAv() {
         return valAv;
     }
 
+    /**
+     * Méthode qui permet de modifier la valeur précédente de la case
+     * @param i la nouvelle valeur pour la valeur de la case précédente
+     */
     public void setValAv(int i) {
         valAv = i;
     }
@@ -268,8 +275,8 @@ public class Case implements Parametres, Serializable {
     /**
      * Méthode qui permet d'afficher la case
      *
-     * @Override
-     * @return Un string représentant la case dans la console
+     * 
+     * @return Un string reprÃ©sentant la case dans la console
      */
     public String toString() {
         return "Case(" + this.x + "," + this.y + "," + this.valeur + ")";
