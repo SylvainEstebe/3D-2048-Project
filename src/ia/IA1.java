@@ -15,6 +15,7 @@ import static variables.Parametres.DROITE;
 import static variables.Parametres.GAUCHE;
 import static variables.Parametres.HAUT;
 import static variables.Parametres.MONTERG;
+import static variables.Parametres.OBJECTIF;
 
 /**
  * Classe qui instancie l'IA qui respecte le 1er algorithme
@@ -68,6 +69,12 @@ public class IA1 {
                     arreter = true;
                 }
                 i++;
+                if(jeu.finJeu() || i==total){
+                    jeu.jeuPerdu();
+                }
+                if(jeu.getValeurMaxJeu()>=OBJECTIF){
+                   jeu.victoire();
+                }
             }
         } catch (CloneNotSupportedException ex) {
             Logger.getLogger(IA1.class.getName()).log(Level.SEVERE, null, ex);

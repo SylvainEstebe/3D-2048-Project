@@ -66,7 +66,7 @@ public class IA3 implements Parametres {
                 System.out.println(jeu.toString());
                 System.out.println(" Tapez 's' puis Entree pour stopper l'IA");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Jeu.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -74,6 +74,13 @@ public class IA3 implements Parametres {
                     arreter = true;
                 }
                 i++;
+
+                if (jeu.finJeu() || i == total) {
+                    jeu.jeuPerdu();
+                }
+                if (jeu.getValeurMaxJeu() >= OBJECTIF) {
+                    jeu.victoire();
+                }
             }
         } catch (CloneNotSupportedException ex) {
             Logger.getLogger(IA1.class.getName()).log(Level.SEVERE, null, ex);
@@ -152,7 +159,7 @@ public class IA3 implements Parametres {
                     this.jeu.majScore();
                     Map<String, Object> currentResult = alphabeta(nouveauJeu, (profondeur - 1), alpha, beta, joueur);
                     int scoreActuelle = ((Number) currentResult.get("Score")).intValue();
-                    if (scoreActuelle > alpha) { 
+                    if (scoreActuelle > alpha) {
                         alpha = scoreActuelle;
                         meilleurDirection = directions.get(i);
                     }
@@ -181,7 +188,7 @@ public class IA3 implements Parametres {
                     this.jeu.majScore();
                     Map<String, Object> currentResult = alphabeta(nouveauJeu, profondeur - 1, alpha, beta, joueur);
                     int currentScore = ((Number) currentResult.get("Score")).intValue();
-                    if (currentScore < beta) { 
+                    if (currentScore < beta) {
                         beta = currentScore;
                         meilleurCase = casesVides.get(i);
                         meilleurCase.setValeur(valeurCase);

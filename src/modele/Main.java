@@ -219,7 +219,6 @@ public class Main implements Parametres {
                 }
             } else { // Lancement d'une nouvelle partie en l'absence d'une sauvegarde
                 Jeu j = new Jeu();
-
                 new Thread(j).start();
             }
         }

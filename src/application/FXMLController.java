@@ -1,6 +1,5 @@
 package application;
 
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
@@ -26,6 +25,8 @@ import javafx.scene.layout.Pane;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -222,9 +223,9 @@ public class FXMLController implements Initializable, Parametres {
         }
     }
 
-    
     /**
      * Permet de commencer une nouvelle partie
+     *
      * @param event qui correspond à l'event sur le bouton de la nouvelle partie
      */
     @FXML
@@ -245,7 +246,6 @@ public class FXMLController implements Initializable, Parametres {
         case32.setVisible(false);
     }
 
-    
     /**
      * Permet de charger une partie déjà existante et sauvegardée
      */
@@ -265,7 +265,6 @@ public class FXMLController implements Initializable, Parametres {
         case32.setVisible(false);
     }
 
-    
     /**
      * Permet de sauvegarder une partie en cours
      */
@@ -276,7 +275,6 @@ public class FXMLController implements Initializable, Parametres {
         chargePartie.setDisable(false);
     }
 
-    
     /**
      * Permet de revenir à un état précédent du jeu
      */
@@ -838,7 +836,8 @@ public class FXMLController implements Initializable, Parametres {
      * @param direction la direction dans laquelle les cases doivent être
      * déplacées
      * @param b booléen qui indique s'il est possible de déplacer les cases
-     * @param ia booléen qui permet d'ajouter des cases dans le jeu quand c'est possible
+     * @param ia booléen qui permet d'ajouter des cases dans le jeu quand c'est
+     * possible
      */
     public void deplacementThread(int direction, boolean b, boolean ia) {
         deplacementCases = new ArrayList<Task>();
@@ -932,7 +931,7 @@ public class FXMLController implements Initializable, Parametres {
                             xCase = (int) eltsGrilles.get(compteur).getLayoutX();
                             yCase = (int) eltsGrilles.get(compteur).getLayoutY();
                             Pane caseABouge = eltsGrilles.get(compteur);
-                            DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this, ia);
+                            DeplacementTask d = new DeplacementTask(xCase, yCase, deplObj, caseABouge, direction, this);
                             deplacementCases.add(d);
                             compteur++;
                         }
@@ -951,7 +950,7 @@ public class FXMLController implements Initializable, Parametres {
                 th.start();
 
             }
-            //   jeuAppli.choixNbCasesAjout(b);
+            //IA1 et IA3 l'ajout d'une case ne se fait pas aléatoirement
             if (!ia) {
                 jeuAppli.choixNbCasesAjout(b);
             }
@@ -1066,8 +1065,7 @@ public class FXMLController implements Initializable, Parametres {
         this.stat.setDisable(true);
         timer = new Timer();
         IAThreadApp task = new IAThreadApp(this, 1);
-        timer.schedule(new IAThreadApp(this, 1), 1000, 2500);
-
+        timer.schedule(task, 1000, 2000);
     }
 
     @FXML
@@ -1123,7 +1121,7 @@ public class FXMLController implements Initializable, Parametres {
         this.i2.setDisable(true);
         this.stat.setDisable(true);
         timer = new Timer();
-        timer.schedule(new IAThreadApp(this, 3), 1000, 2500);
+        timer.schedule(new IAThreadApp(this, 3), 1000, 2000);
     }
 
     @FXML
@@ -1133,6 +1131,7 @@ public class FXMLController implements Initializable, Parametres {
         if (!retourUtilise && nbRetour != 0) {
             retour.setDisable(false);
         }
+
         mouvOrdi.setDisable(false);
         this.ia1.setDisable(false);
         this.i3.setDisable(false);

@@ -52,7 +52,6 @@ public class DeplacementTask extends Task<Void> implements Parametres {
     /**
      * La mode d'affichage pour l'ia
      */
-    boolean ia;
 
 
     /**
@@ -66,14 +65,13 @@ public class DeplacementTask extends Task<Void> implements Parametres {
      * @param c le controleur relié à la case
      * @param i un booléen qui indique si on peut ajouter des cases pour l'IA.
      */
-    public DeplacementTask(int x, int y, int deplobj, Pane caseABougeGraph, int d, FXMLController c, boolean i) {
+    public DeplacementTask(int x, int y, int deplobj, Pane caseABougeGraph, int d, FXMLController c) {
         this.x = x;
         this.y = y;
         this.deplObj = deplobj;
         this.caseABougeGraph = caseABougeGraph;
         this.direction = d;
         this.controleur = c;
-        this.ia = i;
 
     }
 

@@ -14,6 +14,7 @@ import static variables.Parametres.OBJECTIF;
  * @author Alexanne
  */
 public class IAThreadApp extends TimerTask {
+
     private FXMLController controleur;
     private int algo;
 
@@ -22,26 +23,48 @@ public class IAThreadApp extends TimerTask {
         this.algo = algo;
     }
 
+    /* public long scheduledExecutionTime() {
+        long chronos = java.lang.System.currentTimeMillis();
+
+        try {
+            int direction;
+            boolean b2;
+            IA1 ia1 = new IA1(controleur.getJeuAppli());
+            int profondeur = 5;
+            direction = ia1.meilleurMouvement(controleur.getJeuAppli(), profondeur);
+            Case nouvelleCase = ia1.meilleurCase(controleur.getJeuAppli(), profondeur);
+            b2 = controleur.getJeuAppli().deplacerCases3G(direction);
+            chronos = java.lang.System.currentTimeMillis() - chronos;
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(IAThreadApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return chronos;
+    }
+     */
     @Override
     public void run() {
+
         int direction;
         boolean b2;
-        if (algo == 2) {
+        if (algo
+                == 2) {
             IA2 ai_algo2 = new IA2(controleur.getJeuAppli());
             direction = ai_algo2.choixMouvIA2();
             b2 = controleur.getJeuAppli().deplacerCases3G(direction);
             controleur.deplacementThread(direction, b2, false);
 
-        } else if (algo == 1 || algo == 3) {
+        } else if (algo == 1 || algo
+                == 3) {
             IA1 ia1 = new IA1(controleur.getJeuAppli());
             int profondeur = 5;
             try {
+
                 direction = ia1.meilleurMouvement(controleur.getJeuAppli(), profondeur);
                 Case nouvelleCase = ia1.meilleurCase(controleur.getJeuAppli(), profondeur);
                 b2 = controleur.getJeuAppli().deplacerCases3G(direction);
                 controleur.deplacementThread(direction, b2, true);
                 controleur.getJeuAppli().ajoutCase(nouvelleCase);
-                System.out.println("hihih");
+
             } catch (CloneNotSupportedException ex) {
                 Logger.getLogger(IAThreadApp.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -50,7 +73,8 @@ public class IAThreadApp extends TimerTask {
 
         }
 
-        if (controleur.getJeuAppli().finJeu()) {
+        if (controleur.getJeuAppli()
+                .finJeu()) {
             if (controleur.getJeuAppli().getValeurMaxJeu() >= OBJECTIF) {
                 controleur.victoireAppli();
             } else {
@@ -58,5 +82,5 @@ public class IAThreadApp extends TimerTask {
             }
         }
     }
-    
+
 }
