@@ -7,6 +7,7 @@ package multijoueur;
  */
 public interface Routes {
     /* Routes de base */
+    static final String EST_VERSUS = "isVersus";
     static final String CHAT = "aTous";
     static final String VERIF_PSEUDO = "check";
     static final String ENREG_PSEUDO = "register";

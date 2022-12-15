@@ -18,7 +18,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -27,26 +26,37 @@ import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
 import modele.Case;
 import modele.Jeu;
+import modele.Main;
 import modele.Personne;
 import static modele.Personne.recupPersonne;
+import multijoueur.client.Client;
+import multijoueur.serveur.Serveur;
 import variables.Parametres;
 import static variables.Parametres.BAS;
 import static variables.Parametres.DESCG;
@@ -192,7 +202,83 @@ public class FXMLController implements Initializable, Parametres {
     private ImageView gauche;
     @FXML
     private MenuItem multijoueur;
-
+    
+    /**
+     * Statut multijoueur de l'interface
+     */
+    private boolean estMulti = false;
+    
+    /**
+     * Statut serveur de l'interface
+     */
+    private boolean estServeur = false;
+    
+    /**
+     * Serveur
+     */
+    private Serveur serveur;
+    
+    /**
+     * Client
+     */
+    private Client client;
+    
+    /**
+     * Adresse du serveur multijoueur
+     */
+    private String adresse;
+    
+    /**
+     * Port du serveur multijoueur
+     */
+    private int port;
+    
+    /**
+     * Champ de saisi du port pour créer le serveur  
+     */
+    private TextField portServeur;
+    
+    /**
+     * Erreur formulaire serveur
+     */
+    private Label erreurServeur;
+    
+    /**
+     * Champ de saisi de l'adresse pour se connecter au serveur
+     */
+    private TextField adresseClient;
+    
+    /**
+     * Champ de saisi du port pour se connecter au serveur
+     */
+    private TextField portClient;
+    
+    /**
+     * Erreur formulaire client
+     */
+    private Label erreurClient;
+    
+    /**
+     * Racine de la fenêtre multijoueur
+     */
+    private BorderPane multiRoot;
+    
+    /**
+     * Conteneur des formulaires serveur et client
+     */
+    private GridPane formulaireConteneur;
+    
+    /**
+     * Bouton de mode de jeu coop
+     */
+    private ToggleButton coopButton;
+    
+    /**
+     * Bouton de mode de jeu compétitif
+     */
+    private ToggleButton versusButton;
+    
+    
     /**
      * Permet d'initialiser le contrôleur
      */
@@ -225,11 +311,14 @@ public class FXMLController implements Initializable, Parametres {
 
     /**
      * Permet de commencer une nouvelle partie
-     *
+     * 
      * @param event qui correspond à l'event sur le bouton de la nouvelle partie
      */
     @FXML
     public void nouvellePartie(ActionEvent event) {
+        estMulti = false;
+        estServeur = false;
+        
         deplacementBDD = 0;
         chronos = java.lang.System.currentTimeMillis();
         jeuAppli = new Jeu();
@@ -245,12 +334,15 @@ public class FXMLController implements Initializable, Parametres {
         case2.setVisible(false);
         case32.setVisible(false);
     }
-
+    
     /**
      * Permet de charger une partie déjà existante et sauvegardée
      */
     @FXML
     private void chargerPartie(ActionEvent event) {
+        estMulti = false;
+        estServeur = false;
+        
         chargePartie.setDisable(true);
         jeuAppli.deserialiser();
         this.majGrillesApp();
@@ -683,15 +775,19 @@ public class FXMLController implements Initializable, Parametres {
                 default ->
                     0;
             };
+
             if (direction != 0) {
                 jeuAppli.enregistrement();
+
                 boolean b = jeuAppli.deplacerCases3G(direction);
                 deplacementThread(direction, b, false);
+
                 if (b) {
                     jeuAppli.validerEnregistrement();
                 } else {
                     jeuAppli.annulerEnregistrement();
                 }
+
                 //this.majScoreApp();
                 if (jeuAppli.finJeu()) {
                     if (jeuAppli.getValeurMaxJeu() >= OBJECTIF) {
@@ -836,8 +932,7 @@ public class FXMLController implements Initializable, Parametres {
      * @param direction la direction dans laquelle les cases doivent être
      * déplacées
      * @param b booléen qui indique s'il est possible de déplacer les cases
-     * @param ia booléen qui permet d'ajouter des cases dans le jeu quand c'est
-     * possible
+     * @param ia booléen qui permet d'ajouter des cases dans le jeu quand c'est possible
      */
     public void deplacementThread(int direction, boolean b, boolean ia) {
         deplacementCases = new ArrayList<Task>();
@@ -950,20 +1045,342 @@ public class FXMLController implements Initializable, Parametres {
                 th.start();
 
             }
-            //IA1 et IA3 l'ajout d'une case ne se fait pas aléatoirement
+            // IA1 et IA3 l'ajout d'une case ne se fait pas aléatoirement
             if (!ia) {
                 jeuAppli.choixNbCasesAjout(b);
             }
+            
             startSignal.countDown();
-
         }
     }
 
+    /**
+     * Ouvre le popup multijoueur
+     * 
+     * @param event Clic sur le bouton 
+     */
     @FXML
     private void multi(ActionEvent event) {
+        Stage fenetreMulti = new Stage();
+        fenetreMulti.setTitle("Multijoueur");
+        this.multiRoot = new BorderPane();
+        this.multiRoot.getStyleClass().add("pane");
 
+        //Titre
+        Label titreMulti = new Label("Jouer en multijoueur");
+        titreMulti.getStyleClass().add("text_horsjeu");
+        this.multiRoot.setTop(titreMulti);
+        
+        
+        // Formulaire création serveur
+        GridPane formulaireServeur = new GridPane();
+        formulaireServeur.getStyleClass().add("form-pane");
+        formulaireServeur.getStyleClass().add("border-bottom");
+        formulaireServeur.setAlignment(Pos.CENTER);
+        formulaireServeur.setHgap(10);
+        formulaireServeur.setVgap(10);
+        
+        Label titreServeur = new Label("Serveur");
+        titreServeur.getStyleClass().add("form-titre");
+        formulaireServeur.add(titreServeur, 0, 0, 2, 1);
+        
+        Label portServeurLabel = new Label("Port");
+        formulaireServeur.add(portServeurLabel, 0, 1);
+        
+        this.portServeur = new TextField();
+        formulaireServeur.add(this.portServeur, 1, 1);
+        
+        Button creerServeur = new Button("Créer le serveur");
+        HBox hbCreerServeur = new HBox(10);
+        hbCreerServeur.setAlignment(Pos.BOTTOM_RIGHT);
+        hbCreerServeur.getChildren().add(creerServeur);
+        formulaireServeur.add(hbCreerServeur, 1, 2);
+        
+        this.erreurServeur = new Label();
+        this.erreurServeur.getStyleClass().add("texte-erreur");
+        formulaireServeur.add(this.erreurServeur, 0, 3, 2, 1);
+        
+        creerServeur.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+                creerServeur();
+            }
+        });
+        
+        
+        // Formulaire connexion serveur
+        GridPane formulaireClient = new GridPane();
+        formulaireClient.getStyleClass().add("form-pane");
+        formulaireClient.setAlignment(Pos.CENTER);
+        formulaireClient.setHgap(10);
+        formulaireClient.setVgap(10);
+        
+        Label titreClient = new Label("Client");
+        titreClient.getStyleClass().add("form-titre");
+        formulaireClient.add(titreClient, 0, 0);
+        
+        Label adresseClientLabel = new Label("Adresse");
+        formulaireClient.add(adresseClientLabel, 0, 1);
+        
+        this.adresseClient = new TextField();
+        formulaireClient.add(this.adresseClient, 1, 1);
+        
+        Label portClientLabel = new Label("Port");
+        formulaireClient.add(portClientLabel, 0, 2);
+        
+        this.portClient = new TextField();
+        formulaireClient.add(this.portClient, 1, 2);
+        
+        Button connecterServeur = new Button("Se connecter au serveur");
+        HBox hbConnecterServeur = new HBox(10);
+        hbConnecterServeur.setAlignment(Pos.BOTTOM_RIGHT);
+        hbConnecterServeur.getChildren().add(connecterServeur);
+        formulaireClient.add(hbConnecterServeur, 1, 3);
+        
+        this.erreurClient = new Label();
+        this.erreurClient.getStyleClass().add("texte-erreur");
+        formulaireClient.add(this.erreurClient, 0, 4, 2, 1);
+        
+        connecterServeur.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+                connecterServeur();
+            }
+        });
+        
+        
+        // Conteneur des formulaires
+        this.formulaireConteneur = new GridPane();
+        this.formulaireConteneur.setAlignment(Pos.CENTER);
+        this.formulaireConteneur.add(formulaireServeur, 0, 0);
+        this.formulaireConteneur.add(formulaireClient, 0, 1);
+        
+        this.multiRoot.setCenter(this.formulaireConteneur);
+
+        final Scene scene = new Scene(this.multiRoot, 400, 400);
+
+        if (classique.isDisable()) {
+            scene.getStylesheets().add("css/classique.css");
+        } else if (daltonien.isDisable()) {
+            scene.getStylesheets().add("css/daltonien.css");
+        }
+        fenetreMulti.setScene(scene);
+        fenetreMulti.setResizable(false);
+        fenetreMulti.show();
     }
+    
+    /**
+     * Création du serveur
+     */
+    private void creerServeur() {
+        // Vérification de la saisie
+        this.port = 0;
+        String p = this.portServeur.getText();
+        if (p == null || p.equals("")) {
+            this.erreurServeur.setText("Veuillez saisir un numéro de port");
+        } else {
+            try { 
+                this.port = Integer.parseInt(p); 
+                this.erreurServeur.setText("");
+            } catch (NumberFormatException e) {
+                this.erreurServeur.setText("Veuillez saisir un numéro de port");
+            }
+        }
 
+        if (this.port != 0) {
+            this.estMulti = true;
+            this.estServeur = true;
+
+            // Lancement du serveur
+            this.serveur = new Serveur(this.port, 4);
+            this.serveur.setDebug(true);
+            new Thread(this.serveur).start();
+
+            // Attente d'une seconde pour que le serveur ait le temps de se lancer
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            this.adresse = this.serveur.getHost();
+            this.port = this.serveur.getPort();
+
+            // Lancement du client
+            this.client = new Client(this.adresse, this.port, this.estServeur, this);
+            this.client.setDebug(true);
+            this.jeuAppli = new Jeu(this.client, this.estMulti);
+            this.client.setJeu(this.jeuAppli);
+            new Thread(this.client).start();
+        }
+    }
+    
+    /**
+     * Connexion au serveur
+     */
+    private void connecterServeur() {
+        // Vérification de la saisie
+        this.port = 0;
+        String a = this.adresseClient.getText();
+        String p = this.portClient.getText();
+        if ((a == null || a.equals("")) && (p == null || p.equals(""))) {
+            this.erreurClient.setText("Veuillez saisir une adresse et un numéro de port");
+        } else if (a == null || a.equals("")) {
+            this.erreurClient.setText("Veuillez saisir une adresse");
+        } else if (p == null || p.equals("")) {
+            this.erreurClient.setText("Veuillez saisir un numéro de port");
+        } else {
+            try { 
+                this.port = Integer.parseInt(p);
+                this.adresse = a;
+                this.erreurClient.setText("");
+            } catch (NumberFormatException e) {
+                this.erreurClient.setText("Veuillez saisir un numéro de port");
+            }
+        }
+
+        if (this.port != 0 && this.adresse != null) {
+            this.estMulti = true;
+            this.estServeur = false;
+
+            // Lancement du client
+            this.client = new Client(this.adresse, this.port, this.estServeur, this);
+            this.client.setDebug(true);
+            this.jeuAppli = new Jeu(this.client, this.estMulti);
+            this.client.setJeu(this.jeuAppli);
+            new Thread(this.client).start();
+        }
+    }
+    
+    /**
+     * Affichage d'un message d'erreur en cas de problème de connexion au serveur
+     * 
+     * @param message Message à afficher 
+     */
+    public void connexionClientErreur(String message) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                if (erreurClient != null) erreurClient.setText(message);
+            }
+        });
+    }
+    
+    /**
+     * Affichage du salon d'attente
+     * 
+     * @param estS Afficher la version serveur ou client du salon d'attente
+     */
+    public void salonAttente(boolean estS) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                multiRoot.getChildren().remove(formulaireConteneur);
+                
+                VBox attente = new VBox(10);
+                attente.setPadding(new Insets(10));
+                attente.setAlignment(Pos.TOP_CENTER);
+                
+                GridPane formulaireAttente = new GridPane();
+                formulaireAttente.setVgap(10);
+                formulaireAttente.setHgap(10);
+                
+                int row = 0;
+                
+                if (estS) {
+                    Label connecterA = new Label("Adresse : " + adresse + "\nPort : " + port);
+                    formulaireAttente.add(connecterA, 0, row, 4, 1);
+                    row++;
+                }
+                
+                Label modeJeuLabel = new Label("Mode de jeu");
+                formulaireAttente.add(modeJeuLabel, 0, row);
+                ToggleGroup selectionModeJeu = new ToggleGroup();
+                coopButton = new ToggleButton("Coopératif");
+                coopButton.setDisable(!estS);
+                versusButton = new ToggleButton("Compétitif");
+                versusButton.setDisable(!estS);
+                coopButton.setToggleGroup(selectionModeJeu);
+                versusButton.setToggleGroup(selectionModeJeu);
+                
+                if (estS) {
+                    coopButton.setSelected(true);
+                    coopButton.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent t) {
+                            client.getConnexion().envoyerCompetitif(false);
+                        }
+                    });
+
+                    versusButton.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent t) {
+                            client.getConnexion().envoyerCompetitif(true);
+                        }
+                    });
+                }
+                
+                formulaireAttente.add(coopButton, 1, row);
+                formulaireAttente.add(versusButton, 2, row);
+                row++;
+                
+                Label pseudoLabel = new Label("Pseudo");
+                formulaireAttente.add(pseudoLabel, 0, row);
+                TextField pseudo = new TextField();
+                formulaireAttente.add(pseudo, 1, row, 2, 1);
+                Button enregistrerPseudo = new Button("Enregistrer");
+                formulaireAttente.add(enregistrerPseudo, 3, row);
+                row++;
+                
+                Label erreurPseudo = new Label();
+                erreurPseudo.getStyleClass().add("texte-erreur");
+                formulaireAttente.add(erreurPseudo, 0, row, 4, 1);
+                row++;
+                
+                enregistrerPseudo.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent t) {
+                        String p = pseudo.getText();
+                        if (p == null || p.equals("")) {
+                            erreurPseudo.setText("Veuillez saisir votre pseudo");
+                        } else {
+                            erreurPseudo.setText("");
+                            boolean resultat = client.getConnexion().enregistrerJoueur(p);
+                            if (resultat) {
+                                pseudo.setDisable(true);
+                                enregistrerPseudo.setDisable(true);
+                            } else {
+                                erreurPseudo.setText("Pseudo déjà pris, veuillez en saisir un autre");
+                            }
+                        }
+                    }
+                });
+                
+                attente.getChildren().add(formulaireAttente);
+                
+                // TODO : affichage de la liste des joueurs connectés, leur pseudo et s'ils sont prêts
+                
+                multiRoot.setCenter(attente);
+                
+                if (!estS) client.getConnexion().estCompetitif();
+            }
+        });
+    }
+    
+    /**
+     * Actualiser l'affichage du mode de jeu pour les clients
+     * @param versus 
+     */
+    public void actualiserModeJeu(boolean versus) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                coopButton.setSelected(!versus);
+                versusButton.setSelected(versus);
+            }
+        });
+    }
+    
     /**
      * Récupérer le jeu en lien avec l'application
      *
@@ -1065,7 +1482,7 @@ public class FXMLController implements Initializable, Parametres {
         this.stat.setDisable(true);
         timer = new Timer();
         IAThreadApp task = new IAThreadApp(this, 1);
-        timer.schedule(task, 1000, 2000);
+        timer.schedule(task, 1000, 2500);
     }
 
     @FXML
@@ -1131,7 +1548,7 @@ public class FXMLController implements Initializable, Parametres {
         if (!retourUtilise && nbRetour != 0) {
             retour.setDisable(false);
         }
-
+        
         mouvOrdi.setDisable(false);
         this.ia1.setDisable(false);
         this.i3.setDisable(false);

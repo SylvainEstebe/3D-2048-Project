@@ -1,5 +1,7 @@
 package modele;
 
+import ia.IA1;
+import ia.IA2;
 import ia.IA3;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -49,7 +51,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
      * indique s'il existe une version antérieure de ce jeu
      */
     private boolean existePartiePrecedente;
-
+    
     /**
      * Indique si le retour a déjà été utilisé ou non
      */
@@ -62,7 +64,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
     private int directionMouvAleo = 0;
 
     private transient Client client;
-
+    
     /**
      * Option pour indiquer qu'il s'agit d'un jeu multijoueurs (false par
      * défaut)
@@ -77,7 +79,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
      * Détermine si la partie coop est démarrée ou non
      */
     private boolean coopDemarre = false;
-
+    
     /**
      * Détermine si la partie coop est finie ou non
      */
@@ -241,9 +243,8 @@ public class Jeu implements Parametres, Serializable, Runnable {
         return result;
     }
 
-    /**
-     * Méthode qui incrémente les points gagnés au scoreFinal à chaque
-     * déplacement
+    /** 
+     * Méthode qui incrémente les points gagnés au scoreFinal à chaque déplacement
      */
     public void majScore() {
         scoreFinal = grilles.get(0).getScoreG() + grilles.get(1).getScoreG() + grilles.get(2).getScoreG();
@@ -491,8 +492,8 @@ public class Jeu implements Parametres, Serializable, Runnable {
     /**
      * Méthode qui permet de récupérer la direction que réalise l'ordinateur
      * lors du mouvement aléatoire
-     *
-     * @return la direction
+     * 
+     * @return la direction  
      */
     public int getDirectionMouvAleo() {
         return directionMouvAleo;
@@ -582,6 +583,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
     @Override
     public synchronized void run() {
         Scanner sc1 = new Scanner(System.in);
+        int direction = 0;
 
         if (this.existePartiePrecedente) {// si le joueur choisit de terminer une partie précédente
             System.out.println(this);
@@ -592,7 +594,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
             } catch (InterruptedException ex) {
                 Logger.getLogger(Jeu.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
             // Démarrage pour le premier joueur à joueur
             if (!this.coopDemarre) {
                 this.coopDemarre = true;
@@ -628,7 +630,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
                 System.out.println("Taper le numéro d'algo que vous voulez :");
                 System.out.println("1. Algo minmax");
                 System.out.println("2. Algo Monte Carlo");
-                System.out.println("3. Algo Alpha Beta ");
+                System.out.println("3. Algo Alpha Beta");
                 String ia = sc1.next();
                 if (ia.equals("1")) {
                     IA1 ia1 = new IA1(this);
@@ -676,7 +678,6 @@ public class Jeu implements Parametres, Serializable, Runnable {
                     || s.equals("f") || s.equals("niveau inférieur"))) {
                 System.out.println("Vous devez écrire d pour Droite, q pour Gauche, z pour Haut ou s pour Bas, r pour supérieur, f pour inférieur");
             } else {
-                int direction;
                 direction = switch (s) {
                     case "f", "niveau inférieur" ->
                         DESCG;
@@ -709,9 +710,9 @@ public class Jeu implements Parametres, Serializable, Runnable {
                 if (this.multi && this.competitif) {
                     this.client.getConnexion().envoyerScore(this.scoreFinal, this.getValeurMaxJeu());
                 }
-
+                
                 if (this.multi && b2 && !this.competitif && !this.finJeu() && this.getValeurMaxJeu() < OBJECTIF) {
-                    this.client.getConnexion().envoyerJeu();
+                    this.client.getConnexion().envoyerJeu(direction);
                     try {
                         wait();
                     } catch (InterruptedException ex) {
@@ -725,45 +726,45 @@ public class Jeu implements Parametres, Serializable, Runnable {
             if (!this.multi && !this.competitif) {
                 this.victoire();
             }
-
+            
             // Si mode versus, envoi de la notification de victoire
             if (this.multi && this.competitif) {
                 this.client.getConnexion().envoyerVictoireVersus();
             }
-
+            
             // Si mode coop, envoi de la grille finale et de la notification de victoire
             if (this.multi && !this.competitif && !this.coopFini) {
                 System.out.println("Vous avez terminé la partie !!!");
                 this.coopFini = true;
-                this.client.getConnexion().envoyerJeu();
+                this.client.getConnexion().envoyerJeu(direction);
                 this.client.getConnexion().envoyerVictoireCoop();
             }
         } else {
             if (!this.multi && !this.competitif) {
                 this.jeuPerdu();
             }
-
+            
             // Si mode versus, envoi de la notification de défaite
             if (this.multi && this.competitif) {
                 this.client.getConnexion().envoyerDefaiteVersus();
             }
-
+            
             // Si mode coop, envoi de la grille finale et de la notification de défaite
             if (this.multi && !this.competitif && !this.coopFini) {
                 System.out.println("Vous avez perdu...");
-                this.client.getConnexion().envoyerJeu();
+                this.client.getConnexion().envoyerJeu(direction);
                 this.coopFini = true;
                 this.client.getConnexion().envoyerDefaiteCoop();
             }
         }
-
+        
         if (this.multi && !this.competitif) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Jeu.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
             if (this.getValeurMaxJeu() >= OBJECTIF) {
                 System.exit(0);
             } else {
@@ -829,7 +830,6 @@ public class Jeu implements Parametres, Serializable, Runnable {
      * de quiter)
      *
      * @return Jeu l'état des 3 grilles dans la partie précédente
-     *
      */
     public Jeu deserialiser() {
         ObjectInputStream ois = null;
@@ -855,7 +855,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
     }
 
     /**
-     * méthode qui enregistre l'état actuel de la partie
+     * Méthode qui enregistre l'état actuel de la partie
      */
     public void enregistrement() {
         etatsPrecedents.addFirst(this.clone());
@@ -922,15 +922,15 @@ public class Jeu implements Parametres, Serializable, Runnable {
         this.setScoreFinal(etatsPrecedents.get(0).getScoreFinal());
         this.setExistePartiePrecedente(etatsPrecedents.get(0).getExistePartiePrecedente());  //à tester
         etatsPrecedents.remove(0);
-
+        
         // Affichage de la grille après retour en arrière
         System.out.println(this);
     }
 
     /**
      * Actualise le jeu depuis un autre lors d'une partie en coop
-     *
-     * @param j Autre jeu
+     * 
+     * @param j Autre jeu 
      */
     public void actualiserDepuisAutreJeu(Jeu j) {
         this.grilles = j.grilles;
@@ -940,7 +940,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
         this.etatsPrecedents = j.etatsPrecedents;
         this.coopDemarre = j.coopDemarre;
         this.coopFini = j.coopFini;
-
+        
         // Affichage du jeu après actualisation
         System.out.println(this);
     }
@@ -954,9 +954,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
     }
 
     /**
-     * Méthode qui réinitialise le nombre de déplacements pour chaque case du
-     * jeu
-     *
+     * Méthode qui réinitialise le nombre de déplacements pour chaque case du jeu
      */
     public void reinitNbDepl() {
         for (int k = 0; k < TAILLE; k++) {
@@ -969,12 +967,12 @@ public class Jeu implements Parametres, Serializable, Runnable {
             }
         }
     }
-
-    /**
-     * Méthode qui retourne la listes des cases vides pour les 3 grilles
-     *
-     * @return un tableau de cases qui contient toutes les cases vides du jeu.
-     */
+   
+     /**
+      * Méthode qui retourne la listes des cases vides pour les 3 grilles
+      * 
+      * @return un tableau de cases qui contient toutes les cases vides du jeu.
+      */
     public ArrayList<Case> listeCaseVideMultiGrille() {
         ArrayList<Case> listeCaseVideMulti = new ArrayList<>();
         for (int k = 0; k < TAILLE; k++) {
@@ -986,13 +984,14 @@ public class Jeu implements Parametres, Serializable, Runnable {
 
     /**
      * Méthode qui permet d'ajouter une case particulière dans la grille
-     *
+     * 
      * @param c la case à ajouter
      */
     public void ajoutCase(Case c) {
         if (c != null) {
             int type = c.getGrille().getType();
             int index;
+
             if (type == GRILLEH) {
                 index = 0;
             } else if (type == GRILLEM) {
@@ -1006,8 +1005,8 @@ public class Jeu implements Parametres, Serializable, Runnable {
     }
 
     /**
-     * Permet gérer le score pour le jeu multijoueur
-     *
+     * Score utilisé pour les algorithmes d'IA minmax et alphabeta
+     * 
      * @return le score dispersé
      */
     public int scoreDispersion() {
@@ -1060,6 +1059,7 @@ public class Jeu implements Parametres, Serializable, Runnable {
      * @param scoreGeneral : Le score actuel
      * @param nbCasesVides : Le nombre de case vide
      * @param scoreCases : le score de la case
+     * 
      * @return scoreCases : Le score de dispersion
      */
     public static int scoreHeuristique(int scoreGeneral, int nbCasesVides, int scoreCases) {

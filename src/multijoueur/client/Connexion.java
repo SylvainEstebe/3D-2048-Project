@@ -1,5 +1,11 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package multijoueur.client;
 
+import application.FXMLController;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,10 +28,12 @@ import static variables.Parametres.OBJECTIF;
 public class Connexion implements Runnable {
     private Socket socket;
     private Client client;
+    private FXMLController controlleur;
     private BufferedReader in;
     private PrintWriter out;
     private boolean debug = false;
     
+    private boolean competitif = false;
     private boolean pseudoDispo = false;
     private boolean joueursPrets = false;
     private String pseudo;
@@ -34,12 +42,14 @@ public class Connexion implements Runnable {
      * Constructeur
      * 
      * @param s Socket de la connexion entre le serveur et le client
-     * @param c un client du serveur
-     * @throws IOException exception possible quand le socket rencontre un problème
+     * @param c Client associé à la Connexion 
+     * 
+     * @throws IOException Entrée/sortie
      */
     public Connexion(Socket s, Client c) throws IOException {
         this.socket = s;
         this.client = c;
+        this.controlleur = this.client.getControlleur();
         this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
         this.out = new PrintWriter(this.socket.getOutputStream(), true);
     }
@@ -58,7 +68,9 @@ public class Connexion implements Runnable {
                 if (reponse == null) break;
                 
                 /* Routes de base */
-                if (reponse.startsWith(Routes.VERIF_PSEUDO)) { // Vérification du pseudo
+                if (reponse.startsWith(Routes.EST_VERSUS)) { // Changement de mode de jeu
+                    this.setCompetitif(reponse);
+                } else if (reponse.startsWith(Routes.VERIF_PSEUDO)) { // Vérification du pseudo
                     this.setPseudoDispo(reponse);
                 } else if (reponse.startsWith(Routes.JOUEURS_PRETS)) { // Vérification des joueurs prêts
                     this.setJoueursPrets(reponse);
@@ -102,6 +114,33 @@ public class Connexion implements Runnable {
             }
         }
     }
+    
+    /**
+     * Envoie au serveur l'information du mode de jeu choisi par l'hôte
+     * 
+     * @param c Compétitif ou non 
+     */
+    public void envoyerCompetitif(boolean c) {
+        if (this.client.estServeur()) this.out.println(Routes.EST_VERSUS + " " + c);
+    }
+    
+    /**
+     * Gestion d'un changement par l'hôte
+     * 
+     * @param data Données du serveur 
+     */
+    private void setCompetitif(String data) {
+        this.competitif = data.equals(Routes.EST_VERSUS + " true");
+        if (this.controlleur != null) this.controlleur.actualiserModeJeu(this.competitif);
+    }
+    
+    /**
+     * Demande au serveur si le jeu est compétitif ou non
+     * 
+     */
+    public void estCompetitif() {
+        this.out.println(Routes.EST_VERSUS);
+    };
     
     /**
      * Définit la disponibilité du pseudo
@@ -310,10 +349,12 @@ public class Connexion implements Runnable {
     
     /**
      * Envoi le jeu sérialisé au serveur
+     * 
+     * @param direction direction du mouvement réalisé par le joueur
      */
-    public void envoyerJeu() {
+    public void envoyerJeu(int direction) {
         try {
-            this.out.println(Routes.ENVOYER_JEU + " " + SerializeToString.toString(this.client.getJeu()));
+            this.out.println(Routes.ENVOYER_JEU + " " + direction + "#" + SerializeToString.toString(this.client.getJeu()));
         } catch (IOException ex) {
             Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -322,11 +363,13 @@ public class Connexion implements Runnable {
     /**
      * Actualise le jeu à partir du jeu envoyé par un autre joueur
      * 
-     * @param j Jeu recu par un autre joueur
+     * @param data Données envoyées par le serveur (joueur#classement)
      */
-    private void jeuRecu(String j) {
+    private void jeuRecu(String data) {
         try {
-            Jeu jeu = (Jeu) SerializeToString.fromString(j);
+            int splitter = data.indexOf("#");
+            int direction = Integer.parseInt(data.substring(0, splitter));
+            Jeu jeu = (Jeu) SerializeToString.fromString(data.substring(splitter + 1));
             this.client.getJeu().actualiserDepuisAutreJeu(jeu);
         } catch (IOException ex) {
             Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
@@ -389,7 +432,7 @@ public class Connexion implements Runnable {
     /**
      * Setter pour le débuggage (affichage de réponses recues)
      * 
-     * @param d booléen qui lance le débuggage
+     * @param d Active ou non le débuggage
      */
     public void setDebug(boolean d) {
         this.debug = d;

@@ -73,9 +73,9 @@ public class Grille implements Parametres, Serializable {
     /**
      * Méthode qui affiche la grille dans le terminal.
      *
-     * 
      * @return La grille sous forme de String
      */
+    @Override
     public String toString() {
         String result = "";
         for (int i = 0; i < TAILLE; i++) {
@@ -180,8 +180,6 @@ public class Grille implements Parametres, Serializable {
      * grille
      *
      * @param c la case qu'on fusionne
-     * @param voisin la case voisine avec laquelle on fusionne
-     * @return un booléen qui indique si la fusion a marché
      */
     public boolean fusion(Case c, Case voisin) {
         boolean fusion = false;
@@ -418,6 +416,7 @@ public class Grille implements Parametres, Serializable {
      * Méthode qui clone une grille
      *
      * @param j le jeu associé à la grille
+     * 
      * @return La grille copie
      */
     public Grille clone(Jeu j) {
@@ -426,6 +425,7 @@ public class Grille implements Parametres, Serializable {
 
     /**
      * Permet de récupérer toutes les cases vides d'une grille
+     * 
      * @return un tableau de cases vides
      */
     public ArrayList<Case> getListeCaseVide() {

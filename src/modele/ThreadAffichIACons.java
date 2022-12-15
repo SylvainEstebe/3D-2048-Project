@@ -26,9 +26,9 @@ public class ThreadAffichIACons extends Thread implements Parametres{
         String s=sc1.next();
         s = s.toLowerCase();
         boolean est_stoppe=false;
-        while (!est_stoppe){
+        while (!est_stoppe) {
             s=sc1.next();
-            if(s.equals("s")){
+            if (s.equals("s")) {
                 est_stoppe=true; 
             }
         }

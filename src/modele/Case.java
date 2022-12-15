@@ -79,6 +79,7 @@ public class Case implements Parametres, Serializable {
 
     /**
      * Permet de récupérer la valeur qu'avait précédemment la case
+     * 
      * @return la valeur précédente
      */
     public int getValAv() {
@@ -87,6 +88,7 @@ public class Case implements Parametres, Serializable {
 
     /**
      * Méthode qui permet de modifier la valeur précédente de la case
+     * 
      * @param i la nouvelle valeur pour la valeur de la case précédente
      */
     public void setValAv(int i) {
@@ -272,11 +274,11 @@ public class Case implements Parametres, Serializable {
         return null;
     }
 
-    /**
+   /**
      * Méthode qui permet d'afficher la case
      *
      * 
-     * @return Un string reprÃ©sentant la case dans la console
+     * @return Un string repésentant la case dans la console
      */
     public String toString() {
         return "Case(" + this.x + "," + this.y + "," + this.valeur + ")";

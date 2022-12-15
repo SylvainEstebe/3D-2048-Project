@@ -1,8 +1,14 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package multijoueur.client;
 
 import java.io.IOException;
 import java.net.Socket;
 
+import application.FXMLController;
 import modele.Jeu;
 
 /**
@@ -19,6 +25,7 @@ public class Client implements Runnable {
     private boolean estServeur;
     private Socket socket;
     private Connexion connexion;
+    private FXMLController controlleur;
     
     /**
      * Constructeur
@@ -26,11 +33,24 @@ public class Client implements Runnable {
      * @param a Adresse du serveur auquel se connecter
      * @param p Port du serveur auquel se connecter
      * @param estS Client hôte ou non
+     * @param c Controlleur
      */
-    public Client(String a, int p, boolean estS) {
+    public Client(String a, int p, boolean estS, FXMLController c) {
         this.ADDRESSE = a;
         this.PORT = p;
         this.estServeur = estS;
+        this.controlleur = c;
+    }
+    
+    /**
+     * Surcharge pour créer un client sans controlleur (version console)
+     * 
+     * @param a Adresse du serveur auquel se connecter
+     * @param p Port du serveur auquel se connecter
+     * @param estS Client hôte ou non
+     */
+    public Client (String a, int p, boolean estS) {
+        this(a, p, estS, null);
     }
 
     @Override
@@ -48,8 +68,12 @@ public class Client implements Runnable {
             
             // Lancement de l'écoute
             new Thread(this.connexion).start();
+            
+            // Actualisation de l'interface
+            if (this.controlleur != null) this.controlleur.salonAttente(this.estServeur);
         } catch (IOException ex) {
             if (this.debug) System.out.println("[CLIENT] Connexion au serveur impossible");
+            if (this.controlleur != null) this.controlleur.connexionClientErreur("Impossible de se connecter au serveur,\nvérifiez l'adresse et le port");
             this.erreur = true;
         }
     }
@@ -57,7 +81,7 @@ public class Client implements Runnable {
     /**
      * Fermeture du client
      * 
-     * @throws IOException exception possible quand le socket ne se ferme pas
+     * @throws IOException Entrée/sortie
      */
     protected void closeClient() throws IOException {
         this.socket.close();
@@ -66,7 +90,7 @@ public class Client implements Runnable {
     /**
      * Setter pour le débuggage (affichage de réponses recues)
      * 
-     * @param d un booléen qui permet de savoir si le débuggage a fonctionné 
+     * @param d Active ou non le débuggage
      */
     public void setDebug(boolean d) {
         this.debug = d;
@@ -115,6 +139,15 @@ public class Client implements Runnable {
      */
     public Connexion getConnexion() {
         return this.connexion;
+    }
+    
+    /**
+     * Getetr du controlleur
+     * 
+     * @return Controlleur
+     */
+    protected FXMLController getControlleur() {
+        return this.controlleur;
     }
     
     /**

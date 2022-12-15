@@ -11,8 +11,8 @@ import java.util.ArrayList;
 /**
  * Classe utilisée pour établir une connexion avec la base de
  * données, interroger la base et insérer de nouveaux tuples dans la base
- * @author Sylvain 
  * 
+ * @author Sylvain 
  */
 public class ConnexionBDD {
 

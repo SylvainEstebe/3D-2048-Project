@@ -22,7 +22,7 @@ import variables.Parametres;
 public class Main implements Parametres {
 
     public static void main(String[] args) {
-         boolean multi = false;
+        boolean multi = false;
         boolean estServeur = false;
         
         Scanner sc = new Scanner(System.in);
@@ -59,7 +59,7 @@ public class Main implements Parametres {
                 // serveur.setDebug(true);
                 new Thread(serveur).start();
                 
-                // Attente d'une seconde pour que le serveur ait le temps de se lancer (trouver autre chose de mieux)
+                // Attente d'une seconde pour que le serveur ait le temps de se lancer
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
@@ -219,6 +219,7 @@ public class Main implements Parametres {
                 }
             } else { // Lancement d'une nouvelle partie en l'absence d'une sauvegarde
                 Jeu j = new Jeu();
+
                 new Thread(j).start();
             }
         }

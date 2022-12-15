@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Serveur de jeu pour le jeu multijoueur
+ * Serveur de jeu
  *
  * @author Manon
  */
@@ -66,6 +66,35 @@ public class Serveur implements Runnable {
     }
     
     /**
+     * Détermine si le serveur est attaché à une adresse ou non
+     * 
+     * @return 
+     */
+    public boolean isBound() {
+        return this.serveur.isBound();
+    }
+    
+    /**
+     * Détermine si le serveur est fermé ou non
+     * 
+     * @return 
+     */
+    public boolean isClosed() {
+        return this.serveur.isClosed();
+    }
+    
+    /**
+     * Ferme le serveur
+     */
+    public void close() {
+        try {
+            this.serveur.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Serveur.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    /**
      * Getter de l'hôte
      * 
      * @return Hôte du serveur (adresse IP)
@@ -93,7 +122,7 @@ public class Serveur implements Runnable {
     /**
      * Setter pour le débuggage (affichage de requêtes recus)
      * 
-     * @param d un booléen qui permet le débuggage
+     * @param d Active ou non le débuggage
      */
     public void setDebug(boolean d) {
         this.debug = d;

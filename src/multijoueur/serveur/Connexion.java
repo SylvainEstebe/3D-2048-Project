@@ -63,7 +63,11 @@ public class Connexion implements Runnable {
                 if (requete == null) break;
                 
                 /* Routes de base */
-                if (requete.startsWith(Routes.CHAT)) { // Message
+                if (requete.equals(Routes.EST_VERSUS)) { // Demande du mode de jeu
+                    this.estCompetitif();
+                } if (requete.startsWith(Routes.EST_VERSUS)) { // Changement de mode de jeu
+                    this.setCompetitif(requete);
+                } else if (requete.startsWith(Routes.CHAT)) { // Message
                     this.envoyerATous(this.escapeRequest(requete));
                 } else if (requete.startsWith(Routes.VERIF_PSEUDO)) { // Vérification disponibilité pseudo
                     this.pseudoDispo(this.escapeRequest(requete));
@@ -118,6 +122,23 @@ public class Connexion implements Runnable {
                 client.out.println(message);
             }
         }
+    }
+    
+    /**
+     * Demande du mode de jeu par un client
+     */
+    private void estCompetitif() {
+        this.out.println(Routes.EST_VERSUS + " " + this.serveur.estCompetitif());
+    }
+    
+    /**
+     * Actualise le mode de jeu et transmet l'information autres joueurs
+     * 
+     * @param data 
+     */
+    private void setCompetitif(String data) {
+        this.serveur.setCompetitif(data.equals(Routes.EST_VERSUS + " true"));
+        this.envoyerATous(data);
     }
     
     /**
@@ -270,7 +291,7 @@ public class Connexion implements Runnable {
     /**
      * Setter pour le débuggage (affichage de requêtes recus)
      * 
-     * @param d un booléen qui permet le débuggage
+     * @param d Active ou non le débuggage
      */
     public void setDebug(boolean d) {
         this.debug = d;

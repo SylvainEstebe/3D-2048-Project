@@ -21,8 +21,8 @@ public final class SerializeToString {
      * 
      * @return Objet désérialisé
      * 
-     * @throws IOException exception générale
-     * @throws ClassNotFoundException si la classe n'est pas trouvée
+     * @throws IOException Entrée/sortie
+     * @throws ClassNotFoundException Classe non trouvé
      */
     public static Object fromString(String s) throws IOException, ClassNotFoundException {
         byte [] data = Base64.getDecoder().decode(s);
@@ -39,7 +39,7 @@ public final class SerializeToString {
      * 
      * @return Chaîne de caractères
      * 
-     * @throws IOException en cas d'exception générale
+     * @throws IOException Entrée/sortie
      */
     public static String toString(Serializable o) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
