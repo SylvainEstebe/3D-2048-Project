@@ -152,12 +152,12 @@ public class IA3 implements Parametres {
                     this.jeu.majScore();
                     Map<String, Object> currentResult = alphabeta(nouveauJeu, (profondeur - 1), alpha, beta, joueur);
                     int scoreActuelle = ((Number) currentResult.get("Score")).intValue();
-                    if (scoreActuelle > alpha) { //maximize score
+                    if (scoreActuelle > alpha) { 
                         alpha = scoreActuelle;
                         meilleurDirection = directions.get(i);
                     }
                     if (beta <= alpha) {
-                        break; //beta cutoff
+                        break; //coupe
                     }
                 }
 
@@ -181,7 +181,7 @@ public class IA3 implements Parametres {
                     this.jeu.majScore();
                     Map<String, Object> currentResult = alphabeta(nouveauJeu, profondeur - 1, alpha, beta, joueur);
                     int currentScore = ((Number) currentResult.get("Score")).intValue();
-                    if (currentScore < beta) { //minimize best score
+                    if (currentScore < beta) { 
                         beta = currentScore;
                         meilleurCase = casesVides.get(i);
                         meilleurCase.setValeur(valeurCase);
@@ -189,7 +189,7 @@ public class IA3 implements Parametres {
                     }
 
                     if (beta <= alpha) {
-                        break; //alpha cutoff
+                        break; // coupe 
                     }
                 }
             }
