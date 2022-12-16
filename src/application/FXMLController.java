@@ -96,10 +96,10 @@ public class FXMLController implements Initializable, Parametres {
     private GridPane grilleM;
     @FXML
     private Pane instructionJeu;
+    private Pane tuile;
+    private Pane case8;
     @FXML
-    private Pane tuile, case8, case2, case32;
-    @FXML
-    private Label valTuile;
+    private Pane case2, case32;
     @FXML
     private GridPane grilleB;
     @FXML
@@ -149,8 +149,6 @@ public class FXMLController implements Initializable, Parametres {
     @FXML
     private Label score;
     @FXML
-    private Button boutonBDD;
-    @FXML
     private Button retour;
 
     int compteMouv;
@@ -162,8 +160,6 @@ public class FXMLController implements Initializable, Parametres {
     private ImageView haut;
     @FXML
     private ImageView bas;
-    @FXML
-    private ImageView droite;
     @FXML
     private ImageView descendre;
     @FXML
@@ -278,6 +274,8 @@ public class FXMLController implements Initializable, Parametres {
      * Bouton de mode de jeu compétitif
      */
     private ToggleButton versusButton;
+    @FXML
+    private ImageView gauche1;
 
     /**
      * Permet d'initialiser le contrôleur
@@ -814,7 +812,7 @@ public class FXMLController implements Initializable, Parametres {
         fenetre_aide.setTitle("VICTOIRE");
         BorderPane root = new BorderPane();
         root.getStyleClass().add("pane");
-        // enregistrementBDD();
+         enregistrementBDD();
         Label victoire = new Label("Félicitations, vous avez gagné!");
         Label scoreAff = new Label("Votre score : " + jeuAppli.getScoreFinal());
         victoire.getStyleClass().add("text_horsjeu");
@@ -868,8 +866,7 @@ public class FXMLController implements Initializable, Parametres {
      * du score, du nombre de déplacement du Joueur.
      *
      */
-    @FXML
-    private void enregistrementBDD(MouseEvent event) {
+    private void enregistrementBDD() {
         // Récupération du temps de jeux et conversion en seconde 
         long chrono2 = java.lang.System.currentTimeMillis();
         long timeSpentPlaying = (chrono2 - chronos) / 1000;
