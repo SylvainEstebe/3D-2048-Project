@@ -23,24 +23,6 @@ public class IAThreadApp extends TimerTask {
         this.algo = algo;
     }
 
-    /* public long scheduledExecutionTime() {
-        long chronos = java.lang.System.currentTimeMillis();
-
-        try {
-            int direction;
-            boolean b2;
-            IA1 ia1 = new IA1(controleur.getJeuAppli());
-            int profondeur = 5;
-            direction = ia1.meilleurMouvement(controleur.getJeuAppli(), profondeur);
-            Case nouvelleCase = ia1.meilleurCase(controleur.getJeuAppli(), profondeur);
-            b2 = controleur.getJeuAppli().deplacerCases3G(direction);
-            chronos = java.lang.System.currentTimeMillis() - chronos;
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(IAThreadApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return chronos;
-    }
-     */
     @Override
     public void run() {
 
@@ -51,10 +33,9 @@ public class IAThreadApp extends TimerTask {
             IA2 ai_algo2 = new IA2(controleur.getJeuAppli());
             direction = ai_algo2.choixMouvIA2();
             b2 = controleur.getJeuAppli().deplacerCases3G(direction);
-            controleur.deplacementThread(direction, b2, false);
+            controleur.deplacementThread(direction, b2, algo);
 
-        } else if (algo == 1 || algo
-                == 3) {
+        } else if (algo == 1 || algo == 3) {
             IA1 ia1 = new IA1(controleur.getJeuAppli());
             int profondeur = 5;
             try {
@@ -62,7 +43,7 @@ public class IAThreadApp extends TimerTask {
                 direction = ia1.meilleurMouvement(controleur.getJeuAppli(), profondeur);
                 Case nouvelleCase = ia1.meilleurCase(controleur.getJeuAppli(), profondeur);
                 b2 = controleur.getJeuAppli().deplacerCases3G(direction);
-                controleur.deplacementThread(direction, b2, true);
+                controleur.deplacementThread(direction, b2, algo);
                 controleur.getJeuAppli().ajoutCase(nouvelleCase);
 
             } catch (CloneNotSupportedException ex) {
@@ -73,8 +54,7 @@ public class IAThreadApp extends TimerTask {
 
         }
 
-        if (controleur.getJeuAppli()
-                .finJeu()) {
+        if (controleur.getJeuAppli().finJeu()) {
             if (controleur.getJeuAppli().getValeurMaxJeu() >= OBJECTIF) {
                 controleur.victoireAppli();
             } else {

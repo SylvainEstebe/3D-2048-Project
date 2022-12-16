@@ -49,10 +49,10 @@ public class DeplacementTask extends Task<Void> implements Parametres {
      * Le contrôleur relié à la case
      */
     private FXMLController controleur;
+
     /**
      * La mode d'affichage pour l'ia
      */
-
 
     /**
      * Constructeur du thread
@@ -97,6 +97,7 @@ public class DeplacementTask extends Task<Void> implements Parametres {
     /**
      * Réalise le déplacement dynamique de la case et fait la mise à jour de son
      * déplacement.
+     *
      * @throws Exception exception générale.
      */
     protected Void call() throws Exception {

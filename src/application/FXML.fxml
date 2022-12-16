@@ -41,9 +41,9 @@
                 <Menu mnemonicParsing="false" text="Mode">
                   <items>
                     <MenuItem fx:id="multijoueur" mnemonicParsing="false" onAction="#multi" text="multijoueur" />
-                        <MenuItem fx:id="ia1" disable="true" mnemonicParsing="false" onAction="#ia1" text="IA 1" />
+                        <MenuItem fx:id="ia1" mnemonicParsing="false" onAction="#ia1" text="IA 1" />
                         <MenuItem fx:id="i2" mnemonicParsing="false" onAction="#ia2" text="IA 2" />
-                        <MenuItem fx:id="i3" disable="true" mnemonicParsing="false" onAction="#ia3" text="IA 3" />
+                        <MenuItem fx:id="i3" mnemonicParsing="false" onAction="#ia3" text="IA 3" />
                         <MenuItem fx:id="stat" mnemonicParsing="false" onAction="#afficheStat" text="Afficher les statistiques" />
                   </items>
                 </Menu>

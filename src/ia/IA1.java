@@ -32,6 +32,7 @@ public class IA1 {
 
     /**
      * Constructeur de l'IA
+     *
      * @param j jeu associé à l'IA
      */
     public IA1(Jeu j) {
@@ -69,11 +70,15 @@ public class IA1 {
                     arreter = true;
                 }
                 i++;
-                if(jeu.finJeu() || i==total){
+                if (i == total) {
                     jeu.jeuPerdu();
                 }
-                if(jeu.getValeurMaxJeu()>=OBJECTIF){
-                   jeu.victoire();
+                if (jeu.finJeu()) {
+                    if (jeu.getValeurMaxJeu() >= OBJECTIF) {
+                        jeu.jeuPerdu();
+                    } else {
+                        jeu.victoire();
+                    }
                 }
             }
         } catch (CloneNotSupportedException ex) {
@@ -81,7 +86,8 @@ public class IA1 {
         }
 
     }
-/**
+
+    /**
      * Méthode qui cherche le meilleur mouvement à faire (associé à max)
      *
      * @param jeu l'état du jeu actuel
@@ -106,9 +112,12 @@ public class IA1 {
         Map<String, Object> result = this.minimax(jeu, profondeur, joueur2);
         return (Case) result.get("Case");
     }
-/**
-     * Algorithme min-max      *
-     * @param Jeu 
+
+    /**
+     * Algorithme min-max
+     *
+     *
+     * @param Jeu
      * @param profondeur
      * @param joueur
      * @return alphabeta
@@ -134,13 +143,13 @@ public class IA1 {
                 for (int i = 0; i < directions.size(); i++) {
                     Jeu nouveauJeu = jeu.clone();
                     boolean b = nouveauJeu.deplacerCases3G(directions.get(i));
-                    if (b == false && nouveauJeu.equals(jeu)) {
+                    if (b == false || nouveauJeu.equals(jeu)) {
                         continue;
                     }
                     this.jeu.majScore();
                     Map<String, Object> currentResult = minimax(nouveauJeu, (profondeur - 1), joueur);
                     int scoreActuelle = ((Number) currentResult.get("Score")).intValue();
-                    if (scoreActuelle > meilleurScore) { 
+                    if (scoreActuelle > meilleurScore) {
                         meilleurScore = scoreActuelle;
                         meilleurDirection = directions.get(i);
                     }
@@ -165,7 +174,7 @@ public class IA1 {
                     this.jeu.majScore();
                     Map<String, Object> currentResult = minimax(nouveauJeu, profondeur - 1, joueur);
                     int currentScore = ((Number) currentResult.get("Score")).intValue();
-                    if (currentScore < meilleurScore) { 
+                    if (currentScore < meilleurScore) {
                         meilleurScore = currentScore;
                         meilleurCase = casesVides.get(i);
                         meilleurCase.setValeur(valeurCase);

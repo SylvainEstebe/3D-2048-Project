@@ -74,12 +74,15 @@ public class IA3 implements Parametres {
                     arreter = true;
                 }
                 i++;
-
-                if (jeu.finJeu() || i == total) {
+                if (i == total) {
                     jeu.jeuPerdu();
                 }
-                if (jeu.getValeurMaxJeu() >= OBJECTIF) {
-                    jeu.victoire();
+                if (jeu.finJeu()) {
+                    if (jeu.getValeurMaxJeu() >= OBJECTIF) {
+                        jeu.jeuPerdu();
+                    } else {
+                        jeu.victoire();
+                    }
                 }
             }
         } catch (CloneNotSupportedException ex) {
@@ -153,7 +156,7 @@ public class IA3 implements Parametres {
                 for (int i = 0; i < directions.size(); i++) {
                     Jeu nouveauJeu = (Jeu) jeu.clone();
                     boolean b = nouveauJeu.deplacerCases3G(directions.get(i));
-                    if (b == false && nouveauJeu.equals(jeu)) {
+                    if (b == false || nouveauJeu.equals(jeu)) {
                         continue;
                     }
                     this.jeu.majScore();
