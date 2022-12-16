@@ -51,10 +51,6 @@ public class DeplacementTask extends Task<Void> implements Parametres {
     private FXMLController controleur;
 
     /**
-     * La mode d'affichage pour l'ia
-     */
-
-    /**
      * Constructeur du thread
      *
      * @param x abscisse de la case
@@ -63,7 +59,6 @@ public class DeplacementTask extends Task<Void> implements Parametres {
      * @param caseABougeGraph le pane à déplacer correspondant à la case
      * @param d la direction dans laquelle doit aller la case
      * @param c le controleur relié à la case
-     * @param i un booléen qui indique si on peut ajouter des cases pour l'IA.
      */
     public DeplacementTask(int x, int y, int deplobj, Pane caseABougeGraph, int d, FXMLController c) {
         this.x = x;

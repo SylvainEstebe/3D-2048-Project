@@ -1,6 +1,6 @@
 package application;
 
-import ia.IA1;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
@@ -305,6 +305,9 @@ public class FXMLController implements Initializable, Parametres {
 
             }
         }
+        i2.setDisable(true);
+        i3.setDisable(true);
+        ia1.setDisable(true);
     }
 
     /**
@@ -327,10 +330,10 @@ public class FXMLController implements Initializable, Parametres {
         mouvOrdi.setDisable(false);
         nbRetour = 0;
         retourUtilise = false;
-        tuile.setVisible(false);
-        case8.setVisible(false);
-        case2.setVisible(false);
-        case32.setVisible(false);
+        i2.setDisable(false);
+        i3.setDisable(false);
+        ia1.setDisable(false);
+    
     }
 
     /**
@@ -550,7 +553,10 @@ public class FXMLController implements Initializable, Parametres {
         help.setVisible(true);
         help.setDisable(false);
         instructionJeu.setVisible(false);
-        majGrillesApp();
+        if(eltsGrilles!=null){
+            majGrillesApp();
+        }
+        
     }
 
     @FXML
@@ -566,7 +572,9 @@ public class FXMLController implements Initializable, Parametres {
         help.setVisible(true);
         help.setDisable(false);
         instructionJeu.setVisible(false);
-        majGrillesApp();
+        if(eltsGrilles!=null){
+            majGrillesApp();
+        }
 
     }
 
@@ -584,7 +592,9 @@ public class FXMLController implements Initializable, Parametres {
         this.classique.setDisable(false);
         instructionJeu.setVisible(true);
         help.setVisible(false);
-        majGrillesApp();
+        if(eltsGrilles!=null){
+            majGrillesApp();
+        }
 
     }
 
@@ -1040,7 +1050,6 @@ public class FXMLController implements Initializable, Parametres {
                 d.setFin(doneSignal);
                 Thread th = new Thread(deplacementCases.get(i)); // on crée un contrôleur de Thread
                 threadDepl.add(th);
-                System.out.println("hhj");
                 th.setDaemon(true); // le Thread s'exécutera en arrière-plan (démon informatique)
                 th.start();
 
@@ -1468,10 +1477,6 @@ public class FXMLController implements Initializable, Parametres {
             this.majGrillesApp();
             nbRetour = 0;
             retourUtilise = false;
-            tuile.setVisible(false);
-            case8.setVisible(false);
-            case2.setVisible(false);
-            case32.setVisible(false);
         }
         retour.setDisable(true);
         stopIA.setDisable(false);
@@ -1498,10 +1503,6 @@ public class FXMLController implements Initializable, Parametres {
             this.majGrillesApp();
             nbRetour = 0;
             retourUtilise = false;
-            tuile.setVisible(false);
-            case8.setVisible(false);
-            case2.setVisible(false);
-            case32.setVisible(false);
         }
         retour.setDisable(true);
         stopIA.setDisable(false);
@@ -1526,10 +1527,7 @@ public class FXMLController implements Initializable, Parametres {
             this.majGrillesApp();
             nbRetour = 0;
             retourUtilise = false;
-            tuile.setVisible(false);
-            case8.setVisible(false);
-            case2.setVisible(false);
-            case32.setVisible(false);
+
         }
         retour.setDisable(true);
         stopIA.setDisable(false);

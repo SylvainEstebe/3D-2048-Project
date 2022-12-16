@@ -180,6 +180,8 @@ public class Grille implements Parametres, Serializable {
      * grille
      *
      * @param c la case qu'on fusionne
+     * @param voisin la case voisine avec laquelle on fusionne
+     * @return un booléen qui se charge d'indiquer si la fusion s'est bien faite
      */
     public boolean fusion(Case c, Case voisin) {
         boolean fusion = false;
