@@ -53,7 +53,7 @@ import javafx.stage.Stage;
 
 import modele.Case;
 import modele.Jeu;
-import modele.Main;
+import modele.MainConsole;
 import modele.Personne;
 import static modele.Personne.recupPersonne;
 import multijoueur.client.Client;
@@ -1205,7 +1205,7 @@ public class FXMLController implements Initializable, Parametres {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MainConsole.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             this.adresse = this.serveur.getHost();
@@ -1379,7 +1379,7 @@ public class FXMLController implements Initializable, Parametres {
     /**
      * Actualiser l'affichage du mode de jeu pour les clients
      *
-     * @param versus
+     * @param versus permet de savoir si on est en mode compétitif ou coopératif
      */
     public void actualiserModeJeu(boolean versus) {
         Platform.runLater(new Runnable() {

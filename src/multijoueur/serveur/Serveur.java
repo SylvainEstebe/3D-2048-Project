@@ -68,7 +68,7 @@ public class Serveur implements Runnable {
     /**
      * Détermine si le serveur est attaché à une adresse ou non
      * 
-     * @return 
+     * @return un booléen qui indique si le serveur est attaché ou non à une adresse.
      */
     public boolean isBound() {
         return this.serveur.isBound();
@@ -77,7 +77,7 @@ public class Serveur implements Runnable {
     /**
      * Détermine si le serveur est fermé ou non
      * 
-     * @return 
+     * @return un booléen qui indique si le serveur est fermé ou non.
      */
     public boolean isClosed() {
         return this.serveur.isClosed();
