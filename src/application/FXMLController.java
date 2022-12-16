@@ -1488,7 +1488,7 @@ public class FXMLController implements Initializable, Parametres {
         this.stat.setDisable(true);
         timer = new Timer();
         IAThreadApp task = new IAThreadApp(this, 1);
-        timer.schedule(task, 1000, 1500);
+        timer.schedule(task, 1000, 2000);
     }
 
     @FXML
@@ -1538,7 +1538,7 @@ public class FXMLController implements Initializable, Parametres {
         this.i2.setDisable(true);
         this.stat.setDisable(true);
         timer = new Timer();
-        timer.schedule(new IAThreadApp(this, 3), 1000, 1500);
+        timer.schedule(new IAThreadApp(this, 3), 1000, 2000);
     }
 
     @FXML
