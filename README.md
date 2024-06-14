@@ -1,9 +1,7 @@
-# Projet2048_Berdoll_Estebe_Worm_Jegham
+# 3D 2048 Project
 
+This project was developed as part of the Software Engineering course in the third year of the MIASHS Cognitive Science program.
 
+It features a 3D version of the 2048 game, playable both via a graphical interface and a console. 
 
-PROJET 2048 3D, Licence 3 MIASHS Parcours Sciences Cognitives, Ingénierie logicielle.
-
-Projet réalisé dans le cadre du cours d'ingénierie logicielle. Il s'agit du jeu 2048 3D qui peut se jouer en interface graphique ou sur console.
-Les auteurs de ce projet sont : Manon BERDOLL, Sylvain ESTEBE, Mouna JEGHAM et Alexanne WORM.
-
+The contributor of this project are Manon Berdoll, Sylvain Estebe, Mouna Jegham, and Alexanne Worm.
